@@ -24,6 +24,7 @@ import { parseSqliteOrMockSchema, generateMermaidErd } from "./tools/db.js";
 import { auditAssets, checkPerformanceHeaders } from "./tools/perf.js";
 import { fetchCodeforcesProblem } from "./tools/problem.js";
 import { generateCiWorkflow } from "./tools/ci.js";
+import { installSkills } from "./tools/skills.js";
 import { runCli } from "./cli/index.js";
 
 const SERVER_VERSION = "2.2.0";
@@ -521,6 +522,22 @@ export function createServer(enabledModules: Set<string> = getEnabledModules()):
       });
     }
 
+
+    // 🧠 Skills Module
+    if (enabledModules.has("skills") || enabledModules.has("doctor") || enabledModules.has("all")) {
+      allTools.push({
+        name: "skills_install",
+        description: "Installs official MCS agent skills (algo-stress-testing, repo-doctor, db-architect, security-auditor) into local repository (.agents/skills/ or .cursor/rules/)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            targetDir: { type: "string", description: "Target repository root directory (defaults to cwd)" },
+            format: { type: "string", enum: ["agents", "cursor"], description: "Skill target format (default: agents)" },
+          },
+        },
+      });
+    }
+
     // 🤖 CI Module
     if (enabledModules.has("ci")) {
       allTools.push({
@@ -702,6 +719,16 @@ export function createServer(enabledModules: Set<string> = getEnabledModules()):
       if (name === "problem_fetch_codeforces") {
         const problem = await fetchCodeforcesProblem(String(args?.contestId || ""), args?.index as string);
         return { content: [{ type: "text", text: JSON.stringify(problem, null, 2) }] };
+      }
+
+
+      // 🧠 Skills
+      if (name === "skills_install") {
+        const res = installSkills(
+          (args?.targetDir as string) || process.cwd(),
+          (args?.format as "agents" | "cursor") || "agents"
+        );
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
       }
 
       // 🤖 CI

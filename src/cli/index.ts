@@ -1,11 +1,16 @@
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
+import { fileURLToPath } from "url";
 import { diagnoseProject, checkEnvSync, inspectPorts } from "../tools/doctor.js";
 import { scanSecrets } from "../tools/security.js";
 import { parseSqliteOrMockSchema, generateMermaidErd } from "../tools/db.js";
 import { auditAssets } from "../tools/perf.js";
 import { startUiServer } from "../ui/server.js";
+import { installSkills } from "../tools/skills.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export async function runCli(args: string[]): Promise<boolean> {
   const command = args[0]?.toLowerCase();
@@ -121,7 +126,19 @@ export async function runCli(args: string[]): Promise<boolean> {
     return true;
   }
 
-  // 7. `mcs inspector`
+  // 7. `mcs skills [install]`
+  if (command === "skills" || command === "skill") {
+    const format = args.includes("--cursor") ? "cursor" : "agents";
+    console.log(`\n🧠 Installing MCS AI Agent Skills (${format} format)...\n`);
+    const result = installSkills(process.cwd(), format);
+    result.installed.forEach((s) => {
+      console.log(`   ✔ Installed skill [${s.name}] -> ${s.destination}`);
+    });
+    console.log(`\n✨ Successfully installed ${result.totalCount} agent skills into ${result.targetDir}\n`);
+    return true;
+  }
+
+  // 8. `mcs inspector`
   if (command === "inspector" || command === "inspect") {
     console.log("\n🔍 Launching Official Model Context Protocol Inspector...\n");
     const indexPath = path.join(__dirname, "../index.js");
@@ -138,6 +155,7 @@ export async function runCli(args: string[]): Promise<boolean> {
   console.log("  mcs scan               Scan codebase for leaked secrets & API keys");
   console.log("  mcs erd <schema.sql>   Generate Mermaid ERD from SQL file");
   console.log("  mcs perf               Audit image asset compression");
+  console.log("  mcs skills install     Install agent skills into .agents/skills/ or .cursor/rules/");
   console.log("  mcs inspector          Launch official MCP web inspector");
   console.log("\nMCP Server Mode (Default for Cursor/Claude/Antigravity):");
   console.log("  mcs                    Start MCP stdio protocol server\n");
