@@ -3,31 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCS | Let's build from here</title>
+  <title>MCS | IEEE CS Model Context & Skills Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0d1117;
-      --bg-darker: #010409;
-      --bg-card: #161b22;
-      --bg-card-hover: #1c2128;
-      --border: #30363d;
-      --border-muted: #21262d;
-      --border-accent: rgba(255, 208, 0, 0.4);
+      --bg: #09090b;
+      --bg-surface: #111115;
+      --border: #222228;
+      --border-hover: #33333f;
       --yellow: #ffd000;
-      --yellow-bright: #ffdf40;
-      --yellow-glow: rgba(255, 208, 0, 0.15);
-      --purple: #8957e5;
-      --purple-hover: #9e6ff5;
-      --green: #238636;
-      --green-glow: #2ea043;
-      --text: #f0f6fc;
-      --text-muted: #8b949e;
-      --text-dim: #484f58;
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', SFMono-Regular, Consolas, monospace;
+      --yellow-hover: #e6bc00;
+      --yellow-dim: rgba(255, 208, 0, 0.12);
+      --yellow-border: rgba(255, 208, 0, 0.25);
+      --text: #ffffff;
+      --text-muted: #9999a3;
+      --text-dim: #555562;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * {
@@ -37,698 +31,236 @@
     }
 
     body {
-      background-color: var(--bg-darker);
+      background-color: var(--bg);
       color: var(--text);
       font-family: var(--font-sans);
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
-      overflow-x: hidden;
-    }
-
-    /* Ambient Background Glows */
-    .ambient-glow-top-right {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, rgba(56, 139, 253, 0.12) 0%, rgba(137, 87, 229, 0.08) 35%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .ambient-glow-spine {
-      position: absolute;
-      top: 600px;
-      left: 100px;
-      width: 600px;
-      height: 900px;
-      background: radial-gradient(circle, rgba(46, 160, 67, 0.08) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
+      min-height: 100vh;
     }
 
     /* Navbar */
-    .navbar {
+    .nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 40px;
-      background: rgba(13, 17, 23, 0.7);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(240, 246, 252, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      padding: 18px 48px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
     }
 
-    .nav-left {
+    .nav-brand {
       display: flex;
       align-items: center;
-      gap: 28px;
-    }
-
-    .nav-logo-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      gap: 12px;
       text-decoration: none;
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 16px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
     }
 
-    .nav-logo-icon {
-      width: 32px;
-      height: 32px;
-      background: #ffffff;
-      border-radius: 50%;
+    .nav-brand-logo {
+      width: 28px;
+      height: 28px;
+      background: var(--yellow);
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #000000;
       font-family: var(--font-mono);
       font-weight: 900;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    .nav-menu {
+    .nav-brand-sub {
+      color: var(--text-dim);
+      font-weight: 500;
+      font-size: 13px;
+      margin-left: 4px;
+    }
+
+    .nav-items {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 28px;
     }
 
-    .nav-item {
-      color: var(--text);
+    .nav-link {
+      color: var(--text-muted);
       text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      font-size: 13.5px;
+      font-weight: 500;
       transition: color 0.15s;
     }
 
-    .nav-item:hover {
-      color: var(--text-muted);
+    .nav-link:hover {
+      color: var(--yellow);
     }
 
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .nav-search-bar {
-      display: flex;
-      align-items: center;
-      background: #0d1117;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      color: var(--text-muted);
-      width: 240px;
-      justify-content: space-between;
-    }
-
-    .nav-search-key {
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 0 4px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-    }
-
-    .nav-btn-signin {
-      color: var(--text);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 6px 12px;
-    }
-
-    .nav-btn-signup {
-      color: #ffffff;
-      background: transparent;
-      border: 1px solid rgba(240, 246, 252, 0.3);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: border-color 0.15s;
-    }
-
-    .nav-btn-signup:hover {
-      border-color: #ffffff;
-    }
-
-    /* GitHub Spine Layout Wrapper */
-    .spine-layout-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 24px;
-      position: relative;
-    }
-
-    /* Vertical Continuous Spine Line */
-    .vertical-spine-line {
-      position: absolute;
-      left: 64px;
-      top: 140px;
-      bottom: 120px;
-      width: 2px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, #2ea043 25%, #388bfd 50%, #8957e5 75%, rgba(255, 208, 0, 0.8) 100%);
-      z-index: 1;
-    }
-
-    .spine-node-icon {
-      position: absolute;
-      left: 51px;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #0d1117;
-      border: 2px solid #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-    }
-
-    .spine-node-icon svg {
-      width: 14px;
-      height: 14px;
-      color: #ffffff;
-    }
-
-    /* Section Inner Padding relative to Spine */
-    .spine-section-content {
-      padding-left: 90px;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Hero Section */
-    .hero-section {
-      padding-top: 80px;
-      padding-bottom: 100px;
-      position: relative;
-    }
-
-    .hero-top-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 40px;
-      align-items: center;
-    }
-
-    .hero-h1 {
-      font-size: 72px;
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -2.5px;
-      color: #ffffff;
-      margin-bottom: 16px;
-    }
-
-    .hero-p {
-      font-size: 24px;
-      color: var(--text-muted);
-      line-height: 1.45;
-      margin-bottom: 40px;
-      font-weight: 400;
-    }
-
-    /* Hero Input & CTA Bar */
-    .hero-action-bar {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 60px;
-      flex-wrap: wrap;
-    }
-
-    .email-install-box {
-      display: flex;
-      align-items: center;
-      background: #ffffff;
-      border-radius: 6px;
-      padding: 4px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .email-input-text {
-      background: transparent;
-      border: none;
-      outline: none;
-      padding: 10px 16px;
-      font-family: var(--font-mono);
-      font-size: 14px;
+    .nav-btn {
+      background: var(--yellow);
       color: #000000;
-      font-weight: 500;
-      width: 320px;
-    }
-
-    .btn-install-purple {
-      background: #7c3aed;
-      color: #ffffff;
-      font-family: var(--font-sans);
       font-weight: 700;
-      font-size: 14px;
-      padding: 10px 20px;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
+      font-size: 13px;
+      padding: 7px 16px;
+      border-radius: 6px;
+      text-decoration: none;
       transition: background 0.15s;
     }
 
-    .btn-install-purple:hover {
-      background: #6d28d9;
+    .nav-btn:hover {
+      background: var(--yellow-hover);
     }
 
-    .btn-trial-border {
-      background: transparent;
-      border: 1px solid rgba(240, 246, 252, 0.2);
-      color: #ffffff;
-      font-size: 14px;
-      font-weight: 700;
-      padding: 14px 22px;
-      border-radius: 6px;
-      text-decoration: none;
-      display: inline-flex;
+    /* Main Container */
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 56px 24px 100px;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 50px;
       align-items: center;
+      margin-bottom: 50px;
+    }
+
+    .hero-title-group {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
+    }
+
+    .hero-title-main {
+      font-family: var(--font-mono);
+      font-size: 64px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      color: #ffffff;
+    }
+
+    .hero-title-main span.yellow {
+      color: var(--yellow);
+    }
+
+    .hero-tagline {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--yellow);
+      text-transform: uppercase;
+    }
+
+    .hero-desc {
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Action Row */
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 50px;
+      align-items: flex-start;
+      margin-bottom: 64px;
+    }
+
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .install-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 13px 18px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      cursor: pointer;
       transition: all 0.15s;
     }
 
-    .btn-trial-border:hover {
-      border-color: #ffffff;
-      background: rgba(255, 255, 255, 0.05);
+    .install-box:hover {
+      border-color: var(--yellow-border);
+      background: rgba(255, 208, 0, 0.03);
     }
 
-    /* Floating 3D Graphic (Right of Hero) */
-    .hero-graphic-cluster {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .install-box code {
+      color: #ffffff;
     }
 
-    .glossy-3d-emblem {
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle at 35% 35%, #ffd000 0%, #d97706 40%, #1e1b4b 80%, #000000 100%);
-      border-radius: 50%;
-      box-shadow: 
-        inset 0 -20px 40px rgba(0,0,0,0.8),
-        inset 0 20px 30px rgba(255, 255, 255, 0.4),
-        0 20px 60px rgba(255, 208, 0, 0.25);
-      position: relative;
-      animation: floatOrb 6s ease-in-out infinite;
+    .install-box span.prefix {
+      color: var(--yellow);
+      margin-right: 8px;
     }
 
-    @keyframes floatOrb {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-16px) rotate(4deg); }
-    }
-
-    .floating-sub-orb {
-      position: absolute;
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #38bdf8 0%, #1d4ed8 70%, #020617 100%);
-      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4);
-      top: -10px;
-      right: 20px;
-      animation: floatOrb2 8s ease-in-out infinite;
-    }
-
-    @keyframes floatOrb2 {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(14px); }
-    }
-
-    .floating-badge-check {
-      position: absolute;
-      bottom: 20px;
-      right: 10px;
-      width: 68px;
-      height: 68px;
-      background: #161b22;
-      border: 2px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6);
-    }
-
-    /* Trusted / IDEs Logo Strip */
-    .trusted-strip {
-      margin-top: 40px;
-    }
-
-    .trusted-label {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-    }
-
-    .trusted-logos-row {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      flex-wrap: wrap;
-    }
-
-    .trusted-logo-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: 600;
-      color: #6e7681;
+    .copy-icon {
+      color: var(--text-dim);
       transition: color 0.15s;
     }
 
-    .trusted-logo-item:hover {
-      color: #ffffff;
+    .install-box:hover .copy-icon {
+      color: var(--yellow);
     }
 
-    .trusted-logo-item svg {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-    }
-
-    /* Timeline Section 1: Productivity & Execution */
-    .timeline-block {
-      padding-top: 100px;
-      padding-bottom: 100px;
-      position: relative;
-    }
-
-    .block-tag {
-      font-family: var(--font-sans);
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 8px;
-    }
-
-    .block-heading-gradient-green {
-      font-size: 28px;
-      font-weight: 800;
-      color: #3fb950;
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-
-    .block-h2 {
-      font-size: 48px;
-      font-weight: 800;
-      letter-spacing: -1.5px;
-      line-height: 1.1;
-      color: #ffffff;
-      margin-bottom: 40px;
-      max-width: 850px;
-    }
-
-    /* GitHub-style Double Editor Mockup Panel */
-    .editor-composite-panel {
-      position: relative;
-      background: #0d1117;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7);
-      margin-bottom: 48px;
-    }
-
-    .editor-composite-header {
+    .agent-badges {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 18px;
-      background: #161b22;
-      border-bottom: 1px solid var(--border);
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 4px;
     }
 
-    .editor-composite-tabs {
-      display: flex;
-      gap: 8px;
-      margin-left: 12px;
-    }
-
-    .editor-tab {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #0d1117;
-      border: 1px solid var(--border);
-      border-bottom: none;
-      padding: 4px 12px;
-      border-radius: 4px 4px 0 0;
+    .agent-pill {
       font-family: var(--font-mono);
       font-size: 12px;
-      color: var(--text);
-    }
-
-    .editor-main-body {
-      display: grid;
-      grid-template-columns: 1.3fr 0.9fr;
-      min-height: 380px;
-    }
-
-    .editor-code-pane {
-      padding: 24px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.7;
-      border-right: 1px solid var(--border);
-    }
-
-    .editor-code-pane .hl-keyword { color: #ff7b72; font-weight: 600; }
-    .editor-code-pane .hl-fn { color: #d2a8ff; font-weight: 600; }
-    .editor-code-pane .hl-str { color: #a5d6ff; }
-    .editor-code-pane .hl-num { color: #79c0ff; }
-    .editor-code-pane .hl-comment { color: #8b949e; }
-
-    /* Copilot Chat Floating Pane */
-    .copilot-chat-pane {
-      background: #161b22;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .chat-user-prompt {
-      background: #21262d;
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 13px;
-      color: #ffffff;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .copilot-response-box {
-      background: #0d1117;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 12.5px;
-      color: #7ee787;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-
-    .copilot-input-box {
-      background: #0d1117;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-size: 13px;
       color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+    }
+
+    /* Directory Header */
+    .dir-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 14px;
     }
 
-    /* Metric Callout */
-    .metric-callout-wrap {
-      margin-bottom: 80px;
-    }
-
-    .metric-pill-label {
+    .dir-title {
       font-family: var(--font-mono);
-      font-size: 12px;
-      border: 1px solid #30363d;
-      padding: 2px 10px;
-      border-radius: 12px;
-      color: var(--text-muted);
-      display: inline-block;
-      margin-bottom: 12px;
-    }
-
-    .metric-big-number {
-      font-size: 64px;
-      font-weight: 800;
-      letter-spacing: -2px;
-      color: #3fb950;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .metric-big-sub {
-      font-size: 20px;
-      font-weight: 600;
-      color: #ffffff;
-      max-width: 460px;
-    }
-
-    /* 2-Column Bento Feature Cards */
-    .feature-cards-2col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-bottom: 80px;
-    }
-
-    .feature-card-dark {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 36px;
-      transition: border-color 0.15s;
-    }
-
-    .feature-card-dark:hover {
-      border-color: var(--border-muted);
-    }
-
-    .fc-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 12px;
-    }
-
-    .fc-desc {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    .fc-link {
-      color: #58a6ff;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .fc-link:hover {
-      text-decoration: underline;
-    }
-
-    /* Section 2: Security & DevSecOps */
-    .block-heading-gradient-cyan {
-      font-size: 28px;
-      font-weight: 800;
-      color: #38bdf8;
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-
-    /* Security Visual Table */
-    .sec-visual-panel {
-      background: #0d1117;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 60px;
-    }
-
-    .sec-node-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .sec-badge-node {
-      background: #161b22;
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sec-alert-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .sec-alert-item {
-      background: #161b22;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--font-mono);
-      font-size: 13px;
-    }
-
-    .alert-tag-crit {
-      background: rgba(248, 81, 73, 0.15);
-      color: #f85149;
-      border: 1px solid rgba(248, 81, 73, 0.4);
-      padding: 2px 8px;
-      border-radius: 12px;
       font-size: 11px;
       font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
     }
 
-    /* Section 3: Skills Directory / Leaderboard */
-    .skills-directory-section {
-      padding-top: 80px;
-      padding-bottom: 120px;
-    }
-
-    .skills-dir-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
+    /* Search Box */
+    .search-wrap {
+      position: relative;
       margin-bottom: 24px;
     }
 
-    .skills-search-wrap {
-      position: relative;
-      margin-bottom: 20px;
-    }
-
-    .skills-search-wrap svg {
+    .search-wrap svg {
       position: absolute;
       left: 16px;
       top: 50%;
@@ -736,12 +268,12 @@
       color: var(--text-dim);
     }
 
-    .skills-search-input {
+    .search-input {
       width: 100%;
-      background: #0d1117;
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px 40px 12px 42px;
+      border-radius: 8px;
+      padding: 13px 44px 13px 44px;
       color: #ffffff;
       font-family: var(--font-mono);
       font-size: 13.5px;
@@ -749,49 +281,71 @@
       transition: border-color 0.15s;
     }
 
-    .skills-search-input:focus {
-      border-color: #58a6ff;
+    .search-input:focus {
+      border-color: var(--yellow);
     }
 
-    .skills-filter-nav {
+    .search-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .search-shortcut {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Category Filter Tabs */
+    .filter-tabs {
       display: flex;
       gap: 20px;
+      margin-bottom: 16px;
       border-bottom: 1px solid var(--border);
       padding-bottom: 12px;
-      margin-bottom: 16px;
     }
 
-    .skills-tab-btn {
+    .filter-btn {
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      color: var(--text-dim);
       font-family: var(--font-mono);
       font-size: 13px;
       cursor: pointer;
-      position: relative;
       transition: color 0.15s;
+      position: relative;
     }
 
-    .skills-tab-btn.active {
-      color: #ffffff;
+    .filter-btn.active {
+      color: var(--yellow);
       font-weight: 700;
     }
 
-    .skills-tab-btn.active::after {
+    .filter-btn.active::after {
       content: '';
       position: absolute;
       bottom: -13px;
       left: 0;
       right: 0;
       height: 2px;
-      background: #f78166;
+      background: var(--yellow);
     }
 
-    /* Skills Table */
-    .skills-table-card {
-      background: #0d1117;
+    .filter-btn:hover {
+      color: var(--text-muted);
+    }
+
+    /* Table */
+    .table-container {
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
+      background: var(--bg-surface);
       overflow: hidden;
     }
 
@@ -802,123 +356,88 @@
     }
 
     .skills-table th {
-      padding: 12px 18px;
+      padding: 13px 18px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
       text-transform: uppercase;
       border-bottom: 1px solid var(--border);
-      background: #161b22;
+      background: #0d0d10;
     }
 
     .skills-table td {
-      padding: 14px 18px;
+      padding: 15px 18px;
       font-size: 13.5px;
-      border-bottom: 1px solid var(--border-muted);
+      border-bottom: 1px solid #1a1a20;
       vertical-align: middle;
     }
 
     .skills-table tr:hover td {
-      background: #161b22;
+      background: #141418;
     }
 
-    .st-title-link {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      color: #58a6ff;
-      text-decoration: none;
-      margin-right: 8px;
-    }
-
-    .st-title-link:hover {
-      text-decoration: underline;
-    }
-
-    .st-author {
+    .rank-col {
       font-family: var(--font-mono);
       color: var(--text-dim);
+      width: 44px;
       font-size: 12px;
     }
 
-    .st-badge {
+    .skill-link {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.15s;
+    }
+
+    .skill-link:hover {
+      color: var(--yellow);
+    }
+
+    .skill-meta {
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .category-badge {
+      display: inline-block;
       font-family: var(--font-mono);
       font-size: 11px;
+      font-weight: 600;
       padding: 2px 8px;
-      border-radius: 12px;
-      background: #21262d;
-      color: #c9d1d9;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
     }
 
-    .btn-view-spec {
+    .category-badge.campus {
+      background: var(--yellow-dim);
+      color: var(--yellow);
+      border: 1px solid var(--yellow-border);
+    }
+
+    .btn-action-view {
       font-family: var(--font-mono);
       font-size: 12px;
-      color: #c9d1d9;
-      background: #21262d;
+      color: var(--text-muted);
+      background: transparent;
       border: 1px solid var(--border);
-      padding: 4px 12px;
-      border-radius: 4px;
+      padding: 5px 12px;
+      border-radius: 5px;
       text-decoration: none;
       transition: all 0.15s;
     }
 
-    .btn-view-spec:hover {
-      background: #30363d;
-      color: #ffffff;
-    }
-
-    /* Globe / Bottom CTA */
-    .globe-cta-section {
-      text-align: center;
-      padding: 120px 24px;
-      position: relative;
-    }
-
-    .globe-h2 {
-      font-size: 54px;
-      font-weight: 800;
-      letter-spacing: -2px;
-      color: #ffffff;
-      margin-bottom: 16px;
-    }
-
-    .globe-p {
-      font-size: 20px;
-      color: var(--text-muted);
-      margin-bottom: 40px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* Footer */
-    .footer {
-      border-top: 1px solid var(--border);
-      background: #010409;
-      padding: 60px 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 24px;
-      font-size: 13px;
-      color: var(--text-dim);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 24px;
-    }
-
-    .footer-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-
-    .footer-link:hover {
-      color: #ffffff;
+    .btn-action-view:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      background: var(--yellow-dim);
     }
 
     /* Toast */
@@ -926,14 +445,14 @@
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: #238636;
-      color: #ffffff;
+      background: var(--yellow);
+      color: #000000;
       font-family: var(--font-mono);
       font-weight: 700;
       font-size: 13px;
-      padding: 10px 18px;
+      padding: 9px 18px;
       border-radius: 6px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 8px 24px rgba(255, 208, 0, 0.35);
       opacity: 0;
       transform: translateY(10px);
       transition: all 0.2s ease;
@@ -946,347 +465,118 @@
       transform: translateY(0);
     }
 
-    @media (max-width: 900px) {
-      .hero-top-grid, .editor-main-body, .feature-cards-2col {
+    @media (max-width: 860px) {
+      .hero, .action-row {
         grid-template-columns: 1fr;
+        gap: 30px;
       }
-      .hero-h1 {
-        font-size: 44px;
-      }
-      .vertical-spine-line {
-        display: none;
-      }
-      .spine-section-content {
-        padding-left: 0;
-      }
-      .navbar {
-        padding: 16px 20px;
+      .nav {
+        padding: 18px 20px;
       }
     }
   </style>
 </head>
 <body>
 
-  <div class="ambient-glow-top-right"></div>
-  <div class="ambient-glow-spine"></div>
-
-  <!-- Sticky Navbar -->
-  <nav class="navbar">
-    <div class="nav-left">
-      <a href="/" class="nav-logo-link">
-        <svg height="32" viewBox="0 0 16 16" width="32" fill="#ffffff"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
-        <span style="font-weight: 800; font-size: 16px; margin-left: 6px;">MCS</span>
-      </a>
-      <div class="nav-menu">
-        <a href="#productivity" class="nav-item">Productivity</a>
-        <a href="#security" class="nav-item">Security</a>
-        <a href="#skills" class="nav-item">Skills Directory</a>
-        <a href="/skill-detail" class="nav-item">Specifications</a>
-      </div>
-    </div>
-    <div class="nav-right">
-      <div class="nav-search-bar">
-        <span>Search or jump to...</span>
-        <span class="nav-search-key">/</span>
-      </div>
-      <a href="/console" class="nav-btn-signin">Developer Console</a>
-      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-btn-signup">GitHub</a>
+  <!-- Top Navbar -->
+  <nav class="nav">
+    <a href="/" class="nav-brand">
+      <div class="nav-brand-logo">CS</div>
+      <span>MCS</span>
+      <span class="nav-brand-sub">IEEE Computer Society</span>
+    </a>
+    <div class="nav-items">
+      <a href="/" class="nav-link" style="color: var(--yellow); font-weight: 600;">Directory</a>
+      <a href="/skill-detail" class="nav-link">Specifications</a>
+      <a href="/console" class="nav-link">Developer Console</a>
+      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-link">GitHub</a>
+      <a href="/skill-detail" class="nav-btn">Install Skills</a>
     </div>
   </nav>
 
-  <!-- GitHub Vertical Continuous Spine Layout -->
-  <div class="spine-layout-wrapper">
-    <div class="vertical-spine-line"></div>
-
-    <!-- Node 1: Hero -->
-    <div class="spine-node-icon" style="top: 140px;">
-      <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"></circle></svg>
-    </div>
+  <div class="container">
 
     <!-- Hero Section -->
-    <section class="hero-section spine-section-content">
-      <div class="hero-top-grid">
-        <div>
-          <h1 class="hero-h1">Let’s build from here</h1>
-          <p class="hero-p">The world’s open AI-powered developer operations & procedural skills platform.</p>
-
-          <div class="hero-action-bar">
-            <div class="email-install-box">
-              <input type="text" class="email-input-text" value="npx skills add ieeecsopen/mcp-cs" readonly />
-              <button class="btn-install-purple" onclick="copyCmd('npx skills add ieeecsopen/mcp-cs')">Install Skills</button>
-            </div>
-            <a href="/console" class="btn-trial-border">Launch Console <span>→</span></a>
-          </div>
-
-          <div class="trusted-strip">
-            <div class="trusted-label">Compatible with world-class developer tools ↘</div>
-            <div class="trusted-logos-row">
-              <!-- Cursor -->
-              <div class="trusted-logo-item" title="Cursor AI IDE">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path fill="#ffffff" d="M12 2L2 7.2L12 12.4L22 7.2L12 2ZM2 11.2L12 16.4L22 11.2V13.8L12 19L2 13.8V11.2ZM2 15.2L12 20.4L22 15.2V17.8L12 23L2 17.8V15.2Z"/></svg>
-                <span style="color: #ffffff; font-weight: 600;">Cursor</span>
-              </div>
-
-              <!-- Claude -->
-              <div class="trusted-logo-item" title="Claude Code (Anthropic)">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path fill="#d97706" d="M4.5 9.5C4.5 6.74 6.74 4.5 9.5 4.5H14.5C17.26 4.5 19.5 6.74 19.5 9.5V14.5C19.5 17.26 17.26 19.5 14.5 19.5H9.5C6.74 19.5 4.5 17.26 4.5 14.5V9.5Z"/><path fill="#ffffff" d="M12 7L13.2 10.8L17 12L13.2 13.2L12 17L10.8 13.2L7 12L10.8 10.8L12 7Z"/></svg>
-                <span style="color: #ffffff; font-weight: 600;">Claude</span>
-              </div>
-
-              <!-- Antigravity -->
-              <div class="trusted-logo-item" title="Antigravity (Google)">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path fill="#ffd000" d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/></svg>
-                <span style="color: #ffffff; font-weight: 600;">Antigravity</span>
-              </div>
-
-              <!-- VS Code -->
-              <div class="trusted-logo-item" title="Visual Studio Code">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path fill="#007acc" d="M23.15 2.587L17.85.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 6.883a1 1 0 0 0-.005 1.515l3.61 3.42-3.61 3.42a1 1 0 0 0 .005 1.515l.962.824a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l5.302-2.377A1.5 1.5 0 0 0 24 19.675V4.325a1.5 1.5 0 0 0-.85-1.738zM18 17.585l-7.39-6.742L18 4.1v13.485z"/></svg>
-                <span style="color: #ffffff; font-weight: 600;">VS Code</span>
-              </div>
-
-              <!-- ChatGPT / OpenAI -->
-              <div class="trusted-logo-item" title="OpenAI / ChatGPT">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path fill="#10a37f" d="M22.28 9.37a5.985 5.985 0 0 0-.52-4.84 6.065 6.065 0 0 0-6.52-2.81 6.002 6.002 0 0 0-4.66-2.18A6.06 6.06 0 0 0 4.67 2.45a6.002 6.002 0 0 0-3.95 4.3 6.06 6.06 0 0 0 1.34 6.94 5.985 5.985 0 0 0 .52 4.84 6.065 6.065 0 0 0 6.52 2.81 6.002 6.002 0 0 0 4.66 2.18 6.06 6.06 0 0 0 5.91-2.91 6.002 6.002 0 0 0 3.95-4.3 6.06 6.06 0 0 0-1.34-6.94zM12 18.25a6.25 6.25 0 1 1 0-12.5 6.25 6.25 0 0 1 0 12.5z"/></svg>
-                <span style="color: #ffffff; font-weight: 600;">ChatGPT</span>
-              </div>
-
-              <!-- GitHub Copilot -->
-              <div class="trusted-logo-item" title="GitHub Copilot">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path fill="#ffffff" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-                <span style="color: #ffffff; font-weight: 600;">Copilot</span>
-              </div>
-            </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3D Glossy Floating Graphic -->
-        <div class="hero-graphic-cluster">
-          <div class="glossy-3d-emblem"></div>
-          <div class="floating-sub-orb"></div>
-          <div class="floating-badge-check">
-            <svg width="28" height="28" fill="none" stroke="#2ea043" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-        </div>
+    <div class="hero">
+      <div class="hero-title-group">
+        <div class="hero-title-main">MCS <span class="yellow">SKILLS</span></div>
+        <div class="hero-tagline">IEEE CS Open Agent Skills & MCP Ecosystem</div>
       </div>
-    </section>
-
-    <!-- Node 2: Productivity -->
-    <div class="spine-node-icon" style="top: 780px;">
-      <svg fill="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+      <div class="hero-desc">
+        Standardized, reusable procedural runbooks and sandboxed developer operations for AI coding assistants. Install with a single command to empower agents with verified engineering workflows.
+      </div>
     </div>
 
-    <!-- Section 1: Productivity & Execution -->
-    <section class="timeline-block spine-section-content" id="productivity">
-      <div class="block-tag">Productivity</div>
-      <div class="block-heading-gradient-green">Accelerate execution</div>
-      <h2 class="block-h2">Our sandboxed execution engine stress-tests algorithms in milliseconds.</h2>
-
-      <!-- Editor Panel Composite Mockup -->
-      <div class="editor-composite-panel">
-        <div class="editor-composite-header">
-          <span class="dot" style="background: #ff5f56;"></span>
-          <span class="dot" style="background: #ffbd2e;"></span>
-          <span class="dot" style="background: #27c93f;"></span>
-          <div class="editor-composite-tabs">
-            <div class="editor-tab">
-              <span>algo_judge.ts</span>
-            </div>
-          </div>
-        </div>
-        <div class="editor-main-body">
-          <div class="editor-code-pane">
-            <pre><code><span class="hl-keyword">import</span> { stressTest } <span class="hl-keyword">from</span> <span class="hl-str">"mcp-cs/algo"</span>;
-
-<span class="hl-comment">// Stress-test matching algorithms against randomized cases</span>
-<span class="hl-keyword">const</span> report = <span class="hl-keyword">await</span> <span class="hl-fn">stressTest</span>({
-  candidate: <span class="hl-str">"function solve(nums) { ... }"</span>,
-  bruteForce: <span class="hl-str">"function brute(nums) { ... }"</span>,
-  iterations: <span class="hl-num">100</span>
-});
-
-<span class="hl-comment">// Minimal counter-example isolated in 4.2ms</span>
-<span class="hl-keyword">if</span> (report.failedInput) {
-  console.<span class="hl-fn">log</span>(<span class="hl-str">"Divergence detected:"</span>, report.failedInput);
-}</code></pre>
-          </div>
-          <div class="copilot-chat-pane">
-            <div class="chat-user-prompt">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
-              <span>Verify differential edge-cases for candidate solution</span>
-            </div>
-            <div class="copilot-response-box">
-              ✔ 100/100 Iterations Verified<br>
-              ✔ Peak Heap: 14.2 MB<br>
-              ✔ Max Execution Time: 4.2ms<br>
-              Status: PASS (Deterministic)
-            </div>
-            <div class="copilot-input-box">
-              <span>Ask MCS AlgoJudge a question or /stress...</span>
-              <span>↵</span>
-            </div>
-          </div>
+    <!-- Action Row -->
+    <div class="action-row">
+      <div>
+        <div class="section-title">1-Command Installation</div>
+        <div class="install-box" onclick="copyCommand('npx skills add ieeecsopen/mcp-cs')">
+          <code><span class="prefix">$</span>npx skills add ieeecsopen/mcp-cs</code>
+          <svg class="copy-icon" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
         </div>
       </div>
 
-      <!-- Metric Callout -->
-      <div class="metric-callout-wrap">
-        <span class="metric-pill-label">Did you know?</span>
-        <div class="metric-big-number">100% deterministic</div>
-        <div class="metric-big-sub">sandboxed micro-container execution across Python, C++, Go, and Node.js.</div>
-      </div>
-
-      <!-- 2-Col Cards -->
-      <div class="feature-cards-2col">
-        <div class="feature-card-dark">
-          <h3 class="fc-title">V8 & WASM Sandboxes</h3>
-          <p class="fc-desc">Execute code submissions with memory limits, execution timeouts, and strict security isolation.</p>
-          <a href="/skill-detail?skill=algo-stress-testing" class="fc-link">Explore Stress Testing →</a>
-        </div>
-        <div class="feature-card-dark">
-          <h3 class="fc-title">AST Plagiarism Auditing</h3>
-          <p class="fc-desc">Detect code structure cloning and token similarity across university hackathons and assessments.</p>
-          <a href="/skill-detail?skill=algo-plagiarism-detector" class="fc-link">Discover AST Detection →</a>
+      <div>
+        <div class="section-title">Supported AI Assistants</div>
+        <div class="agent-badges">
+          <div class="agent-pill">Antigravity</div>
+          <div class="agent-pill">Cursor</div>
+          <div class="agent-pill">Claude Code</div>
+          <div class="agent-pill">Windsurf</div>
+          <div class="agent-pill">Copilot</div>
+          <div class="agent-pill">Cline</div>
         </div>
       </div>
-    </section>
-
-    <!-- Node 3: Security -->
-    <div class="spine-node-icon" style="top: 1720px;">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
     </div>
 
-    <!-- Section 2: Security & DevSecOps -->
-    <section class="timeline-block spine-section-content" id="security">
-      <div class="block-tag">Application Security</div>
-      <div class="block-heading-gradient-cyan">Empower developers</div>
-      <h2 class="block-h2">Automate capstone models, IEEE reports, and secret sanitization in minutes.</h2>
-
-      <div class="sec-visual-panel">
-        <div class="sec-node-row">
-          <div class="sec-badge-node">
-            <span style="color: #3fb950;">✔</span>
-            <span>doctor_check_env</span>
-          </div>
-          <div class="sec-badge-node">
-            <span style="color: #3fb950;">✔</span>
-            <span>security_scan_secrets</span>
-          </div>
-          <div class="sec-badge-node">
-            <span style="color: #3fb950;">✔</span>
-            <span>db_generate_erd</span>
-          </div>
-        </div>
-
-        <div class="sec-alert-list">
-          <div class="sec-alert-item">
-            <span>✖ Leaked OpenAI API Key detected in auth.ts:24</span>
-            <span class="alert-tag-crit">Auto-Sanitized to process.env</span>
-          </div>
-          <div class="sec-alert-item">
-            <span>✔ Socket Collision on :3000 resolved (Process terminated)</span>
-            <span style="color: #3fb950; font-weight: 700; font-size: 11px;">RESOLVED</span>
-          </div>
-        </div>
+    <!-- Directory Header -->
+    <div class="dir-header">
+      <div class="dir-title">Skills Catalog (30 Production Runbooks)</div>
+      <div style="font-family: var(--font-mono); font-size: 12px; color: var(--yellow);">
+        $ mcs skills install
       </div>
-
-      <!-- 2-Col Cards -->
-      <div class="feature-cards-2col">
-        <div class="feature-card-dark">
-          <h3 class="fc-title">Zero-Downtime DB Guardian</h3>
-          <p class="fc-desc">Enforce concurrent index creation and expand-and-contract migration patterns.</p>
-          <a href="/skill-detail?skill=database-migration-guardian" class="fc-link">View Migration Guardian →</a>
-        </div>
-        <div class="feature-card-dark">
-          <h3 class="fc-title">Campus Capstone Architecture</h3>
-          <p class="fc-desc">Generate IEEE Std 830 SRS chapters, C4 architecture diagrams, and 10-minute viva defense scripts.</p>
-          <a href="/skill-detail?skill=campus-fyp-architecture" class="fc-link">Explore Campus Suite →</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Node 4: Skills Directory -->
-    <div class="spine-node-icon" style="top: 2580px;">
-      <svg fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
     </div>
 
-    <!-- Section 3: Skills Directory -->
-    <section class="skills-directory-section spine-section-content" id="skills">
-      <div class="skills-dir-header">
-        <div>
-          <div class="block-tag">Standardized Ecosystem</div>
-          <h2 style="font-size: 40px; font-weight: 800; letter-spacing: -1px; color: #fff;">Skills Directory</h2>
-          <p style="font-size: 15px; color: var(--text-muted);">30 production agent skills compatible with the skills.sh specification.</p>
-        </div>
-        <div style="font-family: var(--font-mono); font-size: 13px; color: #58a6ff;">
-          $ mcs skills install
-        </div>
-      </div>
+    <!-- Search Box -->
+    <div class="search-wrap">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <input type="text" id="dirSearch" class="search-input" placeholder="Search skills by name, topic, or keyword..." onkeyup="filterCatalog()" />
+      <span class="search-shortcut">/</span>
+    </div>
 
-      <!-- Search Input -->
-      <div class="skills-search-wrap">
-        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <input type="text" id="skillSearch" class="skills-search-input" placeholder="Search skills by name, topic, or keyword (e.g. fyp, docker, algo, api)..." onkeyup="filterTable()" />
-      </div>
+    <!-- Category Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-btn active" id="tab-all" onclick="selectTab('all')">All Skills (30)</button>
+      <button class="filter-btn" id="tab-campus" onclick="selectTab('campus')">Campus Engineering (8)</button>
+      <button class="filter-btn" id="tab-algo" onclick="selectTab('algo')">Algorithms & CP (4)</button>
+      <button class="filter-btn" id="tab-backend" onclick="selectTab('backend')">Backend & DB (4)</button>
+      <button class="filter-btn" id="tab-devops" onclick="selectTab('devops')">DevOps & AI (14)</button>
+    </div>
 
-      <!-- Filter Tabs -->
-      <div class="skills-filter-nav">
-        <button class="skills-tab-btn active" id="tab-all" onclick="selectTab('all')">All Skills (30)</button>
-        <button class="skills-tab-btn" id="tab-campus" onclick="selectTab('campus')">Campus Engineering (8)</button>
-        <button class="skills-tab-btn" id="tab-algo" onclick="selectTab('algo')">Algorithms & CP (4)</button>
-        <button class="skills-tab-btn" id="tab-backend" onclick="selectTab('backend')">Backend & DB (4)</button>
-        <button class="skills-tab-btn" id="tab-devops" onclick="selectTab('devops')">DevOps & AI (14)</button>
-      </div>
-
-      <!-- Table -->
-      <div class="skills-table-card">
-        <table class="skills-table">
-          <thead>
-            <tr>
-              <th style="width: 44px;">#</th>
-              <th>Skill & Repository</th>
-              <th>Category</th>
-              <th style="text-align: right; width: 120px;">Specification</th>
-            </tr>
-          </thead>
-          <tbody id="skillsBody">
-            <!-- Populated by JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <!-- Table -->
+    <div class="table-container">
+      <table class="skills-table">
+        <thead>
+          <tr>
+            <th class="rank-col">#</th>
+            <th>Skill & Author</th>
+            <th>Category</th>
+            <th style="text-align: right; width: 120px;">Specification</th>
+          </tr>
+        </thead>
+        <tbody id="catalogBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
 
   </div>
-
-  <!-- Globe / Bottom CTA -->
-  <div class="globe-cta-section">
-    <h2 class="globe-h2">Over 30 standardized skills.<br>Built for the open AI ecosystem.</h2>
-    <p class="globe-p">Install procedural knowledge and sandboxed developer operations with a single command.</p>
-
-    <div class="email-install-box" style="margin: 0 auto; max-width: 500px;">
-      <input type="text" class="email-input-text" value="npx skills add ieeecsopen/mcp-cs" readonly style="width: 320px;" />
-      <button class="btn-install-purple" onclick="copyCmd('npx skills add ieeecsopen/mcp-cs')">Install Skills</button>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div>
-      © 2026 IEEE Computer Society SLIIT. Open Source Software.
-    </div>
-    <div class="footer-links">
-      <a href="/skill-detail" class="footer-link">Specifications</a>
-      <a href="/console" class="footer-link">Developer Console</a>
-      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="footer-link">GitHub Repository</a>
-      <a href="https://www.npmjs.com/package/mcp-cs" target="_blank" class="footer-link">NPM Package</a>
-    </div>
-  </footer>
 
   <div id="toast" class="toast">Copied to clipboard</div>
 
   <script>
-    const skillsList = [
+    const catalog = [
       { idx: 1, id: "campus-fyp-architecture", cat: "campus", name: "campus-fyp-architecture", catName: "Campus" },
       { idx: 2, id: "campus-ieee-citation", cat: "campus", name: "campus-ieee-citation", catName: "Campus" },
       { idx: 3, id: "campus-lab-report-generator", cat: "campus", name: "campus-lab-report-generator", catName: "Campus" },
@@ -1319,14 +609,14 @@
       { idx: 30, id: "docs-broken-link-checker", cat: "devops", name: "docs-broken-link-checker", catName: "Docs" }
     ];
 
-    let activeTab = "all";
+    let currentTab = "all";
 
-    function renderSkillsTable() {
-      const tbody = document.getElementById("skillsBody");
-      const q = document.getElementById("skillSearch").value.toLowerCase();
+    function renderCatalog() {
+      const tbody = document.getElementById("catalogBody");
+      const q = document.getElementById("dirSearch").value.toLowerCase();
 
-      const filtered = skillsList.filter(s => {
-        const matchesTab = activeTab === "all" || s.cat === activeTab;
+      const filtered = catalog.filter(s => {
+        const matchesTab = currentTab === "all" || s.cat === currentTab;
         const matchesQuery = s.name.toLowerCase().includes(q) || s.catName.toLowerCase().includes(q);
         return matchesTab && matchesQuery;
       });
@@ -1336,44 +626,54 @@
         return;
       }
 
-      tbody.innerHTML = filtered.map(s => `
-        <tr>
-          <td class="st-author" style="width: 44px;">${s.idx}</td>
-          <td>
-            <a href="/skill-detail?skill=${s.id}" class="st-title-link">${s.name}</a>
-            <span class="st-author">ieeecsopen/mcp-cs</span>
-          </td>
-          <td>
-            <span class="st-badge">${s.catName}</span>
-          </td>
-          <td style="text-align: right;">
-            <a href="/skill-detail?skill=${s.id}" class="btn-view-spec">View Spec</a>
-          </td>
-        </tr>
-      `).join("");
+      tbody.innerHTML = filtered.map(s => {
+        const isCampus = s.cat === "campus" ? "campus" : "";
+        return `
+          <tr>
+            <td class="rank-col">${s.idx}</td>
+            <td>
+              <a href="/skill-detail?skill=${s.id}" class="skill-link">${s.name}</a>
+              <span class="skill-meta">ieeecsopen/mcp-cs</span>
+            </td>
+            <td>
+              <span class="category-badge ${isCampus}">${s.catName}</span>
+            </td>
+            <td style="text-align: right;">
+              <a href="/skill-detail?skill=${s.id}" class="btn-action-view">View</a>
+            </td>
+          </tr>
+        `;
+      }).join("");
     }
 
     function selectTab(tab) {
-      activeTab = tab;
-      document.querySelectorAll(".skills-tab-btn").forEach(b => b.classList.remove("active"));
+      currentTab = tab;
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
       const target = document.getElementById(`tab-${tab}`);
       if (target) target.classList.add("active");
-      renderSkillsTable();
+      renderCatalog();
     }
 
-    function filterTable() {
-      renderSkillsTable();
+    function filterCatalog() {
+      renderCatalog();
     }
 
-    function copyCmd(text) {
-      navigator.clipboard.writeText(text);
+    function copyCommand(txt) {
+      navigator.clipboard.writeText(txt);
       const toast = document.getElementById("toast");
-      toast.innerText = `Copied: ${text}`;
+      toast.innerText = `Copied: ${txt}`;
       toast.classList.add("active");
-      setTimeout(() => toast.classList.remove("active"), 2200);
+      setTimeout(() => toast.classList.remove("active"), 2000);
     }
 
-    renderSkillsTable();
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== document.getElementById("dirSearch")) {
+        e.preventDefault();
+        document.getElementById("dirSearch").focus();
+      }
+    });
+
+    renderCatalog();
   </script>
 </body>
 </html>
