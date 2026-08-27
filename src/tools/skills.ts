@@ -21,35 +21,38 @@ export function installSkills(
   }
 
   const installed: InstalledSkill[] = [];
-  const skillNames = ["algo-stress-testing", "repo-doctor", "db-architect", "security-auditor"];
+  
+  // Discover all skill folders dynamically
+  if (fs.existsSync(sourceSkillsDir)) {
+    const entries = fs.readdirSync(sourceSkillsDir, { withFileTypes: true });
+    const skillFolders = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
-  if (format === "agents") {
-    const destBase = path.join(targetDir, ".agents", "skills");
-    fs.mkdirSync(destBase, { recursive: true });
+    if (format === "agents") {
+      const destBase = path.join(targetDir, ".agents", "skills");
+      fs.mkdirSync(destBase, { recursive: true });
 
-    for (const name of skillNames) {
-      const srcFile = path.join(sourceSkillsDir, name, "SKILL.md");
-      const destFolder = path.join(destBase, name);
-      fs.mkdirSync(destFolder, { recursive: true });
-      const destFile = path.join(destFolder, "SKILL.md");
-
-      if (fs.existsSync(srcFile)) {
-        fs.copyFileSync(srcFile, destFile);
-        installed.push({ name, destination: path.relative(targetDir, destFile) });
+      for (const name of skillFolders) {
+        const srcFile = path.join(sourceSkillsDir, name, "SKILL.md");
+        if (fs.existsSync(srcFile)) {
+          const destFolder = path.join(destBase, name);
+          fs.mkdirSync(destFolder, { recursive: true });
+          const destFile = path.join(destFolder, "SKILL.md");
+          fs.copyFileSync(srcFile, destFile);
+          installed.push({ name, destination: path.relative(targetDir, destFile) });
+        }
       }
-    }
-  } else {
-    // Cursor Rules format (.cursor/rules/)
-    const destBase = path.join(targetDir, ".cursor", "rules");
-    fs.mkdirSync(destBase, { recursive: true });
+    } else {
+      // Cursor Rules format (.cursor/rules/)
+      const destBase = path.join(targetDir, ".cursor", "rules");
+      fs.mkdirSync(destBase, { recursive: true });
 
-    for (const name of skillNames) {
-      const srcFile = path.join(sourceSkillsDir, name, "SKILL.md");
-      const destFile = path.join(destBase, `${name}.mdc`);
-
-      if (fs.existsSync(srcFile)) {
-        fs.copyFileSync(srcFile, destFile);
-        installed.push({ name, destination: path.relative(targetDir, destFile) });
+      for (const name of skillFolders) {
+        const srcFile = path.join(sourceSkillsDir, name, "SKILL.md");
+        if (fs.existsSync(srcFile)) {
+          const destFile = path.join(destBase, `${name}.mdc`);
+          fs.copyFileSync(srcFile, destFile);
+          installed.push({ name, destination: path.relative(targetDir, destFile) });
+        }
       }
     }
   }

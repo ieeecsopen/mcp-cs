@@ -246,6 +246,37 @@ Add to your Claude configuration file (`~/Library/Application Support/Claude/cla
 
 ---
 
+
+## 🧠 Agent Skills Suite (Compatible with [skills.sh](https://www.skills.sh))
+
+**MCS** bundles **12 production agent skills** adhering to the open [skills.sh](https://www.skills.sh) standard. These provide AI assistants (**Antigravity, Cursor, Claude Code, Windsurf**) with specialized operational runbooks:
+
+```bash
+# 1-Click Install into any repository (.agents/skills/)
+mcs skills install
+
+# Or install for Cursor (.cursor/rules/)
+mcs skills install --cursor
+
+# Or install via skills.sh package manager
+npx skills add ieeecsopen/mcp-cs
+```
+
+| Category | Skill Name | Description |
+| :--- | :--- | :--- |
+| ⚡ **Algorithms** | `algo-stress-testing` | Differential testing against brute-force baselines to find edge-case failures. |
+| ⚡ **Algorithms** | `algo-edge-case-generator` | Generates corner cases ($N=1$, bounds, extremes, disconnected graphs). |
+| ⚡ **Algorithms** | `algo-plagiarism-detector` | AST token similarity analysis between code submissions. |
+| ⚡ **Algorithms** | `algo-complexity-analyzer` | Asymptotic Big-O time and space complexity auditing. |
+| 🩺 **DevOps** | `repo-doctor` | Identifies broken runtime dependencies, missing packages, and setup errors. |
+| 🩺 **DevOps** | `env-sync` | Compares and synchronizes `.env` against `.env.example`. |
+| 🩺 **DevOps** | `port-inspector` | Resolves socket collisions (`EADDRINUSE`) and identifies holding PIDs. |
+| 🤖 **CI/CD** | `ci-workflow-architect` | Generates GitHub Actions CI/CD workflows for Node, Docker, and Python. |
+| 🗄️ **Database** | `db-architect` | Parses SQL DDL statements into visual Mermaid ER diagrams. |
+| 🌐 **API** | `api-mock-generator` | Generates realistic synthetic datasets (users, products, transactions). |
+| 🛡️ **Security** | `security-auditor` | Pre-flight scanner to detect and auto-sanitize leaked API credentials. |
+| 📚 **Docs** | `docs-broken-link-checker` | Scans markdown files for broken internal links and dead references. |
+
 ## 🧩 Interactive Prompts & Resources
 
 ### Slash Commands / Prompts:
