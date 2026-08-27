@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCS Skills | Developer Specification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --bg-sidebar: #0d0d11;
+      --bg-surface: #131317;
+      --bg-card: #18181f;
+      --border: #222228;
+      --border-hover: #33333f;
+      --yellow: #ffd000;
+      --yellow-hover: #ffdb33;
+      --yellow-dim: rgba(255, 208, 0, 0.1);
+      --yellow-border: rgba(255, 208, 0, 0.25);
+      --text: #ffffff;
+      --text-muted: #9999a5;
+      --text-dim: #60606f;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 36px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .nav-logo-box {
+      width: 28px;
+      height: 28px;
+      background: var(--yellow);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 900;
+      font-size: 13px;
+      font-family: var(--font-mono);
+    }
+
+    .nav-brand span.slash {
+      color: var(--text-dim);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+    }
+
+    .nav-cta-btn {
+      background: var(--yellow);
+      color: #000000;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 15px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .nav-cta-btn:hover {
+      background: var(--yellow-hover);
+    }
+
+    /* Main Layout */
+    .layout-wrapper {
+      display: flex;
+      flex: 1;
+      min-height: calc(100vh - 61px);
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 280px;
+      border-right: 1px solid var(--border);
+      background: var(--bg-sidebar);
+      padding: 24px 16px 60px;
+      overflow-y: auto;
+      height: calc(100vh - 61px);
+      position: sticky;
+      top: 61px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-group {
+      margin-bottom: 24px;
+    }
+
+    .sidebar-heading {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+      cursor: pointer;
+      border: 1px solid transparent;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-item:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .sidebar-item.active {
+      background: var(--yellow-dim);
+      color: var(--yellow);
+      border-color: var(--yellow-border);
+      font-weight: 600;
+    }
+
+    .sidebar-item-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+    }
+
+    .sidebar-item.active .sidebar-item-pill {
+      background: rgba(255, 208, 0, 0.2);
+      color: var(--yellow);
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 48px 64px 100px;
+      max-width: 980px;
+      overflow-y: auto;
+    }
+
+    /* Detail Header */
+    .detail-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .category-crumb {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--yellow);
+      background: var(--yellow-dim);
+      border: 1px solid var(--yellow-border);
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .next-skill-link {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.15s;
+    }
+
+    .next-skill-link:hover {
+      color: var(--yellow);
+    }
+
+    /* Hero Emblem & Title */
+    .skill-emblem-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--yellow);
+    }
+
+    .skill-main-title {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+      color: #ffffff;
+      font-family: var(--font-mono);
+    }
+
+    .skill-tagline-text {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 28px;
+      font-weight: 400;
+    }
+
+    /* Action Toolbar */
+    .action-toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .btn-action-primary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--yellow);
+      color: #000000;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: var(--font-sans);
+    }
+
+    .btn-action-primary:hover {
+      background: var(--yellow-hover);
+      box-shadow: 0 0 16px var(--yellow-dim);
+    }
+
+    .btn-action-secondary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-action-secondary:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card);
+    }
+
+    /* Divider */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 36px 0;
+    }
+
+    /* Overview Paragraph */
+    .overview-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #d1d1db;
+      margin-bottom: 32px;
+    }
+
+    /* Capability Bento Cards */
+    .capability-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .capability-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .cap-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .cap-icon {
+      color: var(--yellow);
+    }
+
+    .cap-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .cap-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* When to use vs When not to use */
+    .usage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .usage-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .usage-heading {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .usage-heading.green { color: #4ade80; }
+    .usage-heading.red { color: #f87171; }
+
+    .usage-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .usage-list li {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .usage-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--text-dim);
+    }
+
+    /* Code & Runbook Section */
+    .runbook-code-card {
+      background: #000000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .code-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: #0f0f13;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .code-content-pre {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #bbbbcc;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--yellow);
+      color: #000000;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(255, 208, 0, 0.35);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+      z-index: 2000;
+    }
+
+    .toast.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .layout-wrapper {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .content-area {
+        padding: 32px 20px;
+      }
+      .capability-grid, .usage-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="nav-logo-box">CS</div>
+      <span>MCS</span>
+      <span class="slash">/</span>
+      <span style="color: #fff; font-size: 14px;">Skills Specification</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Directory</a>
+      <a href="/console" class="nav-link">Developer Console</a>
+      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-link">GitHub</a>
+      <a href="https://github.com/ieeecsopen/mcp-cs#readme" target="_blank" class="nav-cta-btn">npx skills add</a>
+    </div>
+  </nav>
+
+  <div class="layout-wrapper">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-group">
+        <div class="sidebar-heading">Campus Engineering</div>
+        <div id="side-campus"></div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-heading">Algorithms & CP</div>
+        <div id="side-algo"></div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-heading">Frontend & UI</div>
+        <div id="side-frontend"></div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-heading">Backend & Database</div>
+        <div id="side-backend"></div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-heading">AI, Testing & DevOps</div>
+        <div id="side-devops"></div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+
+      <div class="detail-header-top">
+        <div class="category-crumb" id="categoryCrumb">Category</div>
+        <a href="javascript:void(0)" onclick="loadNextSkill()" class="next-skill-link">
+          <span id="nextSkillLabel">Next Skill</span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+
+      <div class="skill-emblem-box">
+        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+      </div>
+
+      <h1 class="skill-main-title" id="skillTitle">Skill Title</h1>
+      <p class="skill-tagline-text" id="skillTagline">Skill tagline text</p>
+
+      <div class="action-toolbar">
+        <button class="btn-action-primary" onclick="copyCurrentInstall()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          <span>Install Skill</span>
+        </button>
+        <button class="btn-action-secondary" onclick="copyFullRunbook()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          <span>Copy Runbook</span>
+        </button>
+        <a id="githubSkillLink" href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="btn-action-secondary">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Overview Section -->
+      <div class="overview-text" id="skillOverview">
+        Skill overview text.
+      </div>
+
+      <!-- Bento Capabilities -->
+      <div class="capability-grid" id="capabilityGrid">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- When to use vs when not to use -->
+      <div class="usage-grid">
+        <div class="usage-card">
+          <div class="usage-heading green">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>When to use</span>
+          </div>
+          <ul class="usage-list" id="whenToUseList"></ul>
+        </div>
+        <div class="usage-card">
+          <div class="usage-heading red">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <span>When not to use</span>
+          </div>
+          <ul class="usage-list" id="whenNotToUseList"></ul>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Execution Specification -->
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 14px; font-family: var(--font-mono);">
+        Operational Execution Specification
+      </h3>
+      <div class="runbook-code-card">
+        <div class="code-card-header">
+          <span id="runbookFileLabel">SKILL.md</span>
+          <span>agents / cursor standard</span>
+        </div>
+        <pre class="code-content-pre" id="runbookContent"></pre>
+      </div>
+
+    </main>
+
+  </div>
+
+  <div id="toast" class="toast">Copied to clipboard</div>
+
+  <script>
+    const allSkills = [
+      // Campus
+      {
+        id: "campus-fyp-architecture",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-fyp-architecture",
+        tagline: "University Final Year Project (FYP) & capstone architecture planner with C4 models, tech tradeoff matrices, and SRS outlines.",
+        overview: "Designed specifically for university undergraduate capstone teams (SLIIT, IEEE CS, computing faculties). Structures the entire engineering lifecycle: System Architecture (C4 Model), Technology Selection Tradeoff Matrices, IEEE Std 830 SRS Chapter mapping, and database cardinality constraints.",
+        caps: [
+          { title: "C4 Architecture", desc: "Generates Context, Container, Component, and Code diagrams for academic defense." },
+          { title: "Tradeoff Matrices", desc: "Constructs weighted decision matrices justifying framework and database selection." },
+          { title: "IEEE Std 830 SRS", desc: "Maps Functional and Non-Functional requirements directly into academic report chapters." },
+          { title: "Defense Pre-Flight", desc: "Validates system diagrams against examiner panel rubrics before submission." }
+        ],
+        whenToUse: [
+          "Starting a University Final Year Project or Capstone design document.",
+          "Writing Chapter 3 (System Architecture) or Chapter 4 (Design & Methodology).",
+          "Selecting database paradigms (PostgreSQL vs MongoDB vs Neo4j) with defense rationale."
+        ],
+        whenNotToUse: [
+          "Quick 2-hour hackathon scripts that require no documentation.",
+          "Simple single-file algorithmic exercises."
+        ]
+      },
+      {
+        id: "campus-ieee-citation",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-ieee-citation",
+        tagline: "Format online software, GitHub repositories, journals, and papers into strict IEEE referencing format.",
+        overview: "Ensures zero referencing penalties in academic submissions. Automatically translates URLs, GitHub repos, technical documentations, conference papers, and journals into exact IEEE format with alphabetical ordering and verified citation anchors.",
+        caps: [
+          { title: "IEEE Format Engine", desc: "Formats Authors, Title in Quotes, Journal in Italics, Volume, Issue, Pages, Year." },
+          { title: "GitHub & Software Citations", desc: "Applies standard IEEE software referencing for open source packages." },
+          { title: "BibTeX Exporter", desc: "Generates copy-pasteable BibTeX blocks for Overleaf LaTeX reports." },
+          { title: "Citation Validator", desc: "Detects missing DOIs, publication years, or unreferenced numbered brackets." }
+        ],
+        whenToUse: [
+          "Writing bibliography and references in FYP reports or conference papers.",
+          "Citing npm packages, Python libraries, or GitHub repositories in academic work."
+        ],
+        whenNotToUse: [
+          "Non-academic informal blog posts or README credits."
+        ]
+      },
+      {
+        id: "campus-lab-report-generator",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-lab-report-generator",
+        tagline: "Structured IEEE 2-column practical lab report generator with objectives, apparatus, results, and error analysis.",
+        overview: "Converts raw lab notes, measurement numbers, and terminal outputs into publication-grade IEEE two-column lab reports. Includes structured apparatus tables, circuit/topology diagrams, calculation blocks, and percentage error analysis.",
+        caps: [
+          { title: "IEEE 2-Column Template", desc: "Structures Title, Abstract, Objectives, Apparatus, Theory, and Procedure." },
+          { title: "Error Analysis Formulae", desc: "Calculates theoretical vs experimental percentage discrepancies." },
+          { title: "Topology Diagrams", desc: "Embeds ASCII network and circuit topologies directly in report sections." },
+          { title: "Discussion & Conclusion", desc: "Formulates rigorous conclusions tying findings back to foundational theory." }
+        ],
+        whenToUse: [
+          "Submitting weekly university computer engineering or network lab reports.",
+          "Formatting data analysis from Wireshark, Cisco Packet Tracer, or physical hardware."
+        ],
+        whenNotToUse: [
+          "Commercial SaaS documentation or API specifications."
+        ]
+      },
+      {
+        id: "campus-presentation-script",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-presentation-script",
+        tagline: "10-minute slide outlines and word-for-word viva examination defense speaking scripts with panel Q&A counter-strategies.",
+        overview: "Eliminates student presentation anxiety by generating word-for-word spoken scripts timed down to the second. Provides structured slide breakdown for 10-minute viva defenses and pre-generates sharp counter-strategies for aggressive examiner questions.",
+        caps: [
+          { title: "Timed Speaking Script", desc: "Word-for-word speech with [CLICK] cues and second-by-second pacing." },
+          { title: "Slide Layout Outlines", desc: "Structures 10 essential slides focusing strictly on high-impact visual data." },
+          { title: "Panel Q&A Defense", desc: "Anticipates tough examiner inquiries and drafts structured answer templates." },
+          { title: "Demo Flow Protocol", desc: "Prepares a foolproof 2-minute live demonstration contingency workflow." }
+        ],
+        whenToUse: [
+          "Preparing for Final Year Project proposal, progress review, or final viva defense.",
+          "Formatting slide decks for university coursework evaluations."
+        ],
+        whenNotToUse: [
+          "Marketing sales pitches or informal team standups."
+        ]
+      },
+      {
+        id: "campus-assignment-cleaner",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-assignment-cleaner",
+        tagline: "LMS assignment pre-flight validator stripping node_modules, .DS_Store, and checking student ID headers.",
+        overview: "Protects students from accidental zero grades due to oversized zip files, missing student ID headers, or committed node_modules. Inspects folders, strips build artifacts, and zips only clean source code.",
+        caps: [
+          { title: "Artifact Stripper", desc: "Safely removes node_modules, .next, dist, target, and OS junk files." },
+          { title: "ID Header Audit", desc: "Verifies every source file contains required student registration comments." },
+          { title: "ZIP Size Optimizer", desc: "Ensures final submission fits under strict university 10MB/25MB LMS limits." },
+          { title: "Reproducibility Test", desc: "Verifies clean package.json / requirements.txt installs without local paths." }
+        ],
+        whenToUse: [
+          "Compressing assignments for submission on Moodle, CourseWeb, or Canvas LMS.",
+          "Verifying student names and IDs are present in all code headers."
+        ],
+        whenNotToUse: [
+          "Production Docker image packaging or CI deployment."
+        ]
+      },
+      {
+        id: "campus-hackathon-fast-scaffold",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-hackathon-fast-scaffold",
+        tagline: "10-minute rapid prototyping architecture for 12h/24h hackathons (SLIITXtreme).",
+        overview: "Optimized for fast-paced 12-hour and 24-hour hackathons like SLIITXtreme. Delivers pre-integrated Next.js, Supabase, Tailwind, and Mock API templates so teams start building core business logic within 10 minutes.",
+        caps: [
+          { title: "10-Min Fast Stack", desc: "Pre-wired Next.js 14, Supabase Auth/DB, and Lucide Icons scaffold." },
+          { title: "Synthetic Mock APIs", desc: "Instantly mocks external backend APIs to unblock frontend developers." },
+          { title: "Pitch Demo State", desc: "Includes pre-seeded realistic data for flawless 3-minute judge demos." },
+          { title: "1-Click Cloud Deploy", desc: "Pre-configured Vercel configuration for instantaneous production links." }
+        ],
+        whenToUse: [
+          "Competing in competitive university hackathons or building quick prototypes.",
+          "Rapidly testing an AI concept within an evening."
+        ],
+        whenNotToUse: [
+          "Enterprise systems requiring strict compliance, PCI-DSS, or high concurrency."
+        ]
+      },
+      {
+        id: "campus-dsa-visualizer",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-dsa-visualizer",
+        tagline: "Step-by-step ASCII memory traces and pointer operations for LinkedLists, BSTs, Heaps, and DP tables.",
+        overview: "Assists computer science students in visualizing complex algorithms without external graphical tools. Generates clean ASCII memory representations of pointer mutations, recursion trees, and 2D DP matrices.",
+        caps: [
+          { title: "Pointer Mutation Tracing", desc: "Visualizes node insertion, deletion, and reversal in linked structures." },
+          { title: "Recursion Tree Trees", desc: "Draws execution branches, return values, and call stacks for divide-and-conquer." },
+          { title: "DP Matrix Tables", desc: "Renders filled dynamic programming lookup tables with dependency arrows." },
+          { title: "Heap & Tree Balance", desc: "Displays AVL/Red-Black tree rotations and binary heap array indexing." }
+        ],
+        whenToUse: [
+          "Studying for Data Structures & Algorithms exams or technical interviews.",
+          "Debugging pointer-based algorithms (C, C++, Java, Python)."
+        ],
+        whenNotToUse: [
+          "Production frontend UI animations."
+        ]
+      },
+      {
+        id: "campus-git-team-workflow",
+        cat: "campus",
+        catLabel: "Campus Engineering",
+        name: "campus-git-team-workflow",
+        tagline: "Student group Git collaboration standard with feature branch naming, PR rebasing, and clean commits.",
+        overview: "Eliminates Git merge conflict nightmares in student group projects. Establishes clean branch naming rules (`feat/`, `fix/`), git rebase workflows, squash-merging protocols, and `.gitignore` safety guards.",
+        caps: [
+          { title: "Branching Taxonomy", desc: "Standardizes feature, bugfix, and chore branch conventions." },
+          { title: "Rebase vs Merge Guide", desc: "Step-by-step conflict resolution keeping git history linear and clean." },
+          { title: "Pull Request Rubric", desc: "Provides PR templates with testing checklists and peer review guidelines." },
+          { title: "Accidental Push Recovery", desc: "Safe runbook for reverting bad commits and detaching large binaries." }
+        ],
+        whenToUse: [
+          "Collaborating in university group projects (3-6 members) on GitHub.",
+          "Resolving merge conflicts before deadline submissions."
+        ],
+        whenNotToUse: [
+          "Single-developer solo personal repositories."
+        ]
+      },
+
+      // Algorithms
+      {
+        id: "algo-stress-testing",
+        cat: "algo",
+        catLabel: "Algorithms & CP",
+        name: "algo-stress-testing",
+        tagline: "Differential testing engine comparing optimal algorithms against brute-force baselines on randomized inputs.",
+        overview: "Essential tool for competitive programmers and algorithm engineers. Generates randomized test cases across hundreds of iterations, running both the optimal candidate and a naive brute-force baseline to catch the exact minimal counter-example causing Wrong Answer.",
+        caps: [
+          { title: "Differential Verification", desc: "Automates parallel execution of candidate and brute-force implementations." },
+          { title: "Randomized Generator", desc: "Generates randomized graphs, trees, arrays, and strings within constraints." },
+          { title: "Minimal Counter-Example", desc: "Isolates the exact smallest input where the two algorithms diverge." },
+          { title: "Multi-Language Engine", desc: "Supports Python, JavaScript, C++, and Go sandboxed execution." }
+        ],
+        whenToUse: [
+          "Debugging elusive Wrong Answer (WA) on competitive programming problems.",
+          "Verifying complex Greedy or Dynamic Programming optimizations."
+        ],
+        whenNotToUse: [
+          "Simple CRUD web application endpoints."
+        ]
+      },
+      {
+        id: "algo-edge-case-generator",
+        cat: "algo",
+        catLabel: "Algorithms & CP",
+        name: "algo-edge-case-generator",
+        tagline: "Generates adversarial corner testcases (N=1, max bounds, identical items, extreme negatives, disjoint graphs).",
+        overview: "Constructs adversarial corner cases that break naive algorithms. Explores extreme boundary values: single elements ($N=1$), empty sets, maximum integer bounds, duplicates, star graphs, and disconnected components.",
+        caps: [
+          { title: "Boundary Value Matrix", desc: "Generates min, max, zero, negative, and parity boundary cases." },
+          { title: "Structural Extremes", desc: "Builds deep linear trees, complete graphs, and zigzag sequences." },
+          { title: "Overflow Triggers", desc: "Calculates products and sums that cause 32-bit integer overflow." },
+          { title: "Standard IO Formatter", desc: "Outputs testcases directly formatted for competitive judge standards." }
+        ],
+        whenToUse: [
+          "Creating test suites for competitive programming problem sets.",
+          "Validating mathematical or algorithmic implementations against edge cases."
+        ],
+        whenNotToUse: [
+          "Standard UI layout testing."
+        ]
+      },
+      {
+        id: "algo-plagiarism-detector",
+        cat: "algo",
+        catLabel: "Algorithms & CP",
+        name: "algo-plagiarism-detector",
+        tagline: "AST token similarity comparison between code submissions to detect academic dishonesty.",
+        overview: "Detects structural plagiarism between code submissions regardless of renamed variables, altered comments, reordered independent functions, or whitespace manipulation using AST tokenization and Jaccard similarity.",
+        caps: [
+          { title: "Abstract Syntax Tree Parser", desc: "Strips superficial formatting and parses code into language AST nodes." },
+          { title: "Token N-Gram Hashing", desc: "Calculates structural similarity using winnowing and n-gram fingerprints." },
+          { title: "Diff Highlighting", desc: "Provides side-by-side visual diffs of structurally cloned subroutines." },
+          { title: "Boilerplate Exclusion", desc: "Ignores standard framework imports and problem template code." }
+        ],
+        whenToUse: [
+          "Evaluating hackathon submissions or academic assignment authenticity.",
+          "Auditing student code repositories for unauthorized copying."
+        ],
+        whenNotToUse: [
+          "Comparing unrelated codebases with different architectures."
+        ]
+      },
+      {
+        id: "algo-complexity-analyzer",
+        cat: "algo",
+        catLabel: "Algorithms & CP",
+        name: "algo-complexity-analyzer",
+        tagline: "Asymptotic Big-O time and space complexity auditing with loop bounds and recursion depth breakdown.",
+        overview: "Performs deep asymptotic audits of algorithms. Decomposes nested loops, analyzes recursion tree master theorem branches, audits auxiliary memory allocations, and delivers formal mathematical proofs of Big-O complexity.",
+        caps: [
+          { title: "Master Theorem Solver", desc: "Deconstructs recurrence relations into exact asymptotic bounds." },
+          { title: "Amortized Analysis", desc: "Audits dynamic array resizes, union-find with path compression, and sliding windows." },
+          { title: "Space Overhead Audit", desc: "Separates stack frame recursion depth from auxiliary heap allocations." },
+          { title: "Bottleneck Highlighting", desc: "Pinpoints exact lines preventing algorithm from running in O(N log N)." }
+        ],
+        whenToUse: [
+          "Auditing algorithms before submission to prevent Time Limit Exceeded (TLE).",
+          "Documenting computational complexity in academic reports and FYPs."
+        ],
+        whenNotToUse: [
+          "Measuring real-world network latency or database IO."
+        ]
+      },
+
+      // Frontend
+      {
+        id: "frontend-clean-ui",
+        cat: "frontend",
+        catLabel: "Frontend & UI",
+        name: "frontend-clean-ui",
+        tagline: "Modern, high-contrast, accessible SaaS UI design with Tailwind CSS, obsidian dark tokens, and glassmorphism.",
+        overview: "Enforces disciplined design token architectures for full-stack developers. Establishes curated obsidian palettes (#09090b), electric yellow/amber accents (#ffd000), subtle border luminescence, 8px grid scales, and WCAG AA accessibility.",
+        caps: [
+          { title: "Design Token Scale", desc: "Defines harmonious HSL palettes, surface layers, and high-contrast text." },
+          { title: "Bento & Metric Cards", desc: "Templates for modern SaaS metric cards with hover micro-interactions." },
+          { title: "WCAG AA Compliance", desc: "Guarantees 4.5:1 contrast ratios and keyboard focus rings." },
+          { title: "Responsive Layouts", desc: "Adaptive grid and flexbox behaviors across mobile, tablet, and widescreen." }
+        ],
+        whenToUse: [
+          "Building SaaS dashboards, product landing pages, or web consoles.",
+          "Redesigning clunky or amateur user interfaces to look modern and sleek."
+        ],
+        whenNotToUse: [
+          "Pure backend CLI utilities with no graphical interface."
+        ]
+      },
+      {
+        id: "react-state-architecture",
+        cat: "frontend",
+        catLabel: "Frontend & UI",
+        name: "react-state-architecture",
+        tagline: "Three-tier state taxonomy separating Server State (TanStack Query), Global UI (Zustand), and Local State.",
+        overview: "Eliminates stale data bugs, race conditions, and excessive re-renders in React and Next.js applications. Enforces clear separation: TanStack Query for server caches, Zustand for global UI state, and React hooks for local component state.",
+        caps: [
+          { title: "Three-Tier Taxonomy", desc: "Strict separation between server cache, client settings, and local state." },
+          { title: "Zustand Atomic Selectors", desc: "Prevents unnecessary component re-renders with fine-grained selectors." },
+          { title: "Optimistic Mutations", desc: "Updates UI immediately with automatic rollback on network failure." },
+          { title: "Next.js RSC Boundary", desc: "Clean patterns for passing data between Server and Client Components." }
+        ],
+        whenToUse: [
+          "Architecting state management in complex React 18/19 or Next.js apps.",
+          "Refactoring messy Redux or Context API setups that cause re-render lag."
+        ],
+        whenNotToUse: [
+          "Static single-page documentation sites."
+        ]
+      },
+
+      // Backend & DB
+      {
+        id: "backend-rest-api-design",
+        cat: "backend",
+        catLabel: "Backend & Database",
+        name: "backend-rest-api-design",
+        tagline: "Production REST API contracts with Zod validation, error envelopes, and cursor pagination.",
+        overview: "Establishes standardized, resilient backend REST API conventions. Implements Zod runtime request/response validation, RFC 7807 error envelopes, cursor-based pagination, and secure JWT authentication headers.",
+        caps: [
+          { title: "Zod Schema Validation", desc: "Validates all request bodies and query params with typed error feedback." },
+          { title: "Standard Error Envelopes", desc: "Structured RFC error formats with errorCode, message, and remediation." },
+          { title: "Cursor Pagination", desc: "Replaces slow OFFSET pagination with high-performance cursor pagination." },
+          { title: "Idempotency Keys", desc: "Protects payment and critical creation endpoints against duplicate execution." }
+        ],
+        whenToUse: [
+          "Designing backend REST APIs in Express, Fastify, Next.js API, or NestJS.",
+          "Standardizing error handling across microservices."
+        ],
+        whenNotToUse: [
+          "Pure GraphQL or gRPC only architectures."
+        ]
+      },
+      {
+        id: "database-migration-guardian",
+        cat: "backend",
+        catLabel: "Backend & Database",
+        name: "database-migration-guardian",
+        tagline: "Zero-downtime database schema migrations, concurrent index creation, and expand-and-contract patterns.",
+        overview: "Prevents table locks and outages during live production database schema updates. Enforces concurrent index creation, non-blocking default columns, and the 3-phase Expand-and-Contract migration pattern.",
+        caps: [
+          { title: "Expand-and-Contract Pattern", desc: "3-step dual-write migration flow avoiding breaking changes." },
+          { title: "Lock-Free Indexing", desc: "Enforces CREATE INDEX CONCURRENTLY on live PostgreSQL tables." },
+          { title: "Batch Backfilling", desc: "Throttles historical row data updates in safe 5,000 row chunks." },
+          { title: "Lock Timeout Guards", desc: "Sets short lock_timeout limits to prevent database connection queuing." }
+        ],
+        whenToUse: [
+          "Modifying live database tables with millions of rows in PostgreSQL/MySQL.",
+          "Writing Prisma, Drizzle, or raw SQL migrations for high-availability backends."
+        ],
+        whenNotToUse: [
+          "Fresh empty database setups during initial local development."
+        ]
+      },
+      {
+        id: "db-architect",
+        cat: "backend",
+        catLabel: "Backend & Database",
+        name: "db-architect",
+        tagline: "Parses SQL DDL table statements and automatically renders visual Mermaid Entity-Relationship Diagrams (ERD).",
+        overview: "Translates raw SQL DDL scripts into interactive Mermaid ERDs. Analyzes primary keys, foreign key constraints, 3NF normalization compliance, and identifies unindexed relational lookups.",
+        caps: [
+          { title: "SQL DDL Parser", desc: "Extracts tables, columns, data types, and constraints from SQL scripts." },
+          { title: "Mermaid ERD Generator", desc: "Renders self-documenting entity diagrams with proper cardinality." },
+          { title: "Relational Audit", desc: "Flags missing foreign key indexes and unnormalized repeating groups." },
+          { title: "Temporal Tracking Check", desc: "Verifies mandatory created_at and updated_at timestamps." }
+        ],
+        whenToUse: [
+          "Visualizing complex database schemas for documentation or FYP reports.",
+          "Reviewing relational integrity before building backend services."
+        ],
+        whenNotToUse: [
+          "Schemaless key-value caches like Redis."
+        ]
+      },
+      {
+        id: "api-mock-generator",
+        cat: "backend",
+        catLabel: "Backend & Database",
+        name: "api-mock-generator",
+        tagline: "Generates realistic synthetic datasets (users, products, posts, transactions) for UI testing.",
+        overview: "Generates comprehensive, realistic mock datasets with relational integrity (e.g. valid foreign key IDs between users and orders). Unblocks frontend engineers while backend APIs are under construction.",
+        caps: [
+          { title: "Relational Mock Engine", desc: "Creates coherent datasets with matching foreign keys and timestamps." },
+          { title: "Realistic Data Types", desc: "Generates realistic names, emails, prices, UUIDs, and statuses." },
+          { title: "JSON & SQL Seed Export", desc: "Outputs ready-to-use JSON fixtures or database INSERT statements." },
+          { title: "Edge Case Generation", desc: "Injects empty lists, long strings, and special characters into mock sets." }
+        ],
+        whenToUse: [
+          "Building frontend prototypes before backend endpoints exist.",
+          "Generating realistic seed data for staging and demo environments."
+        ],
+        whenNotToUse: [
+          "Production databases requiring real user data."
+        ]
+      },
+
+      // AI & DevOps
+      {
+        id: "ai-rag-pipeline-architect",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "ai-rag-pipeline-architect",
+        tagline: "Hybrid RAG pipelines with recursive chunking, vector embeddings, BM25 full-text, and cross-encoder rerankers.",
+        overview: "Establishes production-grade Retrieval-Augmented Generation (RAG) architectures. Combines dense vector similarity (pgvector) with sparse BM25 keyword search, reciprocal rank fusion, and cross-encoder reranking to eliminate hallucinations.",
+        caps: [
+          { title: "Recursive Chunking", desc: "Splits documents along paragraph/header boundaries preserving context." },
+          { title: "Hybrid Search Fusion", desc: "Combines dense vector embeddings with exact BM25 keyword matching." },
+          { title: "Cross-Encoder Reranker", desc: "Reranks top candidates to deliver optimal passages to the LLM." },
+          { title: "Citation Attribution", desc: "Forces LLM outputs to cite exact source chunk identifiers." }
+        ],
+        whenToUse: [
+          "Building AI assistants answering questions over PDF or documentation archives.",
+          "Improving search accuracy and reducing hallucinations in existing RAG apps."
+        ],
+        whenNotToUse: [
+          "Simple prompt tasks requiring no external document retrieval."
+        ]
+      },
+      {
+        id: "ai-prompt-evaluator",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "ai-prompt-evaluator",
+        tagline: "System prompt engineering, red-teaming, XML boundary injection defense, and structured JSON output validation.",
+        overview: "Designs robust, deterministic, and injection-resistant system prompts for AI agents. Wraps inputs in XML boundary tags, establishes few-shot demonstrations, and validates structured JSON schema outputs.",
+        caps: [
+          { title: "XML Boundary Delimiters", desc: "Isolates untrusted user submissions to prevent prompt override attacks." },
+          { title: "Few-Shot Demonstrations", desc: "Provides high-precision input/output examples for tricky edge cases." },
+          { title: "Structured JSON Defense", desc: "Enforces strict JSON schema validation and eliminates conversational chatter." },
+          { title: "Token Efficiency Audit", desc: "Strips redundant adjectives to maximize LLM context window space." }
+        ],
+        whenToUse: [
+          "Designing production prompts for AI agents and LLM-powered backends.",
+          "Hardening chatbots against adversarial prompt injection."
+        ],
+        whenNotToUse: [
+          "Standard deterministic algorithmic code."
+        ]
+      },
+      {
+        id: "test-unit-generator",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "test-unit-generator",
+        tagline: "Comprehensive Vitest / Jest unit test suites with parameterized boundary cases and 100% coverage.",
+        overview: "Constructs deterministic unit test suites following the Arrange-Act-Assert (AAA) pattern. Includes parameterized boundary cases, error branch assertions, and clean mock resets.",
+        caps: [
+          { title: "Arrange-Act-Assert", desc: "Structures tests with clean setup, execution, and explicit assertions." },
+          { title: "Parameterized Boundary Tests", desc: "Tests 0, negative numbers, empty arrays, null, and large values." },
+          { title: "Mock Lifecycle Management", desc: "Resets all mocks in beforeEach to prevent test pollution." },
+          { title: "100% Branch Coverage", desc: "Targets all conditional branches and thrown error paths." }
+        ],
+        whenToUse: [
+          "Writing unit tests for business logic, utilities, and algorithmic functions in TS/JS/Python.",
+          "Preventing regressions during major codebase refactoring."
+        ],
+        whenNotToUse: [
+          "Full browser workflow testing (use Playwright instead)."
+        ]
+      },
+      {
+        id: "test-e2e-playwright",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "test-e2e-playwright",
+        tagline: "Resilient Playwright browser automation tests with user-facing accessibility locators (getByRole).",
+        overview: "Builds fast, flake-free end-to-end browser automation suites. Uses user-facing accessibility locators (getByRole, getByLabel), auto-waiting web assertions, and reusable authentication states.",
+        caps: [
+          { title: "Accessible Locators", desc: "Prioritizes getByRole and getByLabel over fragile CSS selectors." },
+          { title: "Auto-Waiting Assertions", desc: "Eliminates flaky sleep() calls using expect(locator).toBeVisible()." },
+          { title: "Auth State Re-use", desc: "Saves login session to storageState avoiding repetitive login steps." },
+          { title: "Trace & Video Artifacts", desc: "Captures screenshots and video recordings on test failure." }
+        ],
+        whenToUse: [
+          "Testing critical end-to-end user flows (Sign Up, Checkout, Dashboard).",
+          "Automating visual regression tests across Chrome, Firefox, and Safari."
+        ],
+        whenNotToUse: [
+          "Isolated low-level math or utility testing."
+        ]
+      },
+      {
+        id: "devops-dockerfile-optimizer",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "devops-dockerfile-optimizer",
+        tagline: "Secure multi-stage Dockerfiles with layer caching, Alpine base images, and non-root users.",
+        overview: "Transforms bloated 1GB+ container images into compact, secure 50MB production containers. Enforces multi-stage builds, Alpine/distroless bases, layer caching, non-root user execution, and healthchecks.",
+        caps: [
+          { title: "Multi-Stage Build Pipeline", desc: "Separates compilation dependencies from lean runtime artifacts." },
+          { title: "Layer Cache Optimization", desc: "Orders COPY commands so package installation layers cache efficiently." },
+          { title: "Least Privilege Security", desc: "Runs containers under dedicated non-root users (USER node)." },
+          { title: "Production Healthchecks", desc: "Embeds periodic HTTP/socket healthcheck commands." }
+        ],
+        whenToUse: [
+          "Containerizing Node.js, Python, or Go web services for production deployment.",
+          "Shrinking slow CI Docker build times."
+        ],
+        whenNotToUse: [
+          "Pure serverless functions running directly on Vercel or AWS Lambda."
+        ]
+      },
+      {
+        id: "devops-vercel-render-deploy",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "devops-vercel-render-deploy",
+        tagline: "Zero-downtime hosting deployment configuration for Vercel, Supabase, and Render.",
+        overview: "Streamlines deployment across modern cloud platforms. Generates SPA rewrite rules for Vercel, connection pooling configurations for Supabase PostgreSQL, and background worker settings on Render.",
+        caps: [
+          { title: "SPA Route Rewrites", desc: "Configures vercel.json rewrite rules to prevent 404s on browser refresh." },
+          { title: "Connection Pooler Setup", desc: "Configures port 6543 transaction pooling for serverless database backends." },
+          { title: "Environment Validation", desc: "Ensures all variables in .env.example are populated in cloud dashboards." },
+          { title: "Zero-Downtime Releases", desc: "Guides health-checked blue-green and rolling deployments." }
+        ],
+        whenToUse: [
+          "Deploying full-stack web applications to Vercel, Render, or Railway.",
+          "Connecting serverless frontends to managed PostgreSQL databases."
+        ],
+        whenNotToUse: [
+          "Self-hosted Kubernetes clusters requiring custom Helm charts."
+        ]
+      },
+      {
+        id: "repo-doctor",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "repo-doctor",
+        tagline: "Repository health diagnostics identifying broken runtimes, missing packages, and setup errors.",
+        overview: "Automated project triage engine. Inspects package.json, verifies TypeScript configurations, detects missing environment templates, checks occupied localhost ports, and generates remediation advice.",
+        caps: [
+          { title: "Runtime Diagnostics", desc: "Checks Node.js, Python, and package manager versions against engines field." },
+          { title: "Config Auditor", desc: "Validates tsconfig.json, .gitignore, and lockfile consistency." },
+          { title: "Port Collision Check", desc: "Detects occupied local ports and identifies holding process PIDs." },
+          { title: "Automated Remediation", desc: "Provides 1-click terminal commands to resolve discovered issues." }
+        ],
+        whenToUse: [
+          "Onboarding to a new codebase or diagnosing broken local setups.",
+          "Debugging why a project fails to start after git pull."
+        ],
+        whenNotToUse: [
+          "Performance profiling of live production traffic."
+        ]
+      },
+      {
+        id: "env-sync",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "env-sync",
+        tagline: "Bidirectional differential synchronizer between .env and .env.example templates.",
+        overview: "Eliminates undefined runtime configuration crashes across development teams. Compares local .env files with public .env.example templates, flagging missing variables and sanitizing secret leaks.",
+        caps: [
+          { title: "Bidirectional Diff Engine", desc: "Detects keys present in .env.example but missing locally, and vice versa." },
+          { title: "Secret Leak Protection", desc: "Flags accidentally committed API keys in .env.example templates." },
+          { title: "Automatic Synchronization", desc: "Appends missing keys to .env and sanitized dummy keys to .env.example." },
+          { title: "Zod Schema Sync", desc: "Validates environment variables against runtime schema definitions." }
+        ],
+        whenToUse: [
+          "Pulling upstream code changes that require new environment variables.",
+          "Preparing repository for team onboarding and open source distribution."
+        ],
+        whenNotToUse: [
+          "Managing dynamic runtime configurations stored in Redis or databases."
+        ]
+      },
+      {
+        id: "port-inspector",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "port-inspector",
+        tagline: "Resolves local socket port collisions (EADDRINUSE) and identifies holding process PIDs.",
+        overview: "Instantly inspects and resolves local TCP/UDP port collisions. Identifies process names, PIDs, and commands holding ports like 3000, 5173, 5432, or 6379, enabling safe termination of zombie processes.",
+        caps: [
+          { title: "Socket Discovery", desc: "Inspects TCP/UDP listening states across common development ports." },
+          { title: "Process Identification", desc: "Maps socket holders to exact PIDs and application names." },
+          { title: "Graceful Termination", desc: "Provides safe SIGTERM and fallback SIGKILL commands." },
+          { title: "System Guardrails", desc: "Prevents accidental killing of system-protected macOS/Linux services." }
+        ],
+        whenToUse: [
+          "Resolving EADDRINUSE errors when starting dev servers or databases.",
+          "Cleaning up zombie background processes after closing IDEs."
+        ],
+        whenNotToUse: [
+          "Managing remote server firewall rules."
+        ]
+      },
+      {
+        id: "ci-workflow-architect",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "ci-workflow-architect",
+        tagline: "Generates production GitHub Actions CI/CD workflows for Node, Docker, and Python.",
+        overview: "Constructs fast, cached, and secure continuous integration pipelines on GitHub Actions. Features dependency caching, multi-platform matrix testing, secret binding, and automated release publishing.",
+        caps: [
+          { title: "Matrix Testing", desc: "Runs tests across Node.js 20/22 and Python 3.11/3.12 in parallel." },
+          { title: "Dependency Caching", desc: "Caches npm/pip dependencies to reduce CI run times by up to 60%." },
+          { title: "Least Privilege Security", desc: "Declares minimal necessary GitHub Actions workflow permissions." },
+          { title: "NPM & Docker Release", desc: "Automates publishing with npm provenance and GHCR container pushes." }
+        ],
+        whenToUse: [
+          "Setting up automated testing and build validation for GitHub repositories.",
+          "Automating npm package publishing and Docker image distribution."
+        ],
+        whenNotToUse: [
+          "Local-only single-developer exploratory scripts."
+        ]
+      },
+      {
+        id: "security-auditor",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "security-auditor",
+        tagline: "Pre-flight credential scanner detecting leaked API keys and auto-sanitizing into process.env.",
+        overview: "Scans codebases for hardcoded secrets, private keys, API tokens, and credentials before git commits. Features automated sanitization refactoring code to use process.env references.",
+        caps: [
+          { title: "High-Entropy Detection", desc: "Identifies OpenAI, GitHub, AWS, Stripe, and private RSA keys via regex." },
+          { title: "Auto-Sanitization", desc: "Replaces hardcoded string literals with process.env references." },
+          { title: "Pre-Commit Integration", desc: "Integrates with git hooks to block commits containing sensitive tokens." },
+          { title: "Git History Cleanup", desc: "Provides remediation instructions for rotating compromised credentials." }
+        ],
+        whenToUse: [
+          "Scanning repositories before pushing to public GitHub organizations.",
+          "Auditing student submissions for committed credentials."
+        ],
+        whenNotToUse: [
+          "Runtime web application firewall (WAF) traffic inspection."
+        ]
+      },
+      {
+        id: "docs-broken-link-checker",
+        cat: "devops",
+        catLabel: "AI & DevOps",
+        name: "docs-broken-link-checker",
+        tagline: "Scans markdown files to detect broken internal links and dead file references.",
+        overview: "Validates documentation integrity across repositories, wikis, and open source packages. Scans all .md/.mdx files, resolves relative file paths, validates anchor headings, and rewrites broken links.",
+        caps: [
+          { title: "Relative Path Validation", desc: "Resolves internal file links against the local filesystem." },
+          { title: "Heading Anchor Verification", desc: "Verifies section anchors match GitHub markdown slugification." },
+          { title: "Image Asset Check", desc: "Confirms referenced PNG/JPG/SVG assets exist on disk." },
+          { title: "Automated Path Rewriter", desc: "Automatically updates links when documentation files move." }
+        ],
+        whenToUse: [
+          "Refactoring documentation directories or publishing open source packages.",
+          "Verifying README.md links and images before major releases."
+        ],
+        whenNotToUse: [
+          "Scanning live external web links behind firewalls."
+        ]
+      }
+    ];
+
+    let currentSkillId = "campus-fyp-architecture";
+
+    function initSidebar() {
+      const groups = {
+        campus: document.getElementById("side-campus"),
+        algo: document.getElementById("side-algo"),
+        frontend: document.getElementById("side-frontend"),
+        backend: document.getElementById("side-backend"),
+        devops: document.getElementById("side-devops")
+      };
+
+      allSkills.forEach(s => {
+        const container = groups[s.cat];
+        if (!container) return;
+
+        const item = document.createElement("div");
+        item.className = `sidebar-item ${s.id === currentSkillId ? "active" : ""}`;
+        item.id = `side-item-${s.id}`;
+        item.onclick = () => selectSkill(s.id);
+        item.innerHTML = `
+          <span>${s.name}</span>
+          <span class="sidebar-item-pill">${s.cat}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function selectSkill(id) {
+      currentSkillId = id;
+      const skill = allSkills.find(s => s.id === id);
+      if (!skill) return;
+
+      // Update sidebar active states
+      document.querySelectorAll(".sidebar-item").forEach(el => el.classList.remove("active"));
+      const activeEl = document.getElementById(`side-item-${id}`);
+      if (activeEl) activeEl.classList.add("active");
+
+      // Update header
+      document.getElementById("categoryCrumb").innerText = skill.catLabel;
+      document.getElementById("skillTitle").innerText = skill.name;
+      document.getElementById("skillTagline").innerText = skill.tagline;
+      document.getElementById("skillOverview").innerText = skill.overview;
+      document.getElementById("githubSkillLink").href = `https://github.com/ieeecsopen/mcp-cs/tree/main/skills/${skill.name}/SKILL.md`;
+
+      // Update next skill label
+      const currIdx = allSkills.findIndex(s => s.id === id);
+      const nextSkill = allSkills[(currIdx + 1) % allSkills.length];
+      document.getElementById("nextSkillLabel").innerText = nextSkill.name;
+
+      // Render Capabilities
+      const capGrid = document.getElementById("capabilityGrid");
+      capGrid.innerHTML = skill.caps.map(c => `
+        <div class="capability-card">
+          <div class="cap-header">
+            <svg class="cap-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span class="cap-title">${c.title}</span>
+          </div>
+          <div class="cap-desc">${c.desc}</div>
+        </div>
+      `).join("");
+
+      // Render When to use / not use
+      document.getElementById("whenToUseList").innerHTML = skill.whenToUse.map(w => `<li>${w}</li>`).join("");
+      document.getElementById("whenNotToUseList").innerHTML = skill.whenNotToUse.map(w => `<li>${w}</li>`).join("");
+
+      // Render Runbook Code block
+      document.getElementById("runbookFileLabel").innerText = `skills/${skill.name}/SKILL.md`;
+      document.getElementById("runbookContent").innerText = `---
+name: ${skill.name}
+description: ${skill.tagline}
+author: IEEE Computer Society of SLIIT
+ecosystem: IEEE CS Open Agent Suite
+---
+
+# ${skill.name.toUpperCase().replace(/-/g, ' ')} RUNBOOK
+
+## Mission & Problem Statement
+${skill.overview}
+
+## Capabilities
+${skill.caps.map(c => `- **${c.title}**: ${c.desc}`).join('\n')}
+
+## 1-Command Installation
+$ mcs skills install
+# or for skills.sh ecosystem:
+$ npx skills add ieeecsopen/mcp-cs#${skill.name}
+
+## Quality Gate Checklist
+[ ] Verified against IEEE CS open engineering standards.
+[ ] Compatible with Antigravity, Cursor, Claude Code, Windsurf, Copilot, and Cline.
+[ ] Parameterized edge-cases and boundary conditions validated.`;
+
+      // Update URL without full reload
+      if (window.history.pushState) {
+        const newUrl = `${window.location.pathname}?skill=${id}`;
+        window.history.pushState({ path: newUrl }, "", newUrl);
+      }
+    }
+
+    function loadNextSkill() {
+      const currIdx = allSkills.findIndex(s => s.id === currentSkillId);
+      const nextSkill = allSkills[(currIdx + 1) % allSkills.length];
+      selectSkill(nextSkill.id);
+    }
+
+    function copyCurrentInstall() {
+      const cmd = `npx skills add ieeecsopen/mcp-cs#${currentSkillId}`;
+      navigator.clipboard.writeText(cmd);
+      showToast(`Copied: ${cmd}`);
+    }
+
+    function copyFullRunbook() {
+      const code = document.getElementById("runbookContent").innerText;
+      navigator.clipboard.writeText(code);
+      showToast("Full SKILL.md runbook copied to clipboard!");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.classList.add("active");
+      setTimeout(() => toast.classList.remove("active"), 2200);
+    }
+
+    // Check URL parameters for ?skill=...
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSkill = urlParams.get("skill");
+    if (initialSkill && allSkills.some(s => s.id === initialSkill)) {
+      currentSkillId = initialSkill;
+    }
+
+    initSidebar();
+    selectSkill(currentSkillId);
+  </script>
+</body>
+</html>

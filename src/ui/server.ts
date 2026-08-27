@@ -23,6 +23,7 @@ export function startUiServer(port: number = 4100): Promise<http.Server> {
 
     const dashboardPath = resolveHtml("dashboard.html");
     const landingPath = resolveHtml("landing.html");
+    const detailPath = resolveHtml("skill-detail.html");
 
     const server = http.createServer(async (req, res) => {
       // Disable browser caching
@@ -44,6 +45,17 @@ export function startUiServer(port: number = 4100): Promise<http.Server> {
       const parsedUrl = new URL(req.url || "/", `http://localhost:${port}`);
 
       // Route: Landing page
+      if (parsedUrl.pathname === "/skill-detail" || parsedUrl.pathname === "/specification") {
+        try {
+          const htmlContent = fs.readFileSync(detailPath, "utf8");
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(htmlContent);
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "text/plain" });
+          res.end("Error loading skill detail HTML");
+        }
+        return;
+      }
       if (parsedUrl.pathname === "/landing" || parsedUrl.pathname === "/skills") {
         try {
           const htmlContent = fs.readFileSync(landingPath, "utf8");

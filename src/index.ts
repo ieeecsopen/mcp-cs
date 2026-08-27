@@ -812,6 +812,17 @@ async function main() {
         return p;
       };
 
+      // Skill Detail Page Route (/skill-detail or /specification)
+      if ((parsedUrl.pathname === "/skill-detail" || parsedUrl.pathname === "/specification") && isHtmlRequest) {
+        try {
+          const detailPath = resolveHtmlFile("skill-detail.html");
+          const content = fs.readFileSync(fs.existsSync(detailPath) ? detailPath : resolveHtmlFile("landing.html"), "utf8");
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(content);
+          return;
+        } catch (e) {}
+      }
+
       // 1. Developer Console Route (/console or /dashboard)
       if ((parsedUrl.pathname === "/console" || parsedUrl.pathname === "/dashboard" || parsedUrl.pathname === "/ui") && isHtmlRequest) {
         try {

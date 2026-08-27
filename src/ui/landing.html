@@ -641,7 +641,8 @@
       <span class="nav-org-tag">IEEE CS SLIIT</span>
     </a>
     <div class="nav-links">
-      <a href="#skills" class="nav-link" onclick="setFilter('all')">Skills Directory</a>
+      <a href="#skills" class="nav-link" onclick="setFilter('all')">Directory</a>
+      <a href="/skill-detail" class="nav-link">Specification</a>
       <a href="#campus" class="nav-link" onclick="setFilter('campus')">Campus</a>
       <a href="/console" class="nav-link">Developer Console</a>
       <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-link">GitHub</a>
@@ -847,7 +848,7 @@
           <tr>
             <td class="skill-idx">${s.idx}</td>
             <td>
-              <button class="skill-name-btn" onclick="openModal('${s.id}')">${s.name}</button>
+              <a href="/skill-detail?skill=${s.id}" style="color: #ffffff; text-decoration: none; font-family: var(--font-mono); font-weight: 700; font-size: 14px;" class="skill-title-link">${s.name}</a>
               <div class="skill-summary">${s.desc}</div>
             </td>
             <td>
