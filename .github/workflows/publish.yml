@@ -52,4 +52,5 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:2.0.0
+            ghcr.io/${{ github.repository }}:2.2.0
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
