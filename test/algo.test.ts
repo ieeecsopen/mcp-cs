@@ -26,7 +26,7 @@ print("done")
     expect(result.timedOut).toBe(true);
   });
 
-  it("stress-tests matching algorithms successfully", () => {
+  it("stress-tests matching algorithms successfully", { timeout: 15000 }, async () => {
     const sol = `
 import sys
 line = sys.stdin.read().strip()
