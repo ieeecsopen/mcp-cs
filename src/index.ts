@@ -776,7 +776,7 @@ async function main() {
   const enabledModules = getEnabledModules(process.env.MCS_MODULES, moduleArg ? moduleArg.split("=")[1] : undefined);
 
   // Check for Cloud Hosted SSE Mode
-  if (args.includes("--sse") || args.includes("sse")) {
+  if (args.includes("--sse") || args.includes("sse") || args.includes("--relay") || args.includes("relay") || process.env.PORT) {
     const portIndex = args.findIndex((a) => a === "--port" || a === "-p");
     const port = portIndex !== -1 && args[portIndex + 1] ? Number(args[portIndex + 1]) : Number(process.env.PORT) || 8080;
 
