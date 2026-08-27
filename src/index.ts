@@ -5,6 +5,10 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { diagnoseProject, checkEnvSync, inspectPorts } from "./tools/doctor.js";
 import { scanSecrets } from "./tools/security.js";
@@ -13,23 +17,141 @@ import { testApiRequest, generateMockData } from "./tools/api.js";
 import { checkBrokenLinks, extractCodeSnippets } from "./tools/docs.js";
 import { findTodos, inspectHeavyDependencies } from "./tools/code.js";
 import { runSandboxed, stressTest, checkPlagiarism, generateEdgeCases } from "./tools/algo.js";
+import { parseSqliteOrMockSchema, generateMermaidErd } from "./tools/db.js";
+import { auditAssets, checkPerformanceHeaders } from "./tools/perf.js";
+import { fetchCodeforcesProblem } from "./tools/problem.js";
+import { generateCiWorkflow } from "./tools/ci.js";
 
 const server = new Server(
   {
     name: "mcp-cs",
-    version: "1.2.0",
+    version: "2.0.0",
   },
   {
     capabilities: {
       tools: {},
+      resources: {},
+      prompts: {},
     },
   }
 );
 
+// ==========================================
+// 1. MCP PROMPTS
+// ==========================================
+server.setRequestHandler(ListPromptsRequestSchema, async () => {
+  return {
+    prompts: [
+      {
+        name: "diagnose-repo",
+        description: "Runs a complete system doctor diagnostic, checks environment variables, scans ports, and generates an onboarding report",
+      },
+      {
+        name: "stress-test-solution",
+        description: "Interactive prompt to test a fast algorithm against a brute-force baseline on randomized test inputs",
+        arguments: [
+          { name: "problem_goal", description: "Brief description of what the algorithm should solve", required: true },
+        ],
+      },
+      {
+        name: "prepare-pr",
+        description: "Runs pre-flight PR checks, detects uncommitted files, generates release changelogs, and drafts a PR description",
+      },
+    ],
+  };
+});
+
+server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+  const { name } = request.params;
+  if (name === "diagnose-repo") {
+    return {
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: "Please run `doctor_diagnose_project`, `doctor_check_env`, and `doctor_port_inspect` on the current project directory, then provide a structured onboarding and health summary.",
+          },
+        },
+      ],
+    };
+  }
+  if (name === "stress-test-solution") {
+    const goal = request.params.arguments?.problem_goal || "algorithm";
+    return {
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `I need to stress-test an algorithm for "${goal}". Please help me write an optimal solution, a slow brute-force solution, and a randomized testcase generator, then execute \`algo_stress_test\` to find any edge-case failures.`,
+          },
+        },
+      ],
+    };
+  }
+  if (name === "prepare-pr") {
+    return {
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: "Please run `git_pr_readiness_check`, `git_generate_pr_description`, and `git_generate_changelog` to prepare a complete Pull Request summary for my active branch.",
+          },
+        },
+      ],
+    };
+  }
+  throw new Error(`Prompt not found: ${name}`);
+});
+
+// ==========================================
+// 2. MCP RESOURCES
+// ==========================================
+server.setRequestHandler(ListResourcesRequestSchema, async () => {
+  return {
+    resources: [
+      {
+        uri: "resource://system/ports",
+        name: "Active Network Ports",
+        description: "Live snapshot of common development ports (3000, 6379, 5432, 8000, 8080)",
+        mimeType: "application/json",
+      },
+      {
+        uri: "resource://git/status",
+        name: "Git Repository Status",
+        description: "Current git branch, uncommitted files, and upstream sync state",
+        mimeType: "application/json",
+      },
+    ],
+  };
+});
+
+server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+  const { uri } = request.params;
+  if (uri === "resource://system/ports") {
+    const ports = inspectPorts([3000, 3001, 5173, 5432, 6379, 8000, 8080]);
+    return {
+      contents: [{ uri, mimeType: "application/json", text: JSON.stringify(ports, null, 2) }],
+    };
+  }
+  if (uri === "resource://git/status") {
+    const status = checkPrReadiness();
+    return {
+      contents: [{ uri, mimeType: "application/json", text: JSON.stringify(status, null, 2) }],
+    };
+  }
+  throw new Error(`Resource not found: ${uri}`);
+});
+
+// ==========================================
+// 3. MCP TOOLS REGISTRY (24 Tools)
+// ==========================================
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
-      // --- ⚡ AlgoJudge Competitive & Algorithm Engine ---
+      // ⚡ AlgoJudge Suite
       {
         name: "algo_run_sandboxed",
         description: "Executes code in a sandboxed process with strict timeout and memory limits (supports python, javascript, typescript, cpp, c, go)",
@@ -73,7 +195,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "algo_generate_edge_cases",
-        description: "Generates adversarial corner cases (min N=1, max constraints, identical items, extreme negatives, disconnected graphs)",
+        description: "Generates adversarial corner cases (min N=1, max bounds, identical items, extreme negatives, disconnected graphs)",
         inputSchema: {
           type: "object",
           properties: {
@@ -83,7 +205,71 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
 
-      // --- 🩺 Diagnostics Suite ---
+      // 🗄️ Database & Schema Suite
+      {
+        name: "db_generate_erd",
+        description: "Parses SQL table definitions and generates a clean Mermaid Entity-Relationship (ER) Diagram",
+        inputSchema: {
+          type: "object",
+          properties: {
+            schemaSql: { type: "string", description: "DDL SQL string containing CREATE TABLE statements" },
+          },
+          required: ["schemaSql"],
+        },
+      },
+
+      // ⚡ Web Performance Suite
+      {
+        name: "perf_audit_assets",
+        description: "Scans repository for oversized raster images (>250KB) and calculates bandwidth savings from WebP/AVIF conversion",
+        inputSchema: {
+          type: "object",
+          properties: {
+            targetDir: { type: "string", description: "Directory to scan (defaults to cwd)" },
+            thresholdKb: { type: "number", description: "File size threshold in KB (default: 250)" },
+          },
+        },
+      },
+      {
+        name: "perf_check_headers",
+        description: "Audits HTTP response headers of a web application for Gzip/Brotli compression, Cache-Control, and security headers",
+        inputSchema: {
+          type: "object",
+          properties: {
+            url: { type: "string", description: "Target URL (e.g. 'http://localhost:3000')" },
+          },
+          required: ["url"],
+        },
+      },
+
+      // 🏆 Contest & Problem Fetcher
+      {
+        name: "problem_fetch_codeforces",
+        description: "Fetches problem statement metadata, tags, and contest details from Codeforces",
+        inputSchema: {
+          type: "object",
+          properties: {
+            contestId: { type: "string", description: "Codeforces contest ID (e.g. '2060')" },
+            index: { type: "string", description: "Problem letter (e.g. 'A', 'B', 'C')" },
+          },
+          required: ["contestId", "index"],
+        },
+      },
+
+      // 🤖 CI/CD Suite
+      {
+        name: "ci_generate_workflow",
+        description: "Generates production-ready GitHub Actions CI/CD workflows for Next.js, NPM Publishing, Docker, or Python",
+        inputSchema: {
+          type: "object",
+          properties: {
+            type: { type: "string", enum: ["nextjs", "node-publish", "docker", "python"], description: "Workflow type" },
+          },
+          required: ["type"],
+        },
+      },
+
+      // 🩺 Diagnostics Suite
       {
         name: "doctor_diagnose_project",
         description: "Scans project structure, detects language/framework, missing dependencies, and setup issues",
@@ -120,7 +306,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
 
-      // --- 🛡️ Security Suite ---
+      // 🛡️ Security Suite
       {
         name: "security_scan_secrets",
         description: "Scans repository text files for accidentally hardcoded API keys, JWTs, and private tokens",
@@ -132,7 +318,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
 
-      // --- 🌐 API & Web Suite ---
+      // 🌐 API & Web Suite
       {
         name: "api_test_request",
         description: "Executes an HTTP request (GET, POST, PUT, DELETE, PATCH) and measures latency & formats response data",
@@ -160,7 +346,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
 
-      // --- 📚 Documentation Suite ---
+      // 📚 Documentation Suite
       {
         name: "docs_check_broken_links",
         description: "Scans all markdown files (.md, .mdx) in the project to detect broken internal links and dead file references",
@@ -182,7 +368,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
 
-      // --- 🔍 Code Hygiene Suite ---
+      // 🔍 Code Hygiene Suite
       {
         name: "code_find_todos",
         description: "Scans the codebase for TODO, FIXME, HACK, and BUG comments with line numbers and file paths",
@@ -204,7 +390,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
 
-      // --- 🚀 Git & Release Suite ---
+      // 🚀 Git & Release Suite
       {
         name: "git_generate_changelog",
         description: "Parses conventional git commit history between tags and outputs a clean markdown changelog",
@@ -238,11 +424,43 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
+// ==========================================
+// 4. MCP TOOL CALL HANDLER
+// ==========================================
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   try {
-    // ⚡ AlgoJudge Suite
+    // 🗄️ Database
+    if (name === "db_generate_erd") {
+      const tables = parseSqliteOrMockSchema(args?.schemaSql as string);
+      const erd = generateMermaidErd(tables);
+      return { content: [{ type: "text", text: erd }] };
+    }
+
+    // ⚡ Performance
+    if (name === "perf_audit_assets") {
+      const report = auditAssets((args?.targetDir as string) || process.cwd(), (args?.thresholdKb as number) || 250);
+      return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
+    }
+    if (name === "perf_check_headers") {
+      const report = await checkPerformanceHeaders(args?.url as string);
+      return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
+    }
+
+    // 🏆 Problem Fetcher
+    if (name === "problem_fetch_codeforces") {
+      const problem = await fetchCodeforcesProblem(args?.contestId as string, args?.index as string);
+      return { content: [{ type: "text", text: JSON.stringify(problem, null, 2) }] };
+    }
+
+    // 🤖 CI/CD
+    if (name === "ci_generate_workflow") {
+      const workflow = generateCiWorkflow(args?.type as "nextjs" | "node-publish" | "docker" | "python");
+      return { content: [{ type: "text", text: `## File: \`${workflow.fileName}\`\n\n\`\`\`yaml\n${workflow.yamlContent}\`\`\`` }] };
+    }
+
+    // ⚡ AlgoJudge
     if (name === "algo_run_sandboxed") {
       const res = runSandboxed(
         args?.code as string,
