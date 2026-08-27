@@ -14,4 +14,12 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY README.md ./
 
-ENTRYPOINT ["node", "dist/index.js"]
+# Hosted deployment (Fly.io / AWS ECS) means no attached stdin, so stdio
+# transport is useless here - default to Relay mode instead. PORT is read
+# from the environment (Fly.io injects it automatically); RELAY_API_TOKENS
+# must be supplied at deploy time (fly secrets set / ECS task secrets) - the
+# server refuses to start without at least one configured token.
+ENV PORT=8080
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD wget -q -O- http://localhost:${PORT}/health || exit 1
+ENTRYPOINT ["node", "dist/index.js", "--relay"]

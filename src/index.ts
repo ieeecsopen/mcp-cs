@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import http from "http";
+import { timingSafeEqual } from "crypto";
+import { createRequire } from "module";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
@@ -26,7 +28,10 @@ import { fetchCodeforcesProblem } from "./tools/problem.js";
 import { generateCiWorkflow } from "./tools/ci.js";
 import { startUiServer } from "./ui/server.js";
 
-const SERVER_VERSION = "2.1.0";
+// Read once from package.json instead of hardcoding, so this can't drift
+// from the published version the way the old duplicated "2.0.0" literals did.
+const require = createRequire(import.meta.url);
+const SERVER_VERSION: string = require("../package.json").version;
 
 // A fresh Server instance is created per connection (see createServer() below)
 // rather than sharing one module-level instance. The SDK's Protocol.connect()
@@ -655,6 +660,29 @@ function createServer(): Server {
 // ==========================================
 // 5. SERVER RUNNER & MULTI-TRANSPORT DISPATCH
 // ==========================================
+
+// Relay = the hosted, multi-tenant remote SSE mode. Bearer tokens are
+// comma-separated so each connecting team/org can hold its own revocable
+// token instead of one shared secret for everyone.
+function getRelayTokens(): string[] {
+  return (process.env.RELAY_API_TOKENS || "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+function isAuthorized(req: http.IncomingMessage, validTokens: string[]): boolean {
+  const header = req.headers["authorization"];
+  if (!header || Array.isArray(header) || !header.startsWith("Bearer ")) return false;
+  const provided = Buffer.from(header.slice("Bearer ".length));
+  return validTokens.some((token) => {
+    const expected = Buffer.from(token);
+    // timingSafeEqual requires equal-length buffers; a length mismatch is
+    // just "not this token", not something to throw on.
+    return provided.length === expected.length && timingSafeEqual(provided, expected);
+  });
+}
+
 async function main() {
   const args = process.argv.slice(2);
 
@@ -666,18 +694,38 @@ async function main() {
     return;
   }
 
-  // Check for Cloud Hosted SSE Mode
-  if (args.includes("--sse") || args.includes("sse")) {
+  // Relay mode: hosted, multi-tenant remote SSE transport. --sse is kept as
+  // an alias so any existing scripts/docs referencing it keep working.
+  if (args.includes("--relay") || args.includes("relay") || args.includes("--sse") || args.includes("sse")) {
     const portIndex = args.findIndex((a) => a === "--port" || a === "-p");
     const port = portIndex !== -1 && args[portIndex + 1] ? Number(args[portIndex + 1]) : Number(process.env.PORT) || 8080;
 
-    let sseTransport: SSEServerTransport | null = null;
+    const relayTokens = getRelayTokens();
+    if (relayTokens.length === 0) {
+      console.error(
+        "Relay mode requires at least one token in RELAY_API_TOKENS (comma-separated, one per team). Refusing to start unauthenticated."
+      );
+      process.exit(1);
+    }
+
+    // SSEServerTransport is deprecated upstream in favor of
+    // StreamableHTTPServerTransport, but it's kept here since it's still the
+    // most widely-supported "literally SSE" contract across current MCP
+    // clients (the ask was specifically SSE). Worth revisiting once client
+    // support for Streamable HTTP is more settled across Cursor/Windsurf/
+    // Claude Desktop.
+    //
+    // One Server + SSEServerTransport pair per connected session, keyed by
+    // the transport's own sessionId. A single shared Server instance (or a
+    // single shared transport variable, as this used to be) can't serve more
+    // than one live connection at once - see createServer()'s comment.
+    const sessions = new Map<string, { server: Server; transport: SSEServerTransport }>();
 
     const httpServer = http.createServer(async (req, res) => {
       // CORS headers
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
       if (req.method === "OPTIONS") {
         res.writeHead(204);
@@ -687,10 +735,17 @@ async function main() {
 
       const parsedUrl = new URL(req.url || "/", `http://localhost:${port}`);
 
-      // Health Check endpoint
+      // Health check stays unauthenticated on purpose - Fly.io/ECS health
+      // probes don't carry a Bearer token.
       if (parsedUrl.pathname === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ status: "healthy", server: "mcp-cs", version: "2.0.0", timestamp: new Date().toISOString() }));
+        res.end(JSON.stringify({
+          status: "healthy",
+          server: "mcp-cs-relay",
+          version: SERVER_VERSION,
+          activeSessions: sessions.size,
+          timestamp: new Date().toISOString(),
+        }));
         return;
       }
 
@@ -698,32 +753,51 @@ async function main() {
       if (parsedUrl.pathname === "/") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({
-          name: "mcs",
-          description: "IEEE Computer Society Universal Developer Operations & AlgoJudge Server",
-          version: "2.0.0",
+          name: "mcp-cs Relay",
+          description: "Hosted, multi-tenant remote SSE transport for mcp-cs - IEEE Computer Society Universal Developer Operations & AlgoJudge Server",
+          version: SERVER_VERSION,
           sseEndpoint: "/sse",
           messagesEndpoint: "/messages",
           healthEndpoint: "/health",
+          auth: "Bearer token required in the Authorization header for /sse and /messages",
         }, null, 2));
         return;
       }
 
-      // SSE Connect endpoint
+      // Everything past this point requires a valid Bearer token.
+      if (parsedUrl.pathname === "/sse" || parsedUrl.pathname === "/messages") {
+        if (!isAuthorized(req, relayTokens)) {
+          res.writeHead(401, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Missing or invalid Bearer token" }));
+          return;
+        }
+      }
+
+      // SSE connect endpoint - a fresh Server + transport pair per client.
       if (parsedUrl.pathname === "/sse" && req.method === "GET") {
-        const server = createServer();
-        sseTransport = new SSEServerTransport("/messages", res);
-        await server.connect(sseTransport);
+        const transport = new SSEServerTransport("/messages", res);
+        const session = createServer();
+        sessions.set(transport.sessionId, { server: session, transport });
+
+        res.on("close", () => {
+          sessions.delete(transport.sessionId);
+        });
+
+        await session.connect(transport);
         return;
       }
 
-      // Post messages endpoint
+      // Message endpoint - routed to the right session via the sessionId
+      // query param SSEServerTransport hands the client on connect.
       if (parsedUrl.pathname === "/messages" && req.method === "POST") {
-        if (!sseTransport) {
+        const sessionId = parsedUrl.searchParams.get("sessionId");
+        const session = sessionId ? sessions.get(sessionId) : undefined;
+        if (!session) {
           res.writeHead(400, { "Content-Type": "text/plain" });
-          res.end("SSE session not established yet. Connect to /sse first.");
+          res.end("Unknown or expired session. Connect to /sse first.");
           return;
         }
-        await sseTransport.handlePostMessage(req, res);
+        await session.transport.handlePostMessage(req, res);
         return;
       }
 
@@ -733,19 +807,19 @@ async function main() {
 
     httpServer.listen(port, () => {
       console.log(`\n======================================================`);
-      console.log(`🌐 mcp-cs Cloud-Hosted SSE Engine running!`);
-      console.log(`📡 SSE Stream: http://0.0.0.0:${port}/sse`);
-      console.log(`💬 Message Endpoint: http://0.0.0.0:${port}/messages`);
-      console.log(`🩺 Healthcheck: http://0.0.0.0:${port}/health`);
+      console.log(`🛰️  mcp-cs Relay - hosted multi-tenant SSE running!`);
+      console.log(`📡 SSE Stream:      http://0.0.0.0:${port}/sse`);
+      console.log(`💬 Messages:        http://0.0.0.0:${port}/messages`);
+      console.log(`🩺 Health check:    http://0.0.0.0:${port}/health`);
+      console.log(`🔑 Tokens loaded:   ${relayTokens.length}`);
       console.log(`======================================================\n`);
     });
     return;
   }
 
   // Default: Local Stdio Transport (For Claude Desktop, Cursor, local agent invocation)
-  const server = createServer();
   const transport = new StdioServerTransport();
-  await server.connect(transport);
+  await createServer().connect(transport);
 }
 
 main().catch((error) => {

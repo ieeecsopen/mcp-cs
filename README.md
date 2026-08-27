@@ -142,6 +142,28 @@ Add to your Claude configuration file:
 
 ---
 
+### 4. Remote Teams — MCS Relay (Hosted SSE, no local Node.js needed)
+
+If your organization runs a hosted Relay instance (see [🛰️ MCS Relay](#-mcs-relay--hosted-cloud-deployment) below), teammates connect straight to the remote URL instead of running anything locally. Ask whoever manages your Relay deployment for the URL and your team's Bearer token, then point your client at it:
+
+**Cursor / Windsurf / Claude Desktop** (exact field names vary slightly by client version — check that client's current remote-MCP docs if this doesn't connect):
+```json
+{
+  "mcpServers": {
+    "mcs-relay": {
+      "url": "https://mcp.ieeecs-sliit.org/sse",
+      "headers": {
+        "Authorization": "Bearer <your-team-token>"
+      }
+    }
+  }
+}
+```
+
+No `npx`, no local Node.js install, no per-machine setup — the same URL and token work for everyone on the team, and revoking one team's token doesn't affect any other team's connection.
+
+---
+
 ## 🛠️ Complete Tool Catalog (24 Tools)
 
 ### ⚡ 1. AlgoJudge Competitive & Algorithm Engine
@@ -246,6 +268,60 @@ npm run build
 # 5. Start in development mode with UI
 npm run dev -- --ui
 ```
+
+---
+
+## 🛰️ MCS Relay — Hosted Cloud Deployment
+
+MCS runs locally via stdio by default (one process per developer, launched by their MCP client). **Relay** is the hosted, multi-tenant alternative: a single long-running daemon serving remote SSE connections over HTTPS, so whole teams can connect their Cursor, Windsurf, or Claude Desktop directly to a shared URL without installing Node.js locally.
+
+Each incoming `/sse` connection gets its own isolated MCP server + transport instance internally — Relay is safe for many teams connecting concurrently, not just one client at a time.
+
+### Configuration
+
+| Env var | Required | Purpose |
+|---|---|---|
+| `RELAY_API_TOKENS` | **Yes** | Comma-separated Bearer tokens, one per team/org (e.g. `team-a-token,team-b-token`). The server refuses to start without at least one — Relay is never unauthenticated. |
+| `PORT` | No (default `8080`) | Port to listen on. Fly.io injects this automatically. |
+
+### Run locally
+
+```bash
+RELAY_API_TOKENS="dev-token" npm run start:relay
+# or: RELAY_API_TOKENS="dev-token" node dist/index.js --relay --port 8080
+```
+
+Endpoints:
+- `GET /sse` — SSE connect endpoint (needs `Authorization: Bearer <token>`)
+- `POST /messages?sessionId=...` — message endpoint used internally by the client library (needs `Authorization: Bearer <token>`)
+- `GET /health` — unauthenticated health probe (for load balancers / orchestrators)
+
+### Deploy with Docker
+
+The existing `Dockerfile` builds a runner image that starts in Relay mode by default:
+
+```bash
+docker build -t mcs-relay .
+docker run -p 8080:8080 -e RELAY_API_TOKENS="team-a-token,team-b-token" mcs-relay
+```
+
+### Deploy to Fly.io
+
+```bash
+fly launch --no-deploy   # generates fly.toml from the Dockerfile, don't deploy yet
+fly secrets set RELAY_API_TOKENS="team-a-token,team-b-token"
+fly deploy
+```
+
+Point DNS for your chosen hostname (e.g. `mcp.ieeecs-sliit.org`) at the Fly.io app, then share `https://mcp.ieeecs-sliit.org/sse` plus each team's token — see [Remote Teams client config](#4-remote-teams--mcs-relay-hosted-sse-no-local-nodejs-needed) above.
+
+### Deploy to AWS ECS
+
+The same Docker image works unchanged on ECS (Fargate or EC2 launch type) behind an Application Load Balancer terminating TLS — set `RELAY_API_TOKENS` via an ECS task definition secret (Secrets Manager / SSM Parameter Store) rather than a plaintext environment variable, and point the ALB health check at `/health`.
+
+### Rotating or adding a team's token
+
+Update `RELAY_API_TOKENS` (append a new comma-separated value, or remove one to revoke) and restart the daemon — there's no database or persisted session state to migrate, so a restart is a clean, instant token rotation. In-flight sessions are dropped, so time it outside a team's active hours if you can.
 
 ---
 

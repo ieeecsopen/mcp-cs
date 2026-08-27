@@ -19,6 +19,7 @@
     "prepublishOnly": "npm run test && npm run build",
     "test": "vitest run",
     "start": "node dist/index.js",
+    "start:relay": "node dist/index.js --relay",
     "dev": "tsx src/index.ts"
   },
   "keywords": [
