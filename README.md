@@ -1,14 +1,19 @@
-# ⚡ MCP-CS (`mcp-cs`) v1.2.0
+# ⚡ MCP-CS (`mcp-cs`) v2.0.0
 ### IEEE Computer Society Universal Developer, Repo Operations & AlgoJudge Competitive Execution MCP Server
 
-An open-source, full-fledged **Model Context Protocol (MCP)** server providing automated project diagnostics, live sandboxed code execution, differential stress-testing, AST plagiarism detection, secret scanning, live HTTP API testing, and git workflows for AI assistants (**Antigravity, Cursor, Claude Desktop, Windsurf**).
+An open-source, full-featured **Model Context Protocol (MCP)** server providing automated project diagnostics, database ERD generation, web performance audits, competitive problem fetching, live sandboxed code execution, differential stress-testing, and git release workflows for AI assistants (**Antigravity, Cursor, Claude Desktop, Windsurf**).
 
 ---
 
-## 🌟 17 Production Tools Included
+## 🌟 24 Production Tools Included
 
 | Category | Tool | What It Does |
 | :--- | :--- | :--- |
+| 🗄️ **Database & ERD** | `db_generate_erd` | Parses SQL schema and automatically generates a clean Mermaid ER Diagram. |
+| ⚡ **Web Performance** | `perf_audit_assets` | Scans repository for uncompressed raster images (>250KB) and calculates bandwidth savings from WebP/AVIF conversion. |
+| ⚡ **Web Performance** | `perf_check_headers` | Audits HTTP response headers of a web app for Gzip/Brotli compression, Cache-Control, and security headers. |
+| 🏆 **Contest Importer** | `problem_fetch_codeforces` | Fetches problem statements, sample inputs/outputs, tags, and contest limits from Codeforces. |
+| 🤖 **CI/CD Automation** | `ci_generate_workflow` | Generates bulletproof GitHub Actions CI/CD workflows for Next.js, NPM Publishing, Docker, or Python. |
 | ⚡ **AlgoJudge Engine** | `algo_run_sandboxed` | Executes code in Python, JS, TS, C++, C, or Go in an isolated process with strict time & memory limits. |
 | ⚡ **AlgoJudge Engine** | `algo_stress_test` | **Automated Differential Tester:** Compares an optimal algorithm against a brute-force baseline on randomized inputs to find failing edge cases. |
 | ⚡ **AlgoJudge Engine** | `algo_check_plagiarism` | Analyzes code similarity percentage and flags suspicious duplicated logic using AST tokenization. |
@@ -29,9 +34,22 @@ An open-source, full-fledged **Model Context Protocol (MCP)** server providing a
 
 ---
 
+## 🧩 MCP Prompts & Resources
+
+### Prompts (Slash Commands)
+- `/diagnose-repo`: Runs automated doctor diagnostics and environment checks.
+- `/stress-test-solution`: Interactive algorithm stress-testing assistant.
+- `/prepare-pr`: Automated pre-flight PR verification and description generator.
+
+### Resources (Live Dynamic Context)
+- `resource://system/ports`: Live socket inspector of common ports.
+- `resource://git/status`: Real-time repository branch and sync state.
+
+---
+
 ## 🚀 Quickstart
 
-Run directly via `npx` with any AI IDE:
+Run directly via `npx` in any AI IDE (Antigravity, Cursor, Claude Desktop, Windsurf):
 
 ```json
 {
