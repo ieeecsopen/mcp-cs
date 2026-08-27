@@ -1,0 +1,10 @@
+# Smithery configuration file for mcp-cs
+# https://smithery.ai/docs/config
+
+startCommand:
+  type: stdio
+  config:
+    command: npx
+    args:
+      - "-y"
+      - "mcp-cs"
