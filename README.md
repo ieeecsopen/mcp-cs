@@ -11,7 +11,7 @@
 
 **A full-featured [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server created for developers, competitive programmers, and engineering teams.**
 
-[Installation](#-installation--setup) • [Tool Catalog](#-complete-tool-catalog) • [Prompts & Resources](#-interactive-prompts--resources) • [Contributing](#-contributing)
+[Installation](#-installation-guide) • [Client Configuration](#-client-configuration) • [Tool Catalog](#-complete-tool-catalog-24-tools) • [Prompts & Resources](#-interactive-prompts--resources) • [Contributing](#-local-development)
 
 </div>
 
@@ -30,12 +30,55 @@
 
 ---
 
-## 📦 Installation & Setup
+## 📦 Installation Guide
 
-You do **not** need to clone the repository to use `mcp-cs`. It runs automatically via `npx`.
+You can install and use `mcp-cs` through any of the following 3 methods:
 
-### 1. Antigravity Configuration
-Add `mcp-cs` to your global MCP configuration file at `~/.gemini/config/mcp_config.json`:
+### Method 1: Instant Run via `npx` *(Recommended — No install needed)*
+Simply configure your AI client with the command:
+```json
+{
+  "mcpServers": {
+    "mcp-cs": {
+      "command": "npx",
+      "args": ["-y", "mcp-cs"]
+    }
+  }
+}
+```
+
+---
+
+### Method 2: Global NPM Installation
+Install the binary globally to run directly without `npx`:
+```bash
+npm install -g mcp-cs
+```
+
+Then configure your client with:
+```json
+{
+  "mcpServers": {
+    "mcp-cs": {
+      "command": "mcp-cs"
+    }
+  }
+}
+```
+
+---
+
+### Method 3: 1-Click Installation via Smithery
+```bash
+npx -y @smithery/cli install mcp-cs --client claude
+```
+
+---
+
+## 🔌 Client Configuration
+
+### 1. Antigravity IDE
+Add `mcp-cs` to your global configuration file at `~/.gemini/config/mcp_config.json`:
 
 ```json
 {
@@ -69,9 +112,9 @@ Add to your Claude configuration file:
 ---
 
 ### 3. Cursor IDE
-1. Open **Settings** (`Cmd + ,` or `Ctrl + ,`).
-2. Navigate to **Features** $\to$ **MCP**.
-3. Click **Add New MCP Server**:
+1. Open **Settings** (`Cmd + ,` on Mac or `Ctrl + ,` on Windows).
+2. Go to **Features** $\to$ **MCP**.
+3. Click **+ Add New MCP Server**:
    - **Name:** `mcp-cs`
    - **Type:** `command`
    - **Command:** `npx -y mcp-cs`
@@ -79,7 +122,7 @@ Add to your Claude configuration file:
 ---
 
 ### 4. Windsurf & Cline / Roo-Code
-Add the following under `mcpServers` in your settings:
+Add under `mcpServers` in your configuration:
 
 ```json
 {
@@ -191,10 +234,13 @@ cd mcp-cs
 # 2. Install dependencies
 npm install
 
-# 3. Build TypeScript
+# 3. Run automated tests
+npm test
+
+# 4. Build TypeScript
 npm run build
 
-# 4. Start in development mode
+# 5. Start in development mode
 npm run dev
 ```
 
