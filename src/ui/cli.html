@@ -3,29 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCS | Command-Line Interface Reference</title>
+  <title>MCS | The Developer CLI & Terminal Engine</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <!-- GSAP -->
+  <!-- GSAP & ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <style>
     :root {
       --bg: #0d1117;
       --bg-darker: #010409;
       --bg-card: #161b22;
+      --bg-card-hover: #1c2128;
       --border: #30363d;
       --border-muted: #21262d;
+      --border-accent: rgba(255, 208, 0, 0.4);
       --yellow: #ffd000;
+      --yellow-bright: #ffdf40;
+      --yellow-glow: rgba(255, 208, 0, 0.15);
       --purple: #8957e5;
-      --purple-hover: #7c3aed;
+      --purple-hover: #9e6ff5;
       --green: #238636;
+      --green-glow: #2ea043;
       --cyan: #38bdf8;
       --text: #f0f6fc;
       --text-muted: #8b949e;
       --text-dim: #484f58;
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --font-mono: 'JetBrains Mono', SFMono-Regular, Consolas, monospace;
     }
 
     * {
@@ -40,11 +46,10 @@
       font-family: var(--font-sans);
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
-      min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* Ambient Background Grid & Glows */
+    /* Subtle Background Grid & Ambient Lighting */
     body::before {
       content: "";
       position: fixed;
@@ -59,18 +64,43 @@
     .ambient-light-blob {
       position: absolute;
       border-radius: 50%;
-      filter: blur(100px);
+      filter: blur(90px);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.6;
+      opacity: 0.75;
     }
 
     .light-top-right {
-      top: -100px;
-      right: 0;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(137, 87, 229, 0.15) 0%, rgba(56, 139, 253, 0.08) 50%, transparent 70%);
+      top: -120px;
+      right: -100px;
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, rgba(137, 87, 229, 0.18) 0%, rgba(56, 139, 253, 0.12) 45%, transparent 70%);
+    }
+
+    .light-hero-center {
+      top: 100px;
+      left: 15%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 208, 0, 0.07) 0%, transparent 70%);
+    }
+
+    .light-productivity {
+      top: 850px;
+      left: 5%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(46, 160, 67, 0.12) 0%, transparent 65%);
+    }
+
+    .light-globe {
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, rgba(56, 189, 248, 0.08) 50%, transparent 70%);
     }
 
     /* Navbar */
@@ -79,7 +109,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 40px;
-      background: rgba(13, 17, 23, 0.85);
+      background: rgba(13, 17, 23, 0.7);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(240, 246, 252, 0.1);
       position: sticky;
@@ -143,173 +173,261 @@
       border-color: #ffffff;
     }
 
-    /* Main Container */
-    .container {
-      max-width: 1200px;
+    /* Spine Layout Wrapper */
+    .spine-layout-wrapper {
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 60px 24px 120px;
+      padding: 0 24px;
       position: relative;
+    }
+
+    /* Vertical Continuous Spine Line */
+    .vertical-spine-line {
+      position: absolute;
+      left: 64px;
+      top: 140px;
+      bottom: 120px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, #2ea043 30%, #388bfd 60%, #8957e5 85%, rgba(255, 208, 0, 0.8) 100%);
       z-index: 1;
     }
 
-    /* Hero Section */
-    .cli-hero {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-
-    .cli-badge {
-      display: inline-flex;
+    .spine-node-icon {
+      position: absolute;
+      left: 51px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #0d1117;
+      border: 2px solid #ffffff;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(137, 87, 229, 0.1);
-      border: 1px solid rgba(137, 87, 229, 0.3);
-      color: #a371f7;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 14px;
-      border-radius: 20px;
-      margin-bottom: 20px;
+      justify-content: center;
+      z-index: 2;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
     }
 
-    .cli-h1 {
-      font-size: 56px;
+    .spine-node-icon svg {
+      width: 14px;
+      height: 14px;
+      color: #ffffff;
+    }
+
+    .spine-section-content {
+      padding-left: 90px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding-top: 80px;
+      padding-bottom: 100px;
+      position: relative;
+    }
+
+    .hero-top-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-h1 {
+      font-size: 68px;
       font-weight: 800;
-      letter-spacing: -2px;
+      line-height: 1.05;
+      letter-spacing: -2.5px;
       color: #ffffff;
       margin-bottom: 16px;
     }
 
-    .cli-sub {
-      font-size: 18px;
+    .hero-p {
+      font-size: 22px;
       color: var(--text-muted);
-      max-width: 720px;
-      margin: 0 auto 36px;
+      line-height: 1.45;
+      margin-bottom: 40px;
+      font-weight: 400;
     }
 
-    /* Install Switcher */
-    .install-pills-wrap {
-      display: inline-flex;
-      background: #161b22;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+    /* Hero Input & CTA Bar */
+    .hero-action-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 60px;
+      flex-wrap: wrap;
+    }
+
+    .email-install-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 6px;
       padding: 4px;
-      margin-bottom: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     }
 
-    .inst-pill {
+    .email-input-text {
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      outline: none;
+      padding: 10px 16px;
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 13.5px;
+      color: #000000;
       font-weight: 600;
-      padding: 6px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
+      width: 320px;
     }
 
-    .inst-pill.active {
-      background: #21262d;
+    .btn-install-purple {
+      background: #7c3aed;
       color: #ffffff;
-    }
-
-    .install-terminal-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #0d1117;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 20px;
-      max-width: 560px;
-      margin: 0 auto;
-      font-family: var(--font-mono);
+      font-family: var(--font-sans);
+      font-weight: 700;
       font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
       cursor: pointer;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: background 0.15s;
     }
 
-    .install-terminal-box:hover {
-      border-color: var(--purple);
+    .btn-install-purple:hover {
+      background: #6d28d9;
     }
 
-    .install-terminal-box code {
+    .btn-trial-border {
+      background: transparent;
+      border: 1px solid rgba(240, 246, 252, 0.2);
       color: #ffffff;
-    }
-
-    .install-terminal-box span.prefix {
-      color: #a371f7;
-      margin-right: 8px;
-    }
-
-    /* Terminal Simulator Grid */
-    .simulator-grid {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 24px;
-      margin-bottom: 80px;
-    }
-
-    /* Command Selector List */
-    .cmd-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cmd-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 18px;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .cmd-btn:hover {
-      border-color: var(--border-muted);
-      background: #1c2128;
-    }
-
-    .cmd-btn.active {
-      background: #21262d;
-      border-color: rgba(137, 87, 229, 0.5);
-    }
-
-    .cmd-name {
-      font-family: var(--font-mono);
       font-size: 14px;
       font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .cmd-desc {
-      font-size: 12.5px;
-      color: var(--text-muted);
-    }
-
-    /* Terminal Window Mockup */
-    .terminal-window {
-      background: #0b0c11;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-    }
-
-    .terminal-header {
-      display: flex;
+      padding: 14px 22px;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 16px;
+      transition: all 0.15s;
+    }
+
+    .btn-trial-border:hover {
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Floating 3D Graphic (Right of Hero) */
+    .hero-graphic-cluster {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .glossy-3d-emblem {
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle at 35% 35%, #8957e5 0%, #38bdf8 45%, #0f172a 80%, #000000 100%);
+      border-radius: 50%;
+      box-shadow: 
+        inset 0 -20px 40px rgba(0,0,0,0.8),
+        inset 0 20px 30px rgba(255, 255, 255, 0.4),
+        0 20px 60px rgba(137, 87, 229, 0.3);
+      position: relative;
+      animation: floatOrb 6s ease-in-out infinite;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-16px) rotate(4deg); }
+    }
+
+    .floating-sub-orb {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffd000 0%, #d97706 70%, #020617 100%);
+      box-shadow: 0 10px 30px rgba(255, 208, 0, 0.4);
+      top: -10px;
+      right: 20px;
+      animation: floatOrb2 8s ease-in-out infinite;
+    }
+
+    @keyframes floatOrb2 {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(14px); }
+    }
+
+    .floating-badge-check {
+      position: absolute;
+      bottom: 20px;
+      right: 10px;
+      width: 68px;
+      height: 68px;
+      background: #161b22;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6);
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: #38bdf8;
+      font-size: 16px;
+    }
+
+    /* Section 1: Interactive Terminal Playground */
+    .timeline-block {
+      padding-top: 100px;
+      padding-bottom: 100px;
+      position: relative;
+    }
+
+    .block-tag {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .block-heading-gradient-purple {
+      font-size: 28px;
+      font-weight: 800;
+      color: #a371f7;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .block-h2 {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      color: #ffffff;
+      margin-bottom: 40px;
+      max-width: 850px;
+    }
+
+    /* Interactive Dual-Pane Terminal Simulator */
+    .editor-composite-panel {
+      position: relative;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7);
+      margin-bottom: 48px;
+    }
+
+    .editor-composite-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
       background: #161b22;
       border-bottom: 1px solid var(--border);
     }
@@ -323,47 +441,156 @@
     .dot-yellow { background: #ffbd2e; }
     .dot-green { background: #27c93f; }
 
-    .terminal-title {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-dim);
-      margin-left: 8px;
+    .editor-main-body {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 380px;
     }
 
-    .terminal-output {
+    .cmd-nav-pane {
+      background: #161b22;
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cmd-item-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 10px 14px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s;
+    }
+
+    .cmd-item-btn:hover {
+      background: #21262d;
+      color: #ffffff;
+    }
+
+    .cmd-item-btn.active {
+      background: #21262d;
+      color: #58a6ff;
+      border-color: rgba(88, 166, 255, 0.4);
+      font-weight: 700;
+    }
+
+    .terminal-output-pane {
       padding: 24px;
       font-family: var(--font-mono);
       font-size: 13px;
       line-height: 1.7;
       color: #e6edf3;
-      min-height: 380px;
-      white-space: pre-wrap;
       overflow-x: auto;
+      white-space: pre-wrap;
     }
 
-    /* Command Reference Table */
-    .ref-section-title {
-      font-size: 28px;
+    /* Metric Callout */
+    .metric-callout-wrap {
+      margin-bottom: 80px;
+    }
+
+    .metric-pill-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      border: 1px solid #30363d;
+      padding: 2px 10px;
+      border-radius: 12px;
+      color: var(--text-muted);
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .metric-big-number {
+      font-size: 64px;
       font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 16px;
+      letter-spacing: -2px;
+      color: #38bdf8;
+      line-height: 1;
+      margin-bottom: 8px;
     }
 
-    .ref-table-card {
+    .metric-big-sub {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+      max-width: 460px;
+    }
+
+    /* 2-Column Bento Feature Cards */
+    .feature-cards-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+
+    .feature-card-dark {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
+      border-radius: 12px;
+      padding: 36px;
+      transition: border-color 0.15s;
     }
 
-    .ref-table {
+    .feature-card-dark:hover {
+      border-color: var(--border-muted);
+    }
+
+    .fc-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .fc-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .fc-link {
+      color: #58a6ff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fc-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Section 2: Command Reference Table */
+    .table-card-cli {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 100px;
+    }
+
+    .cli-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
     }
 
-    .ref-table th {
-      padding: 12px 18px;
+    .cli-table th {
+      padding: 14px 20px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
@@ -371,20 +598,86 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
       border-bottom: 1px solid var(--border);
-      background: #0d1117;
+      background: #161b22;
     }
 
-    .ref-table td {
-      padding: 14px 18px;
+    .cli-table td {
+      padding: 16px 20px;
       font-size: 13.5px;
       border-bottom: 1px solid var(--border-muted);
       vertical-align: middle;
     }
 
-    .ref-code {
+    .cli-table tr:hover td {
+      background: #161b22;
+    }
+
+    .cli-cmd-name {
       font-family: var(--font-mono);
-      color: #79c0ff;
-      font-weight: 600;
+      font-weight: 700;
+      color: #58a6ff;
+    }
+
+    .cli-flag-badge {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: #21262d;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--yellow);
+    }
+
+    /* Globe / Bottom CTA */
+    .globe-cta-section {
+      text-align: center;
+      padding: 120px 24px;
+      position: relative;
+    }
+
+    .globe-h2 {
+      font-size: 54px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .globe-p {
+      font-size: 20px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      background: #010409;
+      padding: 60px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-link:hover {
+      color: #ffffff;
     }
 
     /* Toast */
@@ -412,12 +705,21 @@
       transform: translateY(0);
     }
 
-    @media (max-width: 860px) {
-      .simulator-grid {
+    @media (max-width: 900px) {
+      .hero-top-grid, .editor-main-body, .feature-cards-2col {
         grid-template-columns: 1fr;
       }
-      .cli-h1 {
-        font-size: 38px;
+      .hero-h1 {
+        font-size: 44px;
+      }
+      .vertical-spine-line {
+        display: none;
+      }
+      .spine-section-content {
+        padding-left: 0;
+      }
+      .navbar {
+        padding: 16px 20px;
       }
     }
   </style>
@@ -425,8 +727,11 @@
 <body>
 
   <div class="ambient-light-blob light-top-right"></div>
+  <div class="ambient-light-blob light-hero-center"></div>
+  <div class="ambient-light-blob light-productivity"></div>
+  <div class="ambient-light-blob light-globe"></div>
 
-  <!-- Navbar -->
+  <!-- Sticky Navbar -->
   <nav class="navbar">
     <div class="nav-left">
       <a href="/" class="nav-logo-link">
@@ -441,139 +746,200 @@
       </div>
     </div>
     <div class="nav-right">
+      <a href="/console" style="color: var(--text); text-decoration: none; font-size: 14px; font-weight: 600;">Console</a>
       <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-btn-github">GitHub</a>
     </div>
   </nav>
 
-  <main class="container">
+  <!-- GitHub Vertical Continuous Spine Layout -->
+  <div class="spine-layout-wrapper">
+    <div class="vertical-spine-line"></div>
 
-    <!-- Hero -->
-    <div class="cli-hero">
-      <div class="cli-badge">MCS Command-Line Interface v2.2.0</div>
-      <h1 class="cli-h1">Direct Terminal Operations</h1>
-      <p class="cli-sub">
-        Run instant repository health audits, inspect occupied localhost sockets, scan for leaked API secrets, and stress-test competitive code directly from your shell.
-      </p>
-
-      <!-- Install Switcher -->
-      <div class="install-pills-wrap">
-        <button class="inst-pill active" onclick="setInst('brew')">Homebrew</button>
-        <button class="inst-pill" onclick="setInst('npm')">npm global</button>
-        <button class="inst-pill" onclick="setInst('npx')">npx direct</button>
-      </div>
-
-      <div class="install-terminal-box" onclick="copyCurrentInst()">
-        <code id="instCode"><span class="prefix">$</span>brew tap ieeecsopen/tap && brew install mcp-cs</code>
-        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-dim);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-      </div>
+    <!-- Node 1: Hero -->
+    <div class="spine-node-icon" style="top: 140px;">
+      <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"></circle></svg>
     </div>
 
-    <!-- Simulator Matrix -->
-    <div class="simulator-grid">
-      
-      <!-- Command List -->
-      <div class="cmd-list">
-        <button class="cmd-btn active" onclick="showCmd('doctor')">
-          <div class="cmd-name">
-            <span>$ mcs doctor</span>
-            <span style="color: var(--cyan);">→</span>
-          </div>
-          <div class="cmd-desc">Sanity diagnostics, environment sync, lockfiles</div>
-        </button>
+    <!-- Hero Section -->
+    <section class="hero-section spine-section-content">
+      <div class="hero-top-grid">
+        <div>
+          <h1 class="hero-h1">Command the context</h1>
+          <p class="hero-p">Universal command-line toolchain for repository diagnostics, socket ports, and algorithmic execution.</p>
 
-        <button class="cmd-btn" onclick="showCmd('ports')">
-          <div class="cmd-name">
-            <span>$ mcs ports</span>
-            <span style="color: var(--cyan);">→</span>
+          <div class="hero-action-bar">
+            <div class="email-install-box">
+              <input type="text" id="installInput" class="email-input-text" value="brew tap ieeecsopen/tap && brew install mcp-cs" readonly />
+              <button class="btn-install-purple" onclick="copyInstall()">Copy Install</button>
+            </div>
+            <a href="/console" class="btn-trial-border">Launch Web UI <span>→</span></a>
           </div>
-          <div class="cmd-desc">Inspect and release occupied localhost sockets</div>
-        </button>
 
-        <button class="cmd-btn" onclick="showCmd('security')">
-          <div class="cmd-name">
-            <span>$ mcs security-scan</span>
-            <span style="color: var(--cyan);">→</span>
+          <div style="display: flex; gap: 12px; margin-top: 10px;">
+            <button onclick="switchInst('brew')" class="badge-inst active" id="pill-brew" style="background:#21262d; border:1px solid var(--border); color:#fff; padding:4px 12px; border-radius:12px; font-family:var(--font-mono); font-size:12px; cursor:pointer;">Homebrew</button>
+            <button onclick="switchInst('npm')" class="badge-inst" id="pill-npm" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:4px 12px; border-radius:12px; font-family:var(--font-mono); font-size:12px; cursor:pointer;">npm global</button>
+            <button onclick="switchInst('npx')" class="badge-inst" id="pill-npx" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:4px 12px; border-radius:12px; font-family:var(--font-mono); font-size:12px; cursor:pointer;">npx direct</button>
           </div>
-          <div class="cmd-desc">Detect leaked OpenAI/AWS API keys and JWTs</div>
-        </button>
+        </div>
 
-        <button class="cmd-btn" onclick="showCmd('skills')">
-          <div class="cmd-name">
-            <span>$ mcs skills install</span>
-            <span style="color: var(--cyan);">→</span>
-          </div>
-          <div class="cmd-desc">Install 30 standardized procedural skills</div>
-        </button>
-
-        <button class="cmd-btn" onclick="showCmd('ui')">
-          <div class="cmd-name">
-            <span>$ mcs --ui</span>
-            <span style="color: var(--cyan);">→</span>
-          </div>
-          <div class="cmd-desc">Launch local developer dashboard on :3000</div>
-        </button>
+        <!-- 3D Glossy Floating Graphic -->
+        <div class="hero-graphic-cluster">
+          <div class="glossy-3d-emblem"></div>
+          <div class="floating-sub-orb"></div>
+          <div class="floating-badge-check">CLI</div>
+        </div>
       </div>
+    </section>
 
-      <!-- Output Window -->
-      <div class="terminal-window">
-        <div class="terminal-header">
+    <!-- Node 2: Commands & Simulator -->
+    <div class="spine-node-icon" style="top: 780px;">
+      <svg fill="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+    </div>
+
+    <!-- Section 1: Interactive Terminal Simulator -->
+    <section class="timeline-block spine-section-content" id="simulator">
+      <div class="block-tag">Terminal Engine</div>
+      <div class="block-heading-gradient-purple">Sub-millisecond CLI operations</div>
+      <h2 class="block-h2">Inspect ports, sync env secrets, and stress-test logic right from your shell.</h2>
+
+      <!-- Composite Terminal Simulator -->
+      <div class="editor-composite-panel">
+        <div class="editor-composite-header">
           <span class="dot dot-red"></span>
           <span class="dot dot-yellow"></span>
           <span class="dot dot-green"></span>
-          <span class="terminal-title" id="termTitle">bash — mcs doctor</span>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-left: 8px;" id="activeCmdTitle">bash — mcs doctor</span>
         </div>
-        <pre class="terminal-output" id="termOutput">Loading command output...</pre>
+        <div class="editor-main-body">
+          <div class="cmd-nav-pane">
+            <button class="cmd-item-btn active" onclick="loadCliSim('doctor')">
+              <span>$ mcs doctor</span>
+              <span>→</span>
+            </button>
+            <button class="cmd-item-btn" onclick="loadCliSim('ports')">
+              <span>$ mcs ports</span>
+              <span>→</span>
+            </button>
+            <button class="cmd-item-btn" onclick="loadCliSim('security')">
+              <span>$ mcs security-scan</span>
+              <span>→</span>
+            </button>
+            <button class="cmd-item-btn" onclick="loadCliSim('skills')">
+              <span>$ mcs skills install</span>
+              <span>→</span>
+            </button>
+            <button class="cmd-item-btn" onclick="loadCliSim('ui')">
+              <span>$ mcs --ui</span>
+              <span>→</span>
+            </button>
+          </div>
+          <pre class="terminal-output-pane" id="cliOutput">Loading terminal output...</pre>
+        </div>
       </div>
 
+      <!-- Metric Callout -->
+      <div class="metric-callout-wrap">
+        <span class="metric-pill-label">Fast Execution</span>
+        <div class="metric-big-number">0 dependencies</div>
+        <div class="metric-big-sub">packaged as a lightweight standalone binary via Node.js or Homebrew tap.</div>
+      </div>
+
+      <!-- 2-Col Cards -->
+      <div class="feature-cards-2col">
+        <div class="feature-card-dark">
+          <h3 class="fc-title">Zero-Config Port Rescue</h3>
+          <p class="fc-desc">Identify which process occupies <code>:3000</code> or <code>:8080</code> and terminate it with <code>mcs ports --kill &lt;port&gt;</code>.</p>
+          <a href="/console" class="fc-link">Explore in Web Console →</a>
+        </div>
+        <div class="feature-card-dark">
+          <h3 class="fc-title">AST Secret Sanitizer</h3>
+          <p class="fc-desc">Catch exposed OpenAI, AWS, and Supabase JWT tokens before committing to open GitHub repositories.</p>
+          <a href="/skill-detail?skill=security-auditor" class="fc-link">View Security Spec →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Node 3: Command Matrix -->
+    <div class="spine-node-icon" style="top: 1720px;">
+      <svg fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
     </div>
 
-    <!-- Flags Reference Table -->
-    <div class="ref-section-title">Command Reference</div>
-    <div class="ref-table-card">
-      <table class="ref-table">
-        <thead>
-          <tr>
-            <th>Command</th>
-            <th>Description</th>
-            <th>Options & Flags</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code class="ref-code">mcs doctor</code></td>
-            <td>Full repository health check, .env synchronizer, and lockfile auditor.</td>
-            <td><code>--fix</code>, <code>--json</code></td>
-          </tr>
-          <tr>
-            <td><code class="ref-code">mcs ports</code></td>
-            <td>Inspect all listening localhost sockets (:3000, :5432, :8080, etc.).</td>
-            <td><code>--kill &lt;port&gt;</code>, <code>--json</code></td>
-          </tr>
-          <tr>
-            <td><code class="ref-code">mcs security-scan</code></td>
-            <td>Entropy and regex analysis to detect leaked private keys and API tokens.</td>
-            <td><code>--strict</code>, <code>--ignore &lt;path&gt;</code></td>
-          </tr>
-          <tr>
-            <td><code class="ref-code">mcs skills install</code></td>
-            <td>Installs standardized skills into <code>.agents/skills/</code> and Cursor rules.</td>
-            <td><code>--all</code>, <code>--skill &lt;id&gt;</code></td>
-          </tr>
-          <tr>
-            <td><code class="ref-code">mcs --ui</code></td>
-            <td>Spawns the local web dashboard for visual socket management and ERD studio.</td>
-            <td><code>--port &lt;num&gt;</code>, <code>--no-open</code></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Section 2: Command Matrix Table -->
+    <section class="timeline-block spine-section-content" id="matrix">
+      <div class="block-tag">Command Reference</div>
+      <div class="block-heading-gradient-purple">Comprehensive Flag Matrix</div>
+      <h2 class="block-h2">Deterministic terminal parameters for every workflow.</h2>
 
-  </main>
+      <div class="table-card-cli">
+        <table class="cli-table">
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Description</th>
+              <th>Options & Flags</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="cli-cmd-name">mcs doctor</code></td>
+              <td>Full repository health check, .env synchronizer, and lockfile auditor.</td>
+              <td><span class="cli-flag-badge">--fix</span> <span class="cli-flag-badge">--json</span></td>
+            </tr>
+            <tr>
+              <td><code class="cli-cmd-name">mcs ports</code></td>
+              <td>Inspect all listening localhost sockets (:3000, :5432, :8080, etc.).</td>
+              <td><span class="cli-flag-badge">--kill &lt;port&gt;</span> <span class="cli-flag-badge">--json</span></td>
+            </tr>
+            <tr>
+              <td><code class="cli-cmd-name">mcs security-scan</code></td>
+              <td>Entropy and regex analysis to detect leaked private keys and API tokens.</td>
+              <td><span class="cli-flag-badge">--strict</span> <span class="cli-flag-badge">--ignore &lt;path&gt;</span></td>
+            </tr>
+            <tr>
+              <td><code class="cli-cmd-name">mcs skills install</code></td>
+              <td>Installs standardized skills into <code>.agents/skills/</code> and Cursor rules.</td>
+              <td><span class="cli-flag-badge">--all</span> <span class="cli-flag-badge">--skill &lt;id&gt;</span></td>
+            </tr>
+            <tr>
+              <td><code class="cli-cmd-name">mcs --ui</code></td>
+              <td>Spawns the local web dashboard for visual socket management and ERD studio.</td>
+              <td><span class="cli-flag-badge">--port &lt;num&gt;</span> <span class="cli-flag-badge">--no-open</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Globe / Bottom CTA -->
+  <div class="globe-cta-section">
+    <h2 class="globe-h2">Universal Developer Operations.<br>Directly from your shell.</h2>
+    <p class="globe-p">Install mcp-cs via Homebrew or npm to empower your local environment.</p>
+
+    <div class="email-install-box" style="margin: 0 auto; max-width: 520px;">
+      <input type="text" class="email-input-text" value="brew tap ieeecsopen/tap && brew install mcp-cs" readonly style="width: 320px;" />
+      <button class="btn-install-purple" onclick="copyInstall()">Copy Brew</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>
+      © 2026 IEEE Computer Society SLIIT. Open Source Software.
+    </div>
+    <div class="footer-links">
+      <a href="/skill-detail" class="footer-link">Specifications</a>
+      <a href="/cli" class="footer-link">CLI Reference</a>
+      <a href="/console" class="footer-link">Developer Console</a>
+      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="footer-link">GitHub Repository</a>
+    </div>
+  </footer>
 
   <div id="toast" class="toast">Copied to clipboard</div>
 
   <script>
-    const outputs = {
+    const cliOutputs = {
       doctor: `🩺 Running MCS Project Diagnostics...
 
 📁 Project Root: /Users/developer/my-project
@@ -628,44 +994,44 @@ Status: 1 Warning Identified`,
 Opening default browser window... (Press Ctrl+C to stop)`
     };
 
-    let currentInstMode = "brew";
+    function loadCliSim(cmdId) {
+      document.querySelectorAll(".cmd-item-btn").forEach(b => b.classList.remove("active"));
+      event.currentTarget.classList.add("active");
 
-    function setInst(mode) {
-      currentInstMode = mode;
-      document.querySelectorAll(".inst-pill").forEach(p => p.classList.remove("active"));
-      event.target.classList.add("active");
+      document.getElementById("activeCmdTitle").innerText = `bash — mcs ${cmdId}`;
+      document.getElementById("cliOutput").innerText = cliOutputs[cmdId] || "// No output";
 
-      const code = document.getElementById("instCode");
-      if (mode === "brew") code.innerHTML = `<span class="prefix">$</span>brew tap ieeecsopen/tap && brew install mcp-cs`;
-      if (mode === "npm") code.innerHTML = `<span class="prefix">$</span>npm install -g mcp-cs`;
-      if (mode === "npx") code.innerHTML = `<span class="prefix">$</span>npx mcp-cs doctor`;
+      gsap.from("#cliOutput", { opacity: 0, y: 10, duration: 0.3, ease: "power2.out" });
     }
 
-    function copyCurrentInst() {
-      let txt = "brew tap ieeecsopen/tap && brew install mcp-cs";
-      if (currentInstMode === "npm") txt = "npm install -g mcp-cs";
-      if (currentInstMode === "npx") txt = "npx mcp-cs doctor";
-      
-      navigator.clipboard.writeText(txt);
+    function switchInst(mode) {
+      document.querySelectorAll(".badge-inst").forEach(b => {
+        b.style.background = "transparent";
+        b.style.color = "var(--text-muted)";
+      });
+      const target = document.getElementById(`pill-${mode}`);
+      if (target) {
+        target.style.background = "#21262d";
+        target.style.color = "#ffffff";
+      }
+
+      const input = document.getElementById("installInput");
+      if (mode === "brew") input.value = "brew tap ieeecsopen/tap && brew install mcp-cs";
+      if (mode === "npm") input.value = "npm install -g mcp-cs";
+      if (mode === "npx") input.value = "npx mcp-cs doctor";
+    }
+
+    function copyInstall() {
+      const val = document.getElementById("installInput").value;
+      navigator.clipboard.writeText(val);
       const toast = document.getElementById("toast");
-      toast.innerText = `Copied: ${txt}`;
+      toast.innerText = `Copied: ${val}`;
       toast.classList.add("active");
       setTimeout(() => toast.classList.remove("active"), 2200);
     }
 
-    function showCmd(cmdId) {
-      document.querySelectorAll(".cmd-btn").forEach(b => b.classList.remove("active"));
-      event.currentTarget.classList.add("active");
-
-      document.getElementById("termTitle").innerText = `bash — mcs ${cmdId}`;
-      const out = document.getElementById("termOutput");
-      out.innerText = outputs[cmdId] || "// No output";
-
-      gsap.from("#termOutput", { opacity: 0, y: 8, duration: 0.3, ease: "power2.out" });
-    }
-
     // Init
-    document.getElementById("termOutput").innerText = outputs.doctor;
+    document.getElementById("cliOutput").innerText = cliOutputs.doctor;
   </script>
 </body>
 </html>
