@@ -3,26 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>mcp-cs | Developer Operations & AlgoJudge Console</title>
+  <title>mcp-cs | Developer Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root {
-      --bg-primary: #0a0e17;
-      --bg-secondary: #111827;
-      --bg-card: rgba(17, 24, 39, 0.7);
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-active: rgba(59, 130, 246, 0.5);
-      --accent-blue: #3b82f6;
-      --accent-cyan: #06b6d4;
-      --accent-purple: #8b5cf6;
-      --accent-emerald: #10b981;
-      --accent-rose: #f43f5e;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
+      --bg: #050505;
+      --bg-surface: #0c0c0c;
+      --bg-card: #111111;
+      --bg-input: #080808;
+      --border: #1e1e1e;
+      --border-focus: #ffd000;
+      --yellow: #ffd000;
+      --yellow-hover: #e6bc00;
+      --yellow-dim: rgba(255, 208, 0, 0.1);
+      --text: #f0f0f0;
+      --text-muted: #888888;
+      --text-dim: #555555;
+      --green: #10b981;
+      --red: #ef4444;
     }
 
     * {
@@ -32,23 +33,18 @@
     }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at 15% 15%, #0f172a 0%, #030712 100%);
-      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
     }
 
-    /* Navbar */
+    /* Top Navigation */
     header {
-      background: rgba(10, 14, 23, 0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
       padding: 0.85rem 2rem;
       display: flex;
       justify-content: space-between;
@@ -58,109 +54,99 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
     }
 
-    .brand-logo {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: #fff;
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    .logo-icon {
+      width: 24px;
+      height: 24px;
+      fill: var(--yellow);
     }
 
     .brand-title {
       font-weight: 700;
       font-size: 1.15rem;
       letter-spacing: -0.02em;
-      background: linear-gradient(90deg, #fff, #93c5fd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
 
-    .badge-ieee {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      color: #93c5fd;
-      padding: 0.2rem 0.55rem;
-      border-radius: 6px;
-      font-size: 0.72rem;
+    .brand-title span {
+      color: var(--yellow);
+    }
+
+    .badge {
+      font-size: 0.75rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      background: var(--yellow-dim);
+      color: var(--yellow);
+      border: 1px solid rgba(255, 208, 0, 0.2);
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Tab Navigation */
     .nav-tabs {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
       display: flex;
       gap: 0.5rem;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 0.3rem;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
     }
 
     .tab-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 0.55rem 1.1rem;
-      border-radius: 7px;
-      font-size: 0.88rem;
       font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.85rem 1.25rem;
       cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      transition: all 0.2s ease;
     }
 
     .tab-btn:hover {
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
     }
 
     .tab-btn.active {
-      color: #fff;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(6, 182, 212, 0.2));
-      border: 1px solid rgba(59, 130, 246, 0.4);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      color: var(--yellow);
+      border-bottom: 2px solid var(--yellow);
     }
 
     /* Main Container */
     main {
       flex: 1;
-      padding: 2rem;
-      max-width: 1500px;
-      margin: 0 auto;
+      max-width: 1300px;
       width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
     }
 
     .tab-content {
       display: none;
-      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .tab-content.active {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Cards */
+    /* Card System */
     .card {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
     }
@@ -169,565 +155,411 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.2rem;
-      padding-bottom: 0.8rem;
-      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
     }
 
     .card-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Buttons */
+    .btn {
+      background: var(--yellow);
+      color: #000;
+      border: none;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn:hover {
+      background: var(--yellow-hover);
+    }
+
+    .btn-secondary {
+      background: #1a1a1a;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #252525;
+      border-color: #333;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    /* Port Grid */
+    .ports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .port-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: border-color 0.15s;
+    }
+
+    .port-item.occupied {
+      border-left: 3px solid var(--yellow);
+    }
+
+    .port-item.free {
+      border-left: 3px solid var(--text-dim);
+      opacity: 0.6;
+    }
+
+    .port-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .port-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .port-status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+    }
+
+    .port-status.active {
+      background: var(--yellow-dim);
+      color: var(--yellow);
+    }
+
+    .port-status.idle {
+      background: #1a1a1a;
+      color: var(--text-dim);
+    }
+
+    .port-details {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Forms and Inputs */
+    textarea, input, select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      padding: 0.75rem;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--border-focus);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     /* Grid Layouts */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
     @media (max-width: 900px) {
-      .grid-2 { grid-template-columns: 1fr; }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
     }
 
-    /* Forms & Buttons */
-    textarea, input, select {
-      width: 100%;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 0.8rem 1rem;
-      color: var(--text-main);
-      font-family: 'Fira Code', monospace;
-      font-size: 0.88rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    textarea:focus, input:focus, select:focus {
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    .btn {
-      background: linear-gradient(135deg, var(--accent-blue), #2563eb);
-      color: #fff;
-      border: none;
-      padding: 0.65rem 1.25rem;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.88rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.14);
-      box-shadow: none;
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, var(--accent-rose), #dc2626);
-    }
-
-    .btn-danger:hover {
-      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4);
-    }
-
-    /* ERD Container */
-    .erd-stage {
-      background: rgba(10, 14, 23, 0.9);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      min-height: 480px;
+    /* Mermaid ERD Output */
+    #erd-output {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      min-height: 250px;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: auto;
-      position: relative;
-      padding: 2rem;
+      overflow-x: auto;
     }
 
-    .stage-controls {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      display: flex;
-      gap: 0.4rem;
-      background: rgba(17, 24, 39, 0.8);
-      backdrop-filter: blur(8px);
-      padding: 0.4rem;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      z-index: 10;
-    }
-
-    .control-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    .control-btn:hover {
-      background: rgba(59, 130, 246, 0.3);
-    }
-
-    /* Port Table */
-    .port-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    .port-table th, .port-table td {
-      padding: 0.9rem 1.2rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .port-table th {
-      color: var(--text-muted);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 600;
-    }
-
-    .status-active {
-      background: rgba(244, 63, 94, 0.15);
-      color: #fb7185;
-      border: 1px solid rgba(244, 63, 94, 0.3);
-    }
-
-    .status-free {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-    }
-    .status-active .dot { background: #fb7185; box-shadow: 0 0 8px #fb7185; }
-    .status-free .dot { background: #34d399; }
-
-    /* Stress Test Visuals */
-    .diff-box {
-      background: #0d1117;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+    /* Terminal Output */
+    .terminal-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 4px;
       padding: 1rem;
-      font-family: 'Fira Code', monospace;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem;
-      max-height: 250px;
-      overflow-y: auto;
+      color: var(--text);
       white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
     }
 
-    .metric-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 1rem;
-      text-align: center;
+    .terminal-prompt {
+      color: var(--yellow);
     }
 
-    .metric-value {
-      font-size: 1.7rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .metric-label {
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      background: var(--bg-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    footer a {
       color: var(--text-muted);
-      margin-top: 0.2rem;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--yellow);
     }
   </style>
 </head>
 <body>
+
+  <!-- Top Header -->
   <header>
     <div class="brand">
-      <div class="brand-logo">CS</div>
-      <div>
-        <div class="brand-title">mcp-cs Dashboard</div>
-      </div>
-      <div class="badge-ieee">SLIIT IEEE CS v2.0</div>
+      <svg class="logo-icon" viewBox="0 0 24 24">
+        <path d="M4 3l16 8-7 2-2 7-7-17z" />
+      </svg>
+      <div class="brand-title">MCP-CS <span>Console</span></div>
+      <span class="badge">v2.1.0</span>
     </div>
-
-    <nav class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('erd')">
-        <span>📊</span> Database ERD
-      </button>
-      <button class="tab-btn" onclick="switchTab('stress')">
-        <span>⚡</span> Stress-Tester
-      </button>
-      <button class="tab-btn" onclick="switchTab('ports')">
-        <span>🔌</span> Port & Process Heatmap
-      </button>
-    </nav>
+    <div class="header-actions">
+      <span class="badge">● Server Active</span>
+      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="btn btn-secondary" style="text-decoration: none;">GitHub</a>
+    </div>
   </header>
 
+  <!-- Clean Tabs -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('ports')">Port Monitor</button>
+    <button class="tab-btn" onclick="switchTab('erd')">Database ERD</button>
+    <button class="tab-btn" onclick="switchTab('stress')">Stress Tester</button>
+    <button class="tab-btn" onclick="switchTab('quickstart')">Quickstart & MCP</button>
+  </nav>
+
+  <!-- Main Content -->
   <main>
-    <!-- TAB 1: ERD VIEWER -->
-    <section id="tab-erd" class="tab-content active">
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title"><span>📝</span> SQL Schema Input</div>
-            <button class="btn btn-secondary" onclick="loadSampleSchema()">Load Contest Sample</button>
-          </div>
-          <textarea id="erd-sql" rows="16" placeholder="Paste your CREATE TABLE SQL DDL here..."></textarea>
-          <div style="margin-top: 1rem; display: flex; gap: 0.8rem;">
-            <button class="btn" onclick="renderErd()">Render Interactive ERD</button>
-          </div>
-        </div>
 
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title"><span>🖼️</span> Visual ERD Diagram</div>
-            <div style="display: flex; gap: 0.5rem;">
-              <button class="btn btn-secondary" onclick="exportErd('svg')">Export SVG</button>
-              <button class="btn btn-secondary" onclick="exportErd('png')">Export PNG</button>
-            </div>
-          </div>
-          <div class="erd-stage" id="erd-container">
-            <div class="stage-controls">
-              <button class="control-btn" onclick="zoomErd(1.2)">+</button>
-              <button class="control-btn" onclick="zoomErd(0.8)">-</button>
-              <button class="control-btn" onclick="resetErdZoom()">↺</button>
-            </div>
-            <div id="mermaid-target" style="transition: transform 0.2s ease;"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 2: STRESS TEST VISUALIZER -->
-    <section id="tab-stress" class="tab-content">
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title"><span>⚙️</span> Code Test Setup</div>
-            <select id="stress-lang" style="width: auto; padding: 0.4rem 0.8rem;">
-              <option value="python">Python 3</option>
-              <option value="javascript">JavaScript (VM Sandbox)</option>
-            </select>
-          </div>
-          
-          <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; display: block;">Optimal Solution Code:</label>
-          <textarea id="sol-code" rows="5" placeholder="Optimal solution implementation..."></textarea>
-
-          <label style="font-size: 0.8rem; color: var(--text-muted); margin: 0.8rem 0 0.3rem; display: block;">Brute Force Baseline Code:</label>
-          <textarea id="brute-code" rows="5" placeholder="Brute-force reference solution..."></textarea>
-
-          <label style="font-size: 0.8rem; color: var(--text-muted); margin: 0.8rem 0 0.3rem; display: block;">Random Test Generator:</label>
-          <textarea id="gen-code" rows="4" placeholder="Generator printing randomized test input to stdout..."></textarea>
-
-          <div style="margin-top: 1rem; display: flex; gap: 0.8rem; align-items: center;">
-            <button class="btn" onclick="runStressVisualizer()">Run Stress Visualizer</button>
-            <button class="btn btn-secondary" onclick="loadStressSample()">Load Sample Problem</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title"><span>📈</span> Execution Metrics & Diff</div>
-            <span id="stress-status" class="status-badge status-free">Ready</span>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.2rem;">
-            <div class="metric-card">
-              <div class="metric-value" id="metric-iters">0</div>
-              <div class="metric-label">Iterations Tested</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value" id="metric-sol-time" style="color: #38bdf8;">0ms</div>
-              <div class="metric-label">Avg Optimal Time</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value" id="metric-brute-time" style="color: #a78bfa;">0ms</div>
-              <div class="metric-label">Avg Brute-Force Time</div>
-            </div>
-          </div>
-
-          <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; display: block;">Side-by-Side Diff Inspector:</label>
-          <div id="diff-display" class="diff-box">Run stress test to inspect side-by-side outputs...</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3: PORT & PROCESS HEATMAP -->
-    <section id="tab-ports" class="tab-content">
+    <!-- Tab 1: Port Monitor -->
+    <div id="tab-ports" class="tab-content active">
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span>🔌</span> Localhost Port & Process Heatmap</div>
-          <button class="btn" onclick="refreshPorts()">
-            <span>🔄</span> Refresh Ports
-          </button>
+          <div>
+            <div class="card-title">Active Local Port Monitor</div>
+            <div class="card-desc">Inspect locked localhost ports, identify background processes, and release ports.</div>
+          </div>
+          <button class="btn" onclick="fetchPorts()">Refresh Ports</button>
+        </div>
+        <div id="ports-list" class="ports-grid">
+          <div style="color: var(--text-muted); font-size: 0.85rem;">Scanning local ports...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Database ERD Studio -->
+    <div id="tab-erd" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">SQL DDL Input</div>
+              <div class="card-desc">Paste CREATE TABLE statements with FOREIGN KEY definitions.</div>
+            </div>
+            <button class="btn" onclick="generateErd()">Render ERD</button>
+          </div>
+          <div class="form-group">
+            <textarea id="sql-input" rows="14" placeholder="CREATE TABLE users (&#10;    id TEXT PRIMARY KEY,&#10;    email TEXT NOT NULL&#10;);&#10;&#10;CREATE TABLE submissions (&#10;    id TEXT PRIMARY KEY,&#10;    user_id TEXT,&#10;    verdict TEXT,&#10;    FOREIGN KEY (user_id) REFERENCES users(id)&#10;);"></textarea>
+          </div>
         </div>
 
-        <table class="port-table">
-          <thead>
-            <tr>
-              <th>Port</th>
-              <th>Status</th>
-              <th>Process / PID</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="port-rows">
-            <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Loading active ports...</td></tr>
-          </tbody>
-        </table>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Mermaid ER Diagram</div>
+              <div class="card-desc">Auto-generated entity relationship model.</div>
+            </div>
+            <button class="btn btn-secondary" onclick="copyMermaid()">Copy Code</button>
+          </div>
+          <div id="erd-output">
+            <div style="color: var(--text-dim); font-size: 0.85rem;">Click "Render ERD" to view diagram</div>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
+
+    <!-- Tab 3: Stress-Test Benchmark -->
+    <div id="tab-stress" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Differential Algorithm Stress Tester</div>
+            <div class="card-desc">Compare an optimal solution against a brute-force baseline on randomized testcases.</div>
+          </div>
+          <button class="btn" onclick="runStressTest()">Run Stress Test</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Optimal Solution (JS/Python)</label>
+            <textarea id="stress-sol" rows="8">function solve(arr) {
+  return Math.max(...arr);
+}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Brute-Force Baseline</label>
+            <textarea id="stress-brute" rows="8">function solve(arr) {
+  let sorted = [...arr].sort((a, b) => a - b);
+  return sorted[sorted.length - 1];
+}</textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Randomized Generator</label>
+          <textarea id="stress-gen" rows="4">function generate() {
+  return Array.from({ length: 5 }, () => Math.floor(Math.random() * 100));
+}</textarea>
+        </div>
+
+        <div id="stress-output" class="terminal-box" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Quickstart & MCP Config -->
+    <div id="tab-quickstart" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">MCP Client Configuration</div>
+            <div class="card-desc">Paste this configuration into Antigravity, Cursor, Claude Desktop, or Windsurf.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <textarea id="mcp-config" rows="8" readonly>{
+  "mcpServers": {
+    "mcp-cs": {
+      "command": "npx",
+      "args": ["-y", "mcp-cs"]
+    }
+  }
+}</textarea>
+        </div>
+        <button class="btn" onclick="copyConfig()">Copy MCP Config</button>
+      </div>
+    </div>
+
   </main>
+
+  <!-- Clean Footer -->
+  <footer>
+    <div>MIT © IEEE Computer Society of SLIIT</div>
+    <div><a href="https://www.npmjs.com/package/mcp-cs" target="_blank">npm: mcp-cs</a></div>
+  </footer>
 
   <script>
     mermaid.initialize({ startOnLoad: false, theme: 'dark' });
 
-    let currentZoom = 1.0;
-
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       
-      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(tabId));
-      if (activeBtn) activeBtn.classList.add('active');
-      document.getElementById(`tab-${tabId}`).classList.add('active');
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
 
-      if (tabId === 'ports') refreshPorts();
+      if (tabId === 'ports') fetchPorts();
     }
 
-    function loadSampleSchema() {
-      document.getElementById('erd-sql').value = `CREATE TABLE users (
-    id INTEGER PRIMARY KEY,
-    username TEXT NOT NULL,
-    email TEXT UNIQUE,
-    created_at TIMESTAMP
-);
-
-CREATE TABLE contests (
-    id INTEGER PRIMARY KEY,
-    title TEXT NOT NULL,
-    start_time TIMESTAMP,
-    duration_minutes INTEGER
-);
-
-CREATE TABLE submissions (
-    id INTEGER PRIMARY KEY,
-    user_id INTEGER,
-    contest_id INTEGER,
-    score INTEGER,
-    verdict TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (contest_id) REFERENCES contests(id)
-);`;
-      renderErd();
-    }
-
-    async function renderErd() {
-      const sql = document.getElementById('erd-sql').value;
-      if (!sql.trim()) return;
-
-      try {
-        const res = await fetch('/api/erd', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ schema: sql })
-        });
-        const data = await res.json();
-
-        const container = document.getElementById('mermaid-target');
-        container.innerHTML = `<pre class="mermaid">${data.mermaid}</pre>`;
-        await mermaid.run({ nodes: [container.querySelector('.mermaid')] });
-        resetErdZoom();
-      } catch (err) {
-        alert('Failed to parse SQL schema: ' + err.message);
-      }
-    }
-
-    function zoomErd(factor) {
-      currentZoom *= factor;
-      const target = document.getElementById('mermaid-target');
-      target.style.transform = `scale(${currentZoom})`;
-    }
-
-    function resetErdZoom() {
-      currentZoom = 1.0;
-      const target = document.getElementById('mermaid-target');
-      target.style.transform = `scale(1.0)`;
-    }
-
-    function exportErd(format) {
-      const svg = document.querySelector('#mermaid-target svg');
-      if (!svg) return alert('Please render an ERD first!');
-
-      const svgData = new XMLSerializer().serializeToString(svg);
-      const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-
-      if (format === 'svg') {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'database-erd.svg';
-        a.click();
-      } else {
-        const canvas = document.createElement('canvas');
-        const img = new Image();
-        img.onload = () => {
-          canvas.width = img.width * 2;
-          canvas.height = img.height * 2;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#0a0e17';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const pngUrl = canvas.toDataURL('image/png');
-          const a = document.createElement('a');
-          a.href = pngUrl;
-          a.download = 'database-erd.png';
-          a.click();
-        };
-        img.src = url;
-      }
-    }
-
-    function loadStressSample() {
-      document.getElementById('stress-lang').value = 'javascript';
-      document.getElementById('sol-code').value = `const fs = require('fs');
-const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/).map(Number);
-if (input.length >= 2) {
-  console.log(input[0] + input[1]);
-}`;
-      document.getElementById('brute-code').value = `const fs = require('fs');
-const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/).map(Number);
-if (input.length >= 2) {
-  let a = input[0], b = input[1];
-  let sum = 0;
-  if (a >= 0) for(let i=0; i<a; i++) sum++;
-  else for(let i=0; i>a; i--) sum--;
-  if (b >= 0) for(let i=0; i<b; i++) sum++;
-  else for(let i=0; i>b; i--) sum--;
-  console.log(sum);
-}`;
-      document.getElementById('gen-code').value = `const a = Math.floor(Math.random() * 200) - 100;
-const b = Math.floor(Math.random() * 200) - 100;
-console.log(a + " " + b);`;
-    }
-
-    async function runStressVisualizer() {
-      const sol = document.getElementById('sol-code').value;
-      const brute = document.getElementById('brute-code').value;
-      const gen = document.getElementById('gen-code').value;
-      const lang = document.getElementById('stress-lang').value;
-
-      const statusBadge = document.getElementById('stress-status');
-      statusBadge.textContent = 'Running...';
-      statusBadge.className = 'status-badge status-active';
-
-      try {
-        const res = await fetch('/api/stress-test', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ solution: sol, bruteForce: brute, generator: gen, language: lang, iterations: 20 })
-        });
-        const data = await res.json();
-
-        document.getElementById('metric-iters').textContent = data.iterationsTested || 0;
-        
-        if (data.status === 'PASSED') {
-          statusBadge.textContent = 'ALL PASSED (20/20)';
-          statusBadge.className = 'status-badge status-free';
-        } else {
-          statusBadge.textContent = `FAILED at #${data.iterationsTested}`;
-          statusBadge.className = 'status-badge status-active';
-        }
-
-        let diffText = `=== STRESS TEST SUMMARY ===\nStatus: ${data.status}\n${data.message}\n\n`;
-        if (data.failingInput) {
-          diffText += `[FAILING INPUT]:\n${data.failingInput}\n\n[OPTIMAL OUTPUT]:\n${data.solutionOutput}\n\n[EXPECTED OUTPUT]:\n${data.expectedOutput}\n`;
-        } else if (data.iterations && data.iterations.length > 0) {
-          diffText += `Recent Iteration Sample (#${data.iterations[0].iteration}):\nInput: ${data.iterations[0].input}\nOutput: ${data.iterations[0].solutionOutput}\nMatches: ${data.iterations[0].passed ? 'YES' : 'NO'}\n`;
-        }
-
-        document.getElementById('diff-display').textContent = diffText;
-      } catch (err) {
-        alert('Stress test error: ' + err.message);
-      }
-    }
-
-    async function refreshPorts() {
-      const tbody = document.getElementById('port-rows');
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Scanning ports...</td></tr>';
+    async function fetchPorts() {
+      const container = document.getElementById('ports-list');
+      container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">Scanning ports...</div>';
 
       try {
         const res = await fetch('/api/ports');
         const ports = await res.json();
 
-        tbody.innerHTML = ports.map(p => {
-          const pidMatch = p.process ? p.process.match(/PID\\s+(\\d+)/) : null;
-          const pid = pidMatch ? pidMatch[1] : null;
-
-          return `
-            <tr>
-              <td style="font-weight: 700; font-family: monospace; color: #93c5fd;">:${p.port}</td>
-              <td>
-                <span class="status-badge ${p.inUse ? 'status-active' : 'status-free'}">
-                  <span class="dot"></span> ${p.inUse ? 'IN USE' : 'AVAILABLE'}
-                </span>
-              </td>
-              <td style="font-family: monospace; font-size: 0.85rem;">${p.process || '—'}</td>
-              <td>
-                ${p.inUse && pid ? `<button class="btn btn-danger" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="killProcess(${pid})">Kill Process</button>` : '—'}
-              </td>
-            </tr>
-          `;
-        }).join('');
+        container.innerHTML = ports.map(p => `
+          <div class="port-item ${p.inUse ? 'occupied' : 'free'}">
+            <div class="port-header">
+              <div class="port-number">:${p.port}</div>
+              <span class="port-status ${p.inUse ? 'active' : 'idle'}">${p.inUse ? 'IN USE' : 'FREE'}</span>
+            </div>
+            <div class="port-details">
+              ${p.inUse ? `PID: ${p.pid || 'Unknown'}<br>Process: ${p.process || 'Node/Daemon'}` : 'No active listeners'}
+            </div>
+            ${p.inUse && p.pid ? `<button class="btn btn-danger" onclick="killPort(${p.pid})">Kill Process</button>` : ''}
+          </div>
+        `).join('');
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color: #fb7185; text-align: center;">Error scanning ports: ${err.message}</td></tr>`;
+        container.innerHTML = `<div style="color: var(--red);">Error loading ports: ${err.message}</div>`;
       }
     }
 
-    async function killProcess(pid) {
-      if (!confirm(`Are you sure you want to terminate process PID ${pid}?`)) return;
-
+    async function killPort(pid) {
+      if (!confirm(`Are you sure you want to kill PID ${pid}?`)) return;
       try {
         const res = await fetch('/api/kill-process', {
           method: 'POST',
@@ -736,20 +568,80 @@ console.log(a + " " + b);`;
         });
         const data = await res.json();
         if (data.success) {
-          alert(`Successfully terminated PID ${pid}`);
-          refreshPorts();
+          fetchPorts();
         } else {
-          alert(`Failed to kill process: ${data.error}`);
+          alert('Error: ' + data.error);
         }
       } catch (err) {
-        alert(`Error: ${err.message}`);
+        alert('Failed to kill process: ' + err.message);
       }
     }
 
-    // Auto-load sample schema on startup
-    window.addEventListener('DOMContentLoaded', () => {
-      loadSampleSchema();
-    });
+    let lastMermaidCode = '';
+    async function generateErd() {
+      const sql = document.getElementById('sql-input').value;
+      const output = document.getElementById('erd-output');
+      output.innerHTML = '<div style="color: var(--text-muted);">Generating ERD...</div>';
+
+      try {
+        const res = await fetch('/api/erd', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ schema: sql })
+        });
+        const data = await res.json();
+        lastMermaidCode = data.mermaid;
+
+        const { svg } = await mermaid.render('erd-svg', data.mermaid);
+        output.innerHTML = svg;
+      } catch (err) {
+        output.innerHTML = `<div style="color: var(--red);">Error parsing SQL: ${err.message}</div>`;
+      }
+    }
+
+    function copyMermaid() {
+      navigator.clipboard.writeText(lastMermaidCode || '');
+      alert('Mermaid diagram code copied!');
+    }
+
+    function copyConfig() {
+      navigator.clipboard.writeText(document.getElementById('mcp-config').value);
+      alert('MCP configuration copied!');
+    }
+
+    async function runStressTest() {
+      const out = document.getElementById('stress-output');
+      out.style.display = 'block';
+      out.innerHTML = '<span class="terminal-prompt">$</span> Running 20 randomized test iterations...';
+
+      const body = {
+        solution: document.getElementById('stress-sol').value,
+        bruteForce: document.getElementById('stress-brute').value,
+        generator: document.getElementById('stress-gen').value,
+        language: 'javascript',
+        iterations: 20
+      };
+
+      try {
+        const res = await fetch('/api/stress-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        if (data.status === 'PASSED') {
+          out.innerHTML = `<span style="color: var(--green);">✔ PASSED</span> Tested ${data.iterationsTested} randomized cases. Both algorithms produced matching outputs.`;
+        } else {
+          out.innerHTML = `<span style="color: var(--red);">✖ FAILED (Counter-example found)</span>\nInput: ${JSON.stringify(data.failingInput)}\nSolution: ${data.solutionOutput}\nExpected: ${data.expectedOutput}`;
+        }
+      } catch (err) {
+        out.innerHTML = `<span style="color: var(--red);">Execution Error:</span> ${err.message}`;
+      }
+    }
+
+    // Auto-fetch ports on load
+    fetchPorts();
   </script>
 </body>
 </html>
