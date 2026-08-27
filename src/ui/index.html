@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCS Skills | The Open Agent Skills & MCP Ecosystem</title>
+  <title>MCS | Model Context Server & Agent Skills Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #000000;
-      --bg-surface: #0a0a0a;
-      --bg-card: #111111;
-      --border: #222222;
-      --border-hover: #333333;
+      --bg: #09090b;
+      --bg-surface: #121215;
+      --bg-card: #18181b;
+      --border: #27272a;
+      --border-hover: #3f3f46;
       --yellow: #ffd000;
-      --yellow-hover: #ffdb33;
-      --yellow-dim: rgba(255, 208, 0, 0.12);
-      --text: #ffffff;
-      --text-muted: #888888;
-      --text-dim: #555555;
+      --yellow-hover: #e6bc00;
+      --yellow-glow: rgba(255, 208, 0, 0.15);
+      --yellow-subtle: rgba(255, 208, 0, 0.08);
+      --text: #fafafa;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
@@ -37,6 +38,11 @@
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
       min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 208, 0, 0.06) 0%, transparent 60%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 48px 48px, 48px 48px;
     }
 
     /* Navbar */
@@ -44,9 +50,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 40px;
+      padding: 18px 48px;
       border-bottom: 1px solid var(--border);
-      background: var(--bg);
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -55,29 +62,34 @@
     .nav-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       text-decoration: none;
       color: var(--text);
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: -0.2px;
     }
 
-    .nav-logo-box {
-      width: 28px;
-      height: 28px;
+    .nav-logo-mark {
+      width: 32px;
+      height: 32px;
       background: var(--yellow);
-      border-radius: 4px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #000;
-      font-weight: 900;
-      font-size: 14px;
       font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 14px;
     }
 
-    .nav-brand span.slash {
+    .nav-org-tag {
+      font-size: 12px;
       color: var(--text-dim);
+      font-weight: 500;
+      padding-left: 6px;
+      border-left: 1px solid var(--border);
     }
 
     .nav-links {
@@ -98,182 +110,247 @@
       color: var(--text);
     }
 
-    .nav-badge-btn {
+    .nav-btn-primary {
       background: var(--yellow);
       color: #000000;
       font-weight: 700;
       font-size: 13px;
-      padding: 6px 14px;
+      padding: 8px 16px;
       border-radius: 6px;
       text-decoration: none;
-      transition: background 0.15s;
+      transition: all 0.15s;
     }
 
-    .nav-badge-btn:hover {
+    .nav-btn-primary:hover {
       background: var(--yellow-hover);
+      box-shadow: 0 0 16px var(--yellow-glow);
     }
 
     /* Container */
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 60px 24px 100px;
+      padding: 72px 24px 120px;
     }
 
     /* Hero Section */
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-      margin-bottom: 70px;
+    .hero-wrapper {
+      text-align: center;
+      max-width: 860px;
+      margin: 0 auto 72px;
     }
 
-    .hero-brand-block {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .hero-big-title {
-      font-family: var(--font-mono);
-      font-size: 68px;
-      font-weight: 900;
-      letter-spacing: -2px;
-      line-height: 1;
-      color: #ffffff;
-      text-transform: uppercase;
-      text-shadow: 4px 4px 0px var(--yellow);
-    }
-
-    .hero-tagline {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--yellow);
-      text-transform: uppercase;
-    }
-
-    .hero-description {
-      font-size: 22px;
-      line-height: 1.45;
-      color: #cccccc;
-      font-weight: 400;
-      letter-spacing: -0.3px;
-    }
-
-    /* Action Row */
-    .action-row {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 40px;
-      align-items: flex-start;
-      margin-bottom: 80px;
-    }
-
-    .action-box-title {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    .terminal-install-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 18px;
-      font-family: var(--font-mono);
-      font-size: 14px;
-      transition: border-color 0.2s;
-    }
-
-    .terminal-install-bar:hover {
-      border-color: var(--border-hover);
-    }
-
-    .terminal-install-bar code {
-      color: #ffffff;
-    }
-
-    .terminal-install-bar code span.cmd-prefix {
-      color: var(--yellow);
-      margin-right: 8px;
-      user-select: none;
-    }
-
-    .copy-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: all 0.15s;
-    }
-
-    .copy-btn:hover {
-      color: var(--yellow);
-      background: var(--yellow-dim);
-    }
-
-    /* Agent Logos Row */
-    .agents-logo-strip {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      flex-wrap: wrap;
-      padding-top: 6px;
-    }
-
-    .agent-pill {
-      display: flex;
+    .hero-badge {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      padding: 6px 14px;
+      background: var(--yellow-subtle);
+      border: 1px solid rgba(255, 208, 0, 0.25);
+      color: var(--yellow);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
       border-radius: 20px;
-      font-size: 13px;
-      color: #aaaaaa;
-      font-weight: 500;
+      margin-bottom: 24px;
     }
 
-    .agent-pill span.dot {
+    .hero-badge span.bullet {
       width: 6px;
       height: 6px;
       border-radius: 50%;
       background: var(--yellow);
     }
 
-    /* Leaderboard Section */
-    .leaderboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .hero-title {
+      font-size: 54px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      color: #ffffff;
       margin-bottom: 20px;
     }
 
-    .leaderboard-title {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
+    .hero-title span.highlight {
+      color: var(--yellow);
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      line-height: 1.6;
       color: var(--text-muted);
+      margin-bottom: 36px;
+      font-weight: 400;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-terminal-copy {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-terminal-copy:hover {
+      border-color: var(--yellow);
+      background: var(--bg-card);
+    }
+
+    .btn-terminal-copy span.prefix {
+      color: var(--yellow);
+      user-select: none;
+    }
+
+    .btn-outline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-surface);
+    }
+
+    /* Bento Feature Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 80px;
+    }
+
+    .bento-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .bento-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+
+    .bento-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--yellow);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .bento-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .bento-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Compatible Agents Strip */
+    .agents-strip-wrap {
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      border-radius: 10px;
+      padding: 20px 28px;
+      margin-bottom: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .agents-strip-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 1px;
       text-transform: uppercase;
     }
 
-    /* Search & Filter Bar */
-    .search-filter-wrap {
-      position: relative;
+    .agents-pill-list {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .agent-tag {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      background: #18181b;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid #27272a;
+    }
+
+    /* Skills Catalog Header */
+    .catalog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
       margin-bottom: 24px;
+    }
+
+    .catalog-title-block h2 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .catalog-title-block p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Search & Filter Controls */
+    .controls-bar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .search-input-wrap {
+      position: relative;
     }
 
     .search-input {
@@ -281,77 +358,54 @@
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 14px 44px 14px 16px;
+      padding: 12px 40px 12px 16px;
       color: #ffffff;
-      font-family: var(--font-mono);
+      font-family: var(--font-sans);
       font-size: 14px;
       outline: none;
-      transition: all 0.2s;
+      transition: border-color 0.2s;
     }
 
     .search-input:focus {
       border-color: var(--yellow);
-      box-shadow: 0 0 0 2px var(--yellow-dim);
     }
 
     .search-input::placeholder {
       color: var(--text-dim);
     }
 
-    .search-shortcut {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: var(--border);
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      user-select: none;
-    }
-
-    /* Category Tabs */
-    .category-tabs {
+    .filter-tabs {
       display: flex;
-      gap: 16px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-      margin-bottom: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px;
+      gap: 4px;
     }
 
-    .tab-btn {
+    .filter-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
       font-family: var(--font-mono);
-      font-size: 13px;
-      cursor: pointer;
-      padding: 6px 0;
-      position: relative;
-      transition: color 0.15s;
-    }
-
-    .tab-btn.active {
-      color: #ffffff;
+      font-size: 12px;
       font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s;
     }
 
-    .tab-btn.active::after {
-      content: '';
-      position: absolute;
-      bottom: -13px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--yellow);
-    }
-
-    /* Table */
-    .skills-table-wrap {
+    .filter-btn.active {
+      background: var(--bg-card);
+      color: var(--yellow);
       border: 1px solid var(--border);
-      border-radius: 8px;
+    }
+
+    /* Skills Table */
+    .skills-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
       background: var(--bg-surface);
       overflow: hidden;
     }
@@ -363,158 +417,158 @@
     }
 
     .skills-table th {
-      padding: 14px 18px;
+      padding: 14px 20px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
       color: var(--text-dim);
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
       border-bottom: 1px solid var(--border);
+      background: #0d0d10;
     }
 
     .skills-table td {
-      padding: 16px 18px;
+      padding: 16px 20px;
       font-size: 14px;
-      border-bottom: 1px solid #161616;
+      border-bottom: 1px solid #1c1c20;
       vertical-align: middle;
     }
 
     .skills-table tr:hover td {
-      background: #0f0f0f;
+      background: #16161a;
     }
 
-    .rank-num {
+    .skill-idx {
       font-family: var(--font-mono);
       color: var(--text-dim);
       font-size: 12px;
     }
 
-    .skill-name-col {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .skill-title-link {
+    .skill-name-btn {
+      background: transparent;
+      border: none;
+      color: #ffffff;
       font-family: var(--font-mono);
       font-weight: 700;
-      color: #ffffff;
-      text-decoration: none;
       font-size: 14px;
+      cursor: pointer;
+      text-align: left;
       transition: color 0.15s;
     }
 
-    .skill-title-link:hover {
+    .skill-name-btn:hover {
       color: var(--yellow);
     }
 
-    .skill-desc {
+    .skill-summary {
       color: var(--text-muted);
       font-size: 13px;
-      font-family: var(--font-sans);
+      margin-top: 3px;
+      line-height: 1.5;
     }
 
-    .skill-badge {
+    .cat-badge {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 600;
-      background: #1c1c1c;
-      color: #aaaaaa;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #1e1e24;
+      color: #bbbbcc;
+      border: 1px solid #2e2e38;
     }
 
-    .skill-badge.campus {
-      background: var(--yellow-dim);
+    .cat-badge.campus {
+      background: var(--yellow-subtle);
       color: var(--yellow);
-      border: 1px solid rgba(255, 208, 0, 0.2);
+      border-color: rgba(255, 208, 0, 0.2);
     }
 
-    .install-pill-btn {
-      background: transparent;
+    .btn-action-install {
+      background: #18181b;
       border: 1px solid var(--border);
       color: var(--text-muted);
       font-family: var(--font-mono);
       font-size: 12px;
-      padding: 6px 12px;
+      font-weight: 600;
+      padding: 6px 14px;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.15s;
-      white-space: nowrap;
     }
 
-    .install-pill-btn:hover {
+    .btn-action-install:hover {
       border-color: var(--yellow);
       color: var(--yellow);
-      background: var(--yellow-dim);
+      background: var(--yellow-subtle);
     }
 
     /* Modal */
-    .modal-overlay {
+    .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(6px);
       z-index: 1000;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
     }
 
-    .modal-overlay.open {
+    .modal-backdrop.active {
       display: flex;
     }
 
-    .modal-card {
-      background: #0d0d0d;
+    .modal-box {
+      background: #101014;
       border: 1px solid var(--border-hover);
       border-radius: 12px;
       width: 100%;
-      max-width: 750px;
+      max-width: 720px;
       max-height: 85vh;
       overflow-y: auto;
       padding: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9);
       position: relative;
     }
 
-    .modal-close-btn {
+    .modal-close {
       position: absolute;
       top: 20px;
       right: 20px;
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      color: var(--text-dim);
       font-size: 20px;
       cursor: pointer;
     }
 
-    .modal-close-btn:hover {
+    .modal-close:hover {
       color: #fff;
     }
 
-    .modal-title {
+    .modal-heading {
       font-family: var(--font-mono);
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       color: var(--yellow);
       margin-bottom: 8px;
     }
 
-    .modal-desc {
+    .modal-subtitle {
       color: var(--text-muted);
-      margin-bottom: 24px;
       font-size: 14px;
       line-height: 1.6;
+      margin-bottom: 24px;
     }
 
-    .modal-cmd-box {
+    .modal-terminal {
       background: #000;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 14px 18px;
       font-family: var(--font-mono);
       font-size: 13px;
@@ -522,6 +576,18 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
+    }
+
+    .modal-runbook {
+      background: #09090b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #a1a1aa;
+      line-height: 1.6;
+      white-space: pre-wrap;
     }
 
     /* Toast */
@@ -536,7 +602,7 @@
       font-size: 13px;
       padding: 10px 18px;
       border-radius: 6px;
-      box-shadow: 0 4px 20px rgba(255, 208, 0, 0.4);
+      box-shadow: 0 8px 24px rgba(255, 208, 0, 0.35);
       opacity: 0;
       transform: translateY(10px);
       transition: all 0.2s ease;
@@ -544,18 +610,20 @@
       z-index: 2000;
     }
 
-    .toast.show {
+    .toast.active {
       opacity: 1;
       transform: translateY(0);
     }
 
     @media (max-width: 900px) {
-      .hero-grid {
+      .bento-grid {
         grid-template-columns: 1fr;
-        gap: 30px;
       }
-      .action-row {
+      .controls-bar {
         grid-template-columns: 1fr;
+      }
+      .hero-title {
+        font-size: 38px;
       }
       .navbar {
         padding: 16px 20px;
@@ -568,267 +636,286 @@
   <!-- Top Navigation -->
   <nav class="navbar">
     <a href="/" class="nav-brand">
-      <div class="nav-logo-box">⚡</div>
+      <div class="nav-logo-mark">CS</div>
       <span>MCS</span>
-      <span class="slash">/</span>
-      <span style="color: #fff;">Skills</span>
+      <span class="nav-org-tag">IEEE CS SLIIT</span>
     </a>
     <div class="nav-links">
-      <a href="#campus" class="nav-link" onclick="setCategory('campus')">Campus</a>
-      <a href="#algorithms" class="nav-link" onclick="setCategory('algo')">Algorithms</a>
-      <a href="#devops" class="nav-link" onclick="setCategory('devops')">DevOps & AI</a>
-      <a href="/console" class="nav-link" style="color: var(--yellow); font-weight: 700;">Console ↗</a>
+      <a href="#skills" class="nav-link" onclick="setFilter('all')">Skills Directory</a>
+      <a href="#campus" class="nav-link" onclick="setFilter('campus')">Campus</a>
+      <a href="/console" class="nav-link">Developer Console</a>
       <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-link">GitHub</a>
-      <a href="https://github.com/ieeecsopen/mcp-cs#readme" target="_blank" class="nav-badge-btn">npx skills add</a>
+      <a href="https://github.com/ieeecsopen/mcp-cs#readme" target="_blank" class="nav-btn-primary">npx skills add</a>
     </div>
   </nav>
 
   <div class="container">
 
     <!-- Hero Section -->
-    <div class="hero-grid">
-      <div class="hero-brand-block">
-        <div class="hero-big-title">SKILLS</div>
-        <div class="hero-tagline">The IEEE CS Open Agent Skills & MCP Ecosystem</div>
+    <div class="hero-wrapper">
+      <div class="hero-badge">
+        <span class="bullet"></span>
+        <span>IEEE Computer Society Open Source Ecosystem</span>
       </div>
-      <div class="hero-description">
-        Skills are reusable capabilities for AI agents. Install them with a single command to enhance your agents with access to procedural knowledge.
+      <h1 class="hero-title">
+        The Intelligent Model Context & <span class="highlight">Skills Suite</span> for Engineers
+      </h1>
+      <p class="hero-subtitle">
+        Equip your AI assistants with 30 battle-tested operational runbooks, sandboxed competitive execution, database modeling, and campus project architecture workflows.
+      </p>
+      <div class="hero-cta-group">
+        <div class="btn-terminal-copy" onclick="copyText('npx skills add ieeecsopen/mcp-cs')" title="Copy Command">
+          <code><span class="prefix">$</span>npx skills add ieeecsopen/mcp-cs</code>
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-dim); margin-left: 6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        </div>
+        <a href="/console" class="btn-outline">
+          <span>Launch Web Console</span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
       </div>
     </div>
 
-    <!-- Action Row -->
-    <div class="action-row">
-      <div>
-        <div class="action-box-title">TRY IT NOW</div>
-        <div class="terminal-install-bar">
-          <code><span class="cmd-prefix">$</span>npx skills add ieeecsopen/mcp-cs</code>
-          <button class="copy-btn" onclick="copyText('npx skills add ieeecsopen/mcp-cs')" title="Copy Command">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-          </button>
+    <!-- Bento Highlights -->
+    <div class="bento-grid">
+      <div class="bento-card">
+        <div class="bento-tag">Engine</div>
+        <div class="bento-title">AlgoJudge Sandboxing</div>
+        <div class="bento-desc">
+          Run and differential stress-test Python, C++, Go, and JS algorithms in isolated V8/WASM and Docker micro-containers.
         </div>
       </div>
-      <div>
-        <div class="action-box-title">AVAILABLE FOR THESE AGENTS</div>
-        <div class="agents-logo-strip">
-          <div class="agent-pill"><span class="dot"></span> Antigravity</div>
-          <div class="agent-pill"><span class="dot"></span> Cursor</div>
-          <div class="agent-pill"><span class="dot"></span> Claude Code</div>
-          <div class="agent-pill"><span class="dot"></span> Windsurf</div>
-          <div class="agent-pill"><span class="dot"></span> Copilot</div>
-          <div class="agent-pill"><span class="dot"></span> Cline</div>
+      <div class="bento-card">
+        <div class="bento-tag">Academic</div>
+        <div class="bento-title">Campus Engineering Suite</div>
+        <div class="bento-desc">
+          Automate university FYP capstone modeling, IEEE 2-column lab reports, LMS submission validation, and viva defense scripts.
+        </div>
+      </div>
+      <div class="bento-card">
+        <div class="bento-tag">DevOps</div>
+        <div class="bento-title">Diagnostics & DevSecOps</div>
+        <div class="bento-desc">
+          Inspect port conflicts, synchronize .env keys, generate Mermaid ERDs, and auto-sanitize leaked credentials before commits.
         </div>
       </div>
     </div>
 
-    <!-- Leaderboard Header -->
-    <div class="leaderboard-header">
-      <div class="leaderboard-title">SKILLS LEADERBOARD & DIRECTORY</div>
-      <div style="font-family: var(--font-mono); font-size: 12px; color: var(--yellow);">30 Production Skills Live</div>
+    <!-- Compatible Agents -->
+    <div class="agents-strip-wrap">
+      <div class="agents-strip-title">Compatible AI Agents</div>
+      <div class="agents-pill-list">
+        <span class="agent-tag">Antigravity</span>
+        <span class="agent-tag">Cursor</span>
+        <span class="agent-tag">Claude Code</span>
+        <span class="agent-tag">Windsurf</span>
+        <span class="agent-tag">GitHub Copilot</span>
+        <span class="agent-tag">Cline</span>
+      </div>
     </div>
 
-    <!-- Search Input -->
-    <div class="search-filter-wrap">
-      <input type="text" id="skillSearch" class="search-input" placeholder="Search skills by name, topic, or keyword (e.g. fyp, algorithm, docker, react)..." onkeyup="filterSkills()" />
-      <span class="search-shortcut">/</span>
+    <!-- Skills Catalog Section -->
+    <div class="catalog-header" id="skills">
+      <div class="catalog-title-block">
+        <h2>Skills Directory</h2>
+        <p>30 standardized operational agent skills compatible with skills.sh</p>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 13px; color: var(--yellow);">
+        $ mcs skills install
+      </div>
     </div>
 
-    <!-- Category Tabs -->
-    <div class="category-tabs">
-      <button class="tab-btn active" id="tab-all" onclick="setCategory('all')">All Skills (30)</button>
-      <button class="tab-btn" id="tab-campus" onclick="setCategory('campus')">🎓 Campus & University (8)</button>
-      <button class="tab-btn" id="tab-algo" onclick="setCategory('algo')">⚡ Algorithms & CP (4)</button>
-      <button class="tab-btn" id="tab-frontend" onclick="setCategory('frontend')">🎨 Frontend & UI (2)</button>
-      <button class="tab-btn" id="tab-backend" onclick="setCategory('backend')">🗄️ Backend & DB (4)</button>
-      <button class="tab-btn" id="tab-devops" onclick="setCategory('devops')">🤖 AI, Testing & DevOps (12)</button>
+    <!-- Controls -->
+    <div class="controls-bar">
+      <div class="search-input-wrap">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search skills by name, topic, or keyword (e.g. fyp, docker, algo, api)..." onkeyup="filterTable()" />
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-btn active" id="btn-all" onclick="setFilter('all')">All (30)</button>
+        <button class="filter-btn" id="btn-campus" onclick="setFilter('campus')">Campus (8)</button>
+        <button class="filter-btn" id="btn-algo" onclick="setFilter('algo')">Algorithms (4)</button>
+        <button class="filter-btn" id="btn-backend" onclick="setFilter('backend')">Backend & DB (4)</button>
+        <button class="filter-btn" id="btn-devops" onclick="setFilter('devops')">DevOps & AI (12)</button>
+      </div>
     </div>
 
     <!-- Table -->
-    <div class="skills-table-wrap">
+    <div class="skills-card">
       <table class="skills-table">
         <thead>
           <tr>
-            <th style="width: 50px;">#</th>
-            <th>SKILL & REPOSITORY</th>
-            <th>CATEGORY</th>
-            <th style="text-align: right;">ACTION</th>
+            <th style="width: 48px;">#</th>
+            <th>Skill Name & Operational Role</th>
+            <th>Category</th>
+            <th style="text-align: right; width: 120px;">Action</th>
           </tr>
         </thead>
-        <tbody id="skillsTableBody">
-          <!-- Populated by JavaScript -->
+        <tbody id="skillsBody">
+          <!-- Populated by JS -->
         </tbody>
       </table>
     </div>
 
   </div>
 
-  <!-- Skill Detail Modal -->
-  <div class="modal-overlay" id="skillModal" onclick="closeModal(event)">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
-      <div class="modal-title" id="mTitle">Skill Name</div>
-      <div class="modal-desc" id="mDesc">Skill Description</div>
-      <div class="action-box-title">1-COMMAND INSTALL</div>
-      <div class="modal-cmd-box">
-        <code id="mCmd" style="color: #fff;">mcs skills install</code>
-        <button class="copy-btn" onclick="copyModalCmd()">Copy</button>
+  <!-- Detail Modal -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-heading" id="modalTitle">Skill Title</div>
+      <div class="modal-subtitle" id="modalDesc">Skill Description</div>
+      
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px;">Install Command</div>
+      <div class="modal-terminal">
+        <code id="modalCmd" style="color: #fff;">npx skills add ieeecsopen/mcp-cs</code>
+        <button class="btn-action-install" onclick="copyModalCommand()">Copy</button>
       </div>
-      <div class="action-box-title">OPERATIONAL RUNBOOK DETAILS</div>
-      <div id="mContent" style="color: #bbb; font-size: 13px; line-height: 1.6; background: #000; padding: 16px; border-radius: 6px; border: 1px solid #222; font-family: var(--font-mono); white-space: pre-wrap;"></div>
+
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px;">Activation Context</div>
+      <div class="modal-runbook" id="modalRunbook"></div>
     </div>
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="toast">Copied to clipboard!</div>
+  <div id="toast" class="toast">Copied to clipboard</div>
 
   <script>
-    const skillsData = [
+    const skillsList = [
       // Campus
-      { rank: 1, id: "campus-fyp-architecture", cat: "campus", name: "campus-fyp-architecture", desc: "University Final Year Project (FYP) & capstone architecture planner with C4 models, tech tradeoff matrices, and SRS outlines.", tags: ["fyp", "capstone", "architecture"] },
-      { rank: 2, id: "campus-ieee-citation", cat: "campus", name: "campus-ieee-citation", desc: "Format online software, GitHub repositories, journals, and papers into strict IEEE referencing format.", tags: ["ieee", "citation", "academic"] },
-      { rank: 3, id: "campus-lab-report-generator", cat: "campus", name: "campus-lab-report-generator", desc: "Structured IEEE 2-column practical lab report generator with objectives, apparatus, results, and error analysis.", tags: ["lab-report", "university", "coursework"] },
-      { rank: 4, id: "campus-presentation-script", cat: "campus", name: "campus-presentation-script", desc: "10-minute slide outlines and word-for-word viva examination defense speaking scripts with panel Q&A counter-strategies.", tags: ["viva", "presentation", "defense"] },
-      { rank: 5, id: "campus-assignment-cleaner", cat: "campus", name: "campus-assignment-cleaner", desc: "LMS assignment pre-flight validator stripping node_modules, .DS_Store, and checking student ID headers.", tags: ["lms", "assignment", "moodle"] },
-      { rank: 6, id: "campus-hackathon-fast-scaffold", cat: "campus", name: "campus-hackathon-fast-scaffold", desc: "10-minute rapid prototyping architecture for 12h/24h hackathons (SLIITXtreme).", tags: ["hackathon", "scaffold", "fast"] },
-      { rank: 7, id: "campus-dsa-visualizer", cat: "campus", name: "campus-dsa-visualizer", desc: "Step-by-step ASCII memory traces and pointer operations for LinkedLists, BSTs, Heaps, and DP tables.", tags: ["dsa", "data-structures", "ascii"] },
-      { rank: 8, id: "campus-git-team-workflow", cat: "campus", name: "campus-git-team-workflow", desc: "Student group Git collaboration standard with feature branch naming, PR rebasing, and clean commits.", tags: ["git", "team", "workflow"] },
+      { idx: 1, id: "campus-fyp-architecture", cat: "campus", name: "campus-fyp-architecture", desc: "University Final Year Project (FYP) & capstone architecture planner with C4 models, tech tradeoff matrices, and SRS outlines.", tags: ["fyp", "capstone", "architecture"] },
+      { idx: 2, id: "campus-ieee-citation", cat: "campus", name: "campus-ieee-citation", desc: "Format online software, GitHub repositories, journals, and papers into strict IEEE referencing format.", tags: ["ieee", "citation", "academic"] },
+      { idx: 3, id: "campus-lab-report-generator", cat: "campus", name: "campus-lab-report-generator", desc: "Structured IEEE 2-column practical lab report generator with objectives, apparatus, results, and error analysis.", tags: ["lab-report", "university", "coursework"] },
+      { idx: 4, id: "campus-presentation-script", cat: "campus", name: "campus-presentation-script", desc: "10-minute slide outlines and word-for-word viva examination defense speaking scripts with panel Q&A counter-strategies.", tags: ["viva", "presentation", "defense"] },
+      { idx: 5, id: "campus-assignment-cleaner", cat: "campus", name: "campus-assignment-cleaner", desc: "LMS assignment pre-flight validator stripping node_modules, .DS_Store, and checking student ID headers.", tags: ["lms", "assignment", "moodle"] },
+      { idx: 6, id: "campus-hackathon-fast-scaffold", cat: "campus", name: "campus-hackathon-fast-scaffold", desc: "10-minute rapid prototyping architecture for 12h/24h hackathons (SLIITXtreme).", tags: ["hackathon", "scaffold", "fast"] },
+      { idx: 7, id: "campus-dsa-visualizer", cat: "campus", name: "campus-dsa-visualizer", desc: "Step-by-step ASCII memory traces and pointer operations for LinkedLists, BSTs, Heaps, and DP tables.", tags: ["dsa", "data-structures", "ascii"] },
+      { idx: 8, id: "campus-git-team-workflow", cat: "campus", name: "campus-git-team-workflow", desc: "Student group Git collaboration standard with feature branch naming, PR rebasing, and clean commits.", tags: ["git", "team", "workflow"] },
 
       // Algorithms
-      { rank: 9, id: "algo-stress-testing", cat: "algo", name: "algo-stress-testing", desc: "Differential testing engine comparing optimal algorithms against brute-force baselines on randomized inputs.", tags: ["algo", "stress-test", "cp"] },
-      { rank: 10, id: "algo-edge-case-generator", cat: "algo", name: "algo-edge-case-generator", desc: "Generates adversarial corner testcases (N=1, max bounds, identical items, extreme negatives, disjoint graphs).", tags: ["algo", "edge-cases", "testcases"] },
-      { rank: 11, id: "algo-plagiarism-detector", cat: "algo", name: "algo-plagiarism-detector", desc: "AST token similarity comparison between code submissions to detect academic dishonesty.", tags: ["plagiarism", "ast", "anti-cheat"] },
-      { rank: 12, id: "algo-complexity-analyzer", cat: "algo", name: "algo-complexity-analyzer", desc: "Asymptotic Big-O time and space complexity auditing with loop bounds and recursion depth breakdown.", tags: ["complexity", "big-o", "optimization"] },
+      { idx: 9, id: "algo-stress-testing", cat: "algo", name: "algo-stress-testing", desc: "Differential testing engine comparing optimal algorithms against brute-force baselines on randomized inputs.", tags: ["algo", "stress-test", "cp"] },
+      { idx: 10, id: "algo-edge-case-generator", cat: "algo", name: "algo-edge-case-generator", desc: "Generates adversarial corner testcases (N=1, max bounds, identical items, extreme negatives, disjoint graphs).", tags: ["algo", "edge-cases", "testcases"] },
+      { idx: 11, id: "algo-plagiarism-detector", cat: "algo", name: "algo-plagiarism-detector", desc: "AST token similarity comparison between code submissions to detect academic dishonesty.", tags: ["plagiarism", "ast", "anti-cheat"] },
+      { idx: 12, id: "algo-complexity-analyzer", cat: "algo", name: "algo-complexity-analyzer", desc: "Asymptotic Big-O time and space complexity auditing with loop bounds and recursion depth breakdown.", tags: ["complexity", "big-o", "optimization"] },
 
       // Frontend
-      { rank: 13, id: "frontend-clean-ui", cat: "frontend", name: "frontend-clean-ui", desc: "Modern, high-contrast, accessible SaaS UI design with Tailwind CSS, obsidian dark tokens, and glassmorphism.", tags: ["tailwind", "ui", "design"] },
-      { rank: 14, id: "react-state-architecture", cat: "frontend", name: "react-state-architecture", desc: "Three-tier state taxonomy separating Server State (TanStack Query), Global UI (Zustand), and Local State.", tags: ["react", "zustand", "tanstack"] },
+      { idx: 13, id: "frontend-clean-ui", cat: "devops", name: "frontend-clean-ui", desc: "Modern, high-contrast, accessible SaaS UI design with Tailwind CSS, obsidian dark tokens, and glassmorphism.", tags: ["tailwind", "ui", "design"] },
+      { idx: 14, id: "react-state-architecture", cat: "devops", name: "react-state-architecture", desc: "Three-tier state taxonomy separating Server State (TanStack Query), Global UI (Zustand), and Local State.", tags: ["react", "zustand", "tanstack"] },
 
       // Backend & DB
-      { rank: 15, id: "backend-rest-api-design", cat: "backend", name: "backend-rest-api-design", desc: "Production REST API contracts with Zod validation, error envelopes, and cursor pagination.", tags: ["api", "rest", "zod"] },
-      { rank: 16, id: "database-migration-guardian", cat: "backend", name: "database-migration-guardian", desc: "Zero-downtime database schema migrations, concurrent index creation, and expand-and-contract patterns.", tags: ["database", "migrations", "sql"] },
-      { rank: 17, id: "db-architect", cat: "backend", name: "db-architect", desc: "Parses SQL DDL table statements and automatically renders visual Mermaid Entity-Relationship Diagrams (ERD).", tags: ["erd", "database", "mermaid"] },
-      { rank: 18, id: "api-mock-generator", cat: "backend", name: "api-mock-generator", desc: "Generates realistic synthetic datasets (users, products, posts, transactions) for UI testing.", tags: ["mock", "api", "testing"] },
+      { idx: 15, id: "backend-rest-api-design", cat: "backend", name: "backend-rest-api-design", desc: "Production REST API contracts with Zod validation, error envelopes, and cursor pagination.", tags: ["api", "rest", "zod"] },
+      { idx: 16, id: "database-migration-guardian", cat: "backend", name: "database-migration-guardian", desc: "Zero-downtime database schema migrations, concurrent index creation, and expand-and-contract patterns.", tags: ["database", "migrations", "sql"] },
+      { idx: 17, id: "db-architect", cat: "backend", name: "db-architect", desc: "Parses SQL DDL table statements and automatically renders visual Mermaid Entity-Relationship Diagrams (ERD).", tags: ["erd", "database", "mermaid"] },
+      { idx: 18, id: "api-mock-generator", cat: "backend", name: "api-mock-generator", desc: "Generates realistic synthetic datasets (users, products, posts, transactions) for UI testing.", tags: ["mock", "api", "testing"] },
 
       // AI & DevOps
-      { rank: 19, id: "ai-rag-pipeline-architect", cat: "devops", name: "ai-rag-pipeline-architect", desc: "Hybrid RAG pipelines with recursive chunking, vector embeddings, BM25 full-text, and cross-encoder rerankers.", tags: ["rag", "ai", "embeddings"] },
-      { rank: 20, id: "ai-prompt-evaluator", cat: "devops", name: "ai-prompt-evaluator", desc: "System prompt engineering, red-teaming, XML boundary injection defense, and structured JSON output validation.", tags: ["prompts", "ai", "red-team"] },
-      { rank: 21, id: "test-unit-generator", cat: "devops", name: "test-unit-generator", desc: "Comprehensive Vitest / Jest unit test suites with parameterized boundary cases and 100% coverage.", tags: ["vitest", "jest", "unit-test"] },
-      { rank: 22, id: "test-e2e-playwright", cat: "devops", name: "test-e2e-playwright", desc: "Resilient Playwright browser automation tests with user-facing accessibility locators (getByRole).", tags: ["playwright", "e2e", "browser"] },
-      { rank: 23, id: "devops-dockerfile-optimizer", cat: "devops", name: "devops-dockerfile-optimizer", desc: "Secure multi-stage Dockerfiles with layer caching, Alpine base images, and non-root users.", tags: ["docker", "devops", "container"] },
-      { rank: 24, id: "devops-vercel-render-deploy", cat: "devops", name: "devops-vercel-render-deploy", desc: "Zero-downtime hosting deployment configuration for Vercel, Supabase, and Render.", tags: ["vercel", "render", "deploy"] },
-      { rank: 25, id: "repo-doctor", cat: "devops", name: "repo-doctor", desc: "Repository health diagnostics identifying broken runtimes, missing packages, and setup errors.", tags: ["doctor", "diagnostics", "setup"] },
-      { rank: 26, id: "env-sync", cat: "devops", name: "env-sync", desc: "Bidirectional differential synchronizer between .env and .env.example templates.", tags: ["env", "secrets", "config"] },
-      { rank: 27, id: "port-inspector", cat: "devops", name: "port-inspector", desc: "Resolves local socket port collisions (EADDRINUSE) and identifies holding process PIDs.", tags: ["ports", "eaddrinuse", "sockets"] },
-      { rank: 28, id: "ci-workflow-architect", cat: "devops", name: "ci-workflow-architect", desc: "Generates production GitHub Actions CI/CD workflows for Node, Docker, and Python.", tags: ["ci", "github-actions", "workflow"] },
-      { rank: 29, id: "security-auditor", cat: "devops", name: "security-auditor", desc: "Pre-flight credential scanner detecting leaked API keys and auto-sanitizing into process.env.", tags: ["security", "secrets", "audit"] },
-      { rank: 30, id: "docs-broken-link-checker", cat: "devops", name: "docs-broken-link-checker", desc: "Scans markdown files to detect broken internal links and dead file references.", tags: ["docs", "markdown", "links"] }
+      { idx: 19, id: "ai-rag-pipeline-architect", cat: "devops", name: "ai-rag-pipeline-architect", desc: "Hybrid RAG pipelines with recursive chunking, vector embeddings, BM25 full-text, and cross-encoder rerankers.", tags: ["rag", "ai", "embeddings"] },
+      { idx: 20, id: "ai-prompt-evaluator", cat: "devops", name: "ai-prompt-evaluator", desc: "System prompt engineering, red-teaming, XML boundary injection defense, and structured JSON output validation.", tags: ["prompts", "ai", "red-team"] },
+      { idx: 21, id: "test-unit-generator", cat: "devops", name: "test-unit-generator", desc: "Comprehensive Vitest / Jest unit test suites with parameterized boundary cases and 100% coverage.", tags: ["vitest", "jest", "unit-test"] },
+      { idx: 22, id: "test-e2e-playwright", cat: "devops", name: "test-e2e-playwright", desc: "Resilient Playwright browser automation tests with user-facing accessibility locators (getByRole).", tags: ["playwright", "e2e", "browser"] },
+      { idx: 23, id: "devops-dockerfile-optimizer", cat: "devops", name: "devops-dockerfile-optimizer", desc: "Secure multi-stage Dockerfiles with layer caching, Alpine base images, and non-root users.", tags: ["docker", "devops", "container"] },
+      { idx: 24, id: "devops-vercel-render-deploy", cat: "devops", name: "devops-vercel-render-deploy", desc: "Zero-downtime hosting deployment configuration for Vercel, Supabase, and Render.", tags: ["vercel", "render", "deploy"] },
+      { idx: 25, id: "repo-doctor", cat: "devops", name: "repo-doctor", desc: "Repository health diagnostics identifying broken runtimes, missing packages, and setup errors.", tags: ["doctor", "diagnostics", "setup"] },
+      { idx: 26, id: "env-sync", cat: "devops", name: "env-sync", desc: "Bidirectional differential synchronizer between .env and .env.example templates.", tags: ["env", "secrets", "config"] },
+      { idx: 27, id: "port-inspector", cat: "devops", name: "port-inspector", desc: "Resolves local socket port collisions (EADDRINUSE) and identifies holding process PIDs.", tags: ["ports", "eaddrinuse", "sockets"] },
+      { idx: 28, id: "ci-workflow-architect", cat: "devops", name: "ci-workflow-architect", desc: "Generates production GitHub Actions CI/CD workflows for Node, Docker, and Python.", tags: ["ci", "github-actions", "workflow"] },
+      { idx: 29, id: "security-auditor", cat: "devops", name: "security-auditor", desc: "Pre-flight credential scanner detecting leaked API keys and auto-sanitizing into process.env.", tags: ["security", "secrets", "audit"] },
+      { idx: 30, id: "docs-broken-link-checker", cat: "devops", name: "docs-broken-link-checker", desc: "Scans markdown files to detect broken internal links and dead file references.", tags: ["docs", "markdown", "links"] }
     ];
 
-    let currentCategory = "all";
+    let activeCategory = "all";
 
-    function renderTable() {
-      const tbody = document.getElementById("skillsTableBody");
-      const search = document.getElementById("skillSearch").value.toLowerCase();
-      
-      let filtered = skillsData.filter(s => {
-        const matchesCat = currentCategory === "all" || s.cat === currentCategory;
-        const matchesSearch = s.name.toLowerCase().includes(search) || 
-                              s.desc.toLowerCase().includes(search) ||
-                              s.tags.some(t => t.toLowerCase().includes(search));
-        return matchesCat && matchesSearch;
+    function renderSkills() {
+      const tbody = document.getElementById("skillsBody");
+      const query = document.getElementById("searchInput").value.toLowerCase();
+
+      const filtered = skillsList.filter(s => {
+        const matchesCat = activeCategory === "all" || s.cat === activeCategory;
+        const matchesQuery = s.name.toLowerCase().includes(query) ||
+                             s.desc.toLowerCase().includes(query) ||
+                             s.tags.some(t => t.toLowerCase().includes(query));
+        return matchesCat && matchesQuery;
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-dim);">No skills matching query "${search}". Try searching "fyp", "algo", or "docker".</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 48px; color: var(--text-dim);">No skills found matching "${query}".</td></tr>`;
         return;
       }
 
       tbody.innerHTML = filtered.map(s => {
         const badgeClass = s.cat === "campus" ? "campus" : "";
-        const badgeText = s.cat === "campus" ? "🎓 Campus" : s.cat === "algo" ? "⚡ Algo" : s.cat === "frontend" ? "🎨 Frontend" : s.cat === "backend" ? "🗄️ Backend" : "🤖 DevOps & AI";
+        const badgeLabel = s.cat === "campus" ? "Campus" : s.cat === "algo" ? "Algorithms" : s.cat === "backend" ? "Backend & DB" : "DevOps & AI";
         return `
           <tr>
-            <td class="rank-num">${s.rank}</td>
+            <td class="skill-idx">${s.idx}</td>
             <td>
-              <div class="skill-name-col">
-                <a href="javascript:void(0)" onclick="openSkillModal('${s.id}')" class="skill-title-link">${s.name}</a>
-                <span class="skill-desc">${s.desc}</span>
-              </div>
+              <button class="skill-name-btn" onclick="openModal('${s.id}')">${s.name}</button>
+              <div class="skill-summary">${s.desc}</div>
             </td>
             <td>
-              <span class="skill-badge ${badgeClass}">${badgeText}</span>
+              <span class="cat-badge ${badgeClass}">${badgeLabel}</span>
             </td>
             <td style="text-align: right;">
-              <button class="install-pill-btn" onclick="copySkill('${s.name}')">
-                Install
-              </button>
+              <button class="btn-action-install" onclick="copyInstall('${s.name}')">Install</button>
             </td>
           </tr>
         `;
       }).join("");
     }
 
-    function setCategory(cat) {
-      currentCategory = cat;
-      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-      const activeTab = document.getElementById(`tab-${cat}`);
-      if (activeTab) activeTab.classList.add("active");
-      renderTable();
+    function setFilter(cat) {
+      activeCategory = cat;
+      document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+      const targetBtn = document.getElementById(`btn-${cat}`);
+      if (targetBtn) targetBtn.classList.add("active");
+      renderSkills();
     }
 
-    function filterSkills() {
-      renderTable();
+    function filterTable() {
+      renderSkills();
     }
 
-    function copyText(text) {
-      navigator.clipboard.writeText(text);
-      showToast(`Copied: ${text}`);
+    function copyText(txt) {
+      navigator.clipboard.writeText(txt);
+      showToast(`Copied: ${txt}`);
     }
 
-    function copySkill(name) {
-      navigator.clipboard.writeText(`npx skills add ieeecsopen/mcp-cs#${name}`);
-      showToast(`Copied: npx skills add ieeecsopen/mcp-cs#${name}`);
+    function copyInstall(name) {
+      const cmd = `npx skills add ieeecsopen/mcp-cs#${name}`;
+      navigator.clipboard.writeText(cmd);
+      showToast(`Copied: ${cmd}`);
     }
 
-    function copyModalCmd() {
-      const text = document.getElementById("mCmd").innerText;
-      navigator.clipboard.writeText(text);
-      showToast("Command copied to clipboard!");
+    function copyModalCommand() {
+      const txt = document.getElementById("modalCmd").innerText;
+      navigator.clipboard.writeText(txt);
+      showToast("Install command copied!");
     }
 
     function showToast(msg) {
       const toast = document.getElementById("toast");
       toast.innerText = msg;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 2500);
+      toast.classList.add("active");
+      setTimeout(() => toast.classList.remove("active"), 2200);
     }
 
-    function openSkillModal(skillId) {
-      const skill = skillsData.find(s => s.id === skillId);
+    function openModal(id) {
+      const skill = skillsList.find(s => s.id === id);
       if (!skill) return;
-      document.getElementById("mTitle").innerText = skill.name;
-      document.getElementById("mDesc").innerText = skill.desc;
-      document.getElementById("mCmd").innerText = `npx skills add ieeecsopen/mcp-cs#${skill.name}`;
-      document.getElementById("mContent").innerText = `Activated automatically by AI coding agents when you work on ${skill.tags.join(", ")} tasks.\n\nUniversal Install:\n$ mcs skills install\n\nDirect skills.sh Install:\n$ npx skills add ieeecsopen/mcp-cs#${skill.name}`;
-      document.getElementById("skillModal").classList.add("open");
+      document.getElementById("modalTitle").innerText = skill.name;
+      document.getElementById("modalDesc").innerText = skill.desc;
+      document.getElementById("modalCmd").innerText = `npx skills add ieeecsopen/mcp-cs#${skill.name}`;
+      document.getElementById("modalRunbook").innerText = `Activated automatically by AI coding assistants when working on ${skill.tags.join(", ")} tasks.\n\nGlobal Multi-Skill Install:\n$ mcs skills install\n\nSpecific Skill Install:\n$ npx skills add ieeecsopen/mcp-cs#${skill.name}`;
+      document.getElementById("modalBackdrop").classList.add("active");
     }
 
     function closeModal(e) {
-      document.getElementById("skillModal").classList.remove("open");
+      document.getElementById("modalBackdrop").classList.remove("active");
     }
 
-    // Keyboard shortcut / to search
     window.addEventListener("keydown", (e) => {
-      if (e.key === "/" && document.activeElement !== document.getElementById("skillSearch")) {
-        e.preventDefault();
-        document.getElementById("skillSearch").focus();
-      }
-      if (e.key === "Escape") {
-        closeModal();
-      }
+      if (e.key === "Escape") closeModal();
     });
 
-    // Initial render
-    renderTable();
+    renderSkills();
   </script>
 </body>
 </html>
