@@ -1,5 +1,9 @@
 <div align="center">
 
+<img src="./assets/logo.png" alt="MCS Logo" width="120px" style="border-radius: 24px; box-shadow: 0 4px 20px rgba(255, 208, 0, 0.15);" />
+
+<br/><br/>
+
 # ⚡ MCS (`mcp-cs`)
 ### The Universal Campus Developer, Diagnostics & AlgoJudge Competitive Execution Suite
 
