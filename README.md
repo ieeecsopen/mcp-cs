@@ -247,21 +247,35 @@ Add to your Claude configuration file (`~/Library/Application Support/Claude/cla
 ---
 
 
+
 ## 🧠 Agent Skills Suite (Compatible with [skills.sh](https://www.skills.sh))
 
-**MCS** bundles **12 production agent skills** adhering to the open [skills.sh](https://www.skills.sh) standard. These provide AI assistants (**Antigravity, Cursor, Claude Code, Windsurf**) with specialized operational runbooks:
+**MCS** bundles **20 production agent skills** adhering to the open [skills.sh](https://www.skills.sh) standard. These provide AI assistants (**Antigravity, Cursor, Claude Code, Windsurf**) with specialized operational runbooks:
 
 ```bash
-# 1-Click Install into any repository (.agents/skills/)
+# 1-Click Install all 20 skills into any project (.agents/skills/)
 mcs skills install
 
 # Or install for Cursor (.cursor/rules/)
 mcs skills install --cursor
 
-# Or install via skills.sh package manager
+# Or install via skills.sh open package manager
 npx skills add ieeecsopen/mcp-cs
 ```
 
+### 🎓 1. Campus & University Engineering Skills
+| Skill Name | What It Instructs the AI Agent to Do |
+| :--- | :--- |
+| `campus-fyp-architecture` | Plans and documents university Final Year Projects (FYP) with C4 architecture diagrams, tech comparisons, and IEEE Std 830 SRS chapters. |
+| `campus-ieee-citation` | Formats online software, journals, DOIs, and papers into strict IEEE referencing format. |
+| `campus-lab-report-generator` | Auto-generates structured IEEE 2-column practical lab reports and experiment write-ups. |
+| `campus-git-team-workflow` | Guides student group projects on feature branching, rebase strategies, and conventional commits. |
+| `campus-presentation-script` | Generates 10-minute slide outlines and word-for-word viva defense speaking scripts. |
+| `campus-assignment-cleaner` | Pre-flight LMS assignment validator (strips `node_modules`/`.DS_Store`, checks student ID headers). |
+| `campus-hackathon-fast-scaffold` | 10-minute rapid prototyping architecture for 12h/24h hackathons (SLIITXtreme). |
+| `campus-dsa-visualizer` | Generates step-by-step ASCII memory traces for LinkedLists, BST trees, DP tables, and Graphs. |
+
+### ⚡ 2. Algorithms & Developer Operations Skills
 | Category | Skill Name | Description |
 | :--- | :--- | :--- |
 | ⚡ **Algorithms** | `algo-stress-testing` | Differential testing against brute-force baselines to find edge-case failures. |
