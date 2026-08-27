@@ -1,4 +1,4 @@
-import { spawnSync } from "child_process";
+import { execSync, spawnSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -274,4 +274,62 @@ export function generateEdgeCases(
   }
 
   return cases;
+}
+
+export function runInDockerSandbox(
+  code: string,
+  language: "python" | "javascript" | "cpp" = "python",
+  stdin: string = "",
+  timeoutMs: number = 5000
+): { stdout: string; stderr: string; exitCode: number; timedOut: boolean; containerEngine: string } {
+  const tmpDir = path.join(os.tmpdir(), `mcs_docker_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`);
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  const imageMap = {
+    python: "python:3.12-alpine",
+    javascript: "node:22-alpine",
+    cpp: "gcc:alpine",
+  };
+
+  const fileMap = {
+    python: "solution.py",
+    javascript: "solution.js",
+    cpp: "solution.cpp",
+  };
+
+  const runCmdMap = {
+    python: "python3 /app/solution.py",
+    javascript: "node /app/solution.js",
+    cpp: "g++ /app/solution.cpp -o /app/a.out && /app/a.out",
+  };
+
+  const filename = fileMap[language];
+  fs.writeFileSync(path.join(tmpDir, filename), code);
+  if (stdin) {
+    fs.writeFileSync(path.join(tmpDir, "stdin.txt"), stdin);
+  }
+
+  const stdinArg = stdin ? `< /app/stdin.txt` : "";
+  const dockerCmd = `docker run --rm --network none --memory 128m --cpus 1 -v "${tmpDir}:/app" -w /app ${imageMap[language]} sh -c "${runCmdMap[language]} ${stdinArg}"`;
+
+  try {
+    const stdout = execSync(dockerCmd, {
+      timeout: timeoutMs,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    return { stdout, stderr: "", exitCode: 0, timedOut: false, containerEngine: "Docker" };
+  } catch (err: any) {
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    const isTimeout = err.code === "ETIMEDOUT" || err.signal === "SIGTERM";
+    return {
+      stdout: err.stdout?.toString() || "",
+      stderr: err.stderr?.toString() || err.message,
+      exitCode: isTimeout ? 124 : err.status || 1,
+      timedOut: isTimeout,
+      containerEngine: "Docker",
+    };
+  }
 }

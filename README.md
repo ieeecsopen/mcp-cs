@@ -13,9 +13,9 @@
 [![MCP](https://img.shields.io/badge/protocol-Model%20Context%20Protocol-black)](https://modelcontextprotocol.io)
 [![Organization](https://img.shields.io/badge/IEEE%20CS-SLIIT-blue)](https://github.com/ieeecsopen)
 
-**MCS** (*Model Context Server for Computer Society*) is a full-featured [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server and visual console created for developers, university students, competitive programmers, and engineering teams.
+**MCS** (*Model Context Server for Computer Society*) is a full-featured [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server, standalone developer CLI, and visual console created for developers, university students, competitive programmers, and engineering teams.
 
-[Installation](#-installation-guide) • [Visual Console](#-interactive-visual-dashboard) • [Client Configuration](#-client-configuration) • [Tool Catalog](#-complete-tool-catalog-24-tools) • [Homebrew](#-homebrew-installation)
+[Installation](#-installation-guide) • [Terminal CLI](#-standalone-terminal-cli-commands) • [Visual Console](#-interactive-visual-dashboard) • [Client Configuration](#-client-configuration) • [Tool Catalog](#-complete-tool-catalog-25-tools)
 
 <br/>
 
@@ -29,7 +29,7 @@
 
 **MCS** connects your AI assistant (**Antigravity, Cursor, Claude Desktop, Windsurf, Cline**) directly to powerful local execution, repository diagnostics, database modeling, and competitive algorithm tools with **zero manual configuration**.
 
-- ⚡ **AlgoJudge Engine**: Run sandboxed code (Python, JS/TS, C++, Go), perform automated differential stress-testing, and check AST code similarity.
+- ⚡ **AlgoJudge Engine**: Run sandboxed code (Python, JS/TS, C++, Go, Docker micro-containers), perform automated differential stress-testing, and check AST code similarity.
 - 🩺 **Environment Doctor**: Diagnose project setups, detect `.env` disparities, and inspect port conflicts with process PIDs.
 - 🗄️ **Database & ERD**: Parse SQL schemas and auto-generate Mermaid Entity-Relationship diagrams.
 - ⚡ **Web Performance**: Scan for oversized raster assets and audit HTTP compression & security headers.
@@ -38,12 +38,38 @@
 
 ---
 
+## 💻 Standalone Terminal CLI Commands
+
+In addition to serving AI assistants, **MCS** works as a standalone terminal productivity CLI:
+
+```bash
+# 1. Run instant project diagnostics & .env synchronization check
+mcs doctor
+
+# 2. Inspect active network ports and process PIDs
+mcs ports
+
+# 3. Scan repository for leaked secrets and API keys
+mcs scan
+
+# 4. Generate Mermaid ER diagram from a SQL file
+mcs erd schema.sql
+
+# 5. Launch the embedded visual web dashboard
+mcs ui
+
+# 6. Launch the official Model Context Protocol Inspector
+mcs inspector
+```
+
+---
+
 ## 🖥️ Interactive Visual Dashboard
 
 Launch the embedded graphical visualizer locally with either command:
 
 ```bash
-mcs --ui
+mcs ui
 # or
 npx mcp-cs --ui
 ```
@@ -55,8 +81,6 @@ npx mcp-cs --ui
 ---
 
 ## 📦 Installation Guide
-
-You can install and use **MCS** through any of the following methods:
 
 ### Method 1: Instant Run via `npx` *(Recommended — No install needed)*
 ```json
@@ -77,7 +101,6 @@ You can install and use **MCS** through any of the following methods:
 brew tap ieeecsopen/tap
 brew install mcs
 ```
-*(Or install `mcp-cs`: `brew install ieeecsopen/tap/mcp-cs`)*
 
 ---
 
@@ -85,14 +108,22 @@ brew install mcs
 ```bash
 npm install -g mcp-cs
 ```
-*(Installs both `mcs` and `mcp-cs` executable commands)*
 
 ---
 
-### Method 4: 1-Click Installation via Smithery
+## 🎛️ Modular Tool Filtering
+
+To save prompt tokens in your AI assistants, enable only the specific tool modules you need:
+
 ```bash
-npx -y @smithery/cli install mcp-cs --client claude
+# Enable only algorithm and doctor tools
+MCS_MODULES=algo,doctor npx mcp-cs
+
+# Or via CLI arguments
+mcp-cs --modules=algo,security,db
 ```
+
+Supported module tags: `algo`, `doctor`, `security`, `db`, `perf`, `api`, `docs`, `code`, `git`, `problem`, `ci`, `wasm`.
 
 ---
 
@@ -115,9 +146,7 @@ Add `mcs` to your global configuration file at `~/.gemini/config/mcp_config.json
 ---
 
 ### 2. Claude Desktop
-Add to your Claude configuration file:
-- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+Add to your Claude configuration file (`~/Library/Application Support/Claude/claude_desktop_config.json` on Mac or `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
 
 ```json
 {
@@ -142,34 +171,13 @@ Add to your Claude configuration file:
 
 ---
 
-### 4. Remote Teams — MCS Relay (Hosted SSE, no local Node.js needed)
-
-If your organization runs a hosted Relay instance (see [🛰️ MCS Relay](#-mcs-relay--hosted-cloud-deployment) below), teammates connect straight to the remote URL instead of running anything locally. Ask whoever manages your Relay deployment for the URL and your team's Bearer token, then point your client at it:
-
-**Cursor / Windsurf / Claude Desktop** (exact field names vary slightly by client version — check that client's current remote-MCP docs if this doesn't connect):
-```json
-{
-  "mcpServers": {
-    "mcs-relay": {
-      "url": "https://mcp.ieeecs-sliit.org/sse",
-      "headers": {
-        "Authorization": "Bearer <your-team-token>"
-      }
-    }
-  }
-}
-```
-
-No `npx`, no local Node.js install, no per-machine setup — the same URL and token work for everyone on the team, and revoking one team's token doesn't affect any other team's connection.
-
----
-
-## 🛠️ Complete Tool Catalog (24 Tools)
+## 🛠️ Complete Tool Catalog (25 Tools)
 
 ### ⚡ 1. AlgoJudge Competitive & Algorithm Engine
 | Tool | Description | Example Prompt |
 | :--- | :--- | :--- |
 | `algo_run_sandboxed` | Runs code in Python, JS, TS, C++, C, or Go in an isolated process with strict time and memory limits. | *"Run this C++ solution with the test input `5\n1 2 3 4 5`."* |
+| `algo_run_docker` | Runs code inside a zero-trust ephemeral Docker micro-container (`python:alpine`, `node:alpine`, `gcc:alpine`). | *"Run this untrusted script inside a Docker sandbox."* |
 | `algo_stress_test` | **Automated Differential Tester:** Compares an optimal algorithm against a brute-force baseline on randomized inputs to find failing edge cases. | *"Stress-test my Dijkstra implementation against a brute-force solution to find where it fails."* |
 | `algo_check_plagiarism` | Token-based AST code similarity checker that compares two code submissions and detects suspicious duplicated logic. | *"Check if `solution_a.py` and `solution_b.py` have plagiarized logic."* |
 | `algo_generate_edge_cases` | Generates adversarial corner cases (min $N=1$, max constraints, identical items, extreme negatives, disconnected graphs). | *"Generate edge testcases for a binary tree problem."* |
@@ -204,6 +212,7 @@ No `npx`, no local Node.js install, no per-machine setup — the same URL and to
 | Tool | Description | Example Prompt |
 | :--- | :--- | :--- |
 | `security_scan_secrets` | Scans codebase for leaked OpenAI keys, AWS access tokens, GitHub PATs, and private keys. | *"Scan my repository for accidentally committed secrets."* |
+| `security_auto_sanitize` | Auto-replaces detected secrets with `process.env` references and populates `.env.example`. | *"Sanitize all hardcoded keys across the project."* |
 
 ---
 
@@ -219,6 +228,7 @@ No `npx`, no local Node.js install, no per-machine setup — the same URL and to
 | Tool | Description | Example Prompt |
 | :--- | :--- | :--- |
 | `docs_check_broken_links` | Scans all markdown files (`.md`, `.mdx`) to detect broken internal links and dead file references. | *"Check all markdown files in the repo for broken links."* |
+| `docs_auto_fix_links` | Automatically updates and rewrites broken markdown links when target files have moved. | *"Fix broken links in the `docs/` folder."* |
 | `docs_extract_code_snippets`| Extracts all fenced code blocks from markdown documentation for quick inspection. | *"Extract all code snippets in `docs/` so we can verify their syntax."* |
 | `code_find_todos` | Scans the codebase for `TODO`, `FIXME`, `HACK`, and `BUG` comments with line numbers and file paths. | *"Find all `TODO` and `FIXME` comments in the codebase."* |
 | `code_inspect_heavy_dependencies` | Inspects `package.json` to identify bloated dependencies (moment, lodash, monaco, katex) with optimization tips. | *"Check if we have heavy dependencies slowing down our bundle."* |
@@ -259,7 +269,7 @@ cd mcp-cs
 # 2. Install dependencies
 npm install
 
-# 3. Run automated tests
+# 3. Run automated tests (23 tests)
 npm test
 
 # 4. Build TypeScript
@@ -268,60 +278,6 @@ npm run build
 # 5. Start in development mode with UI
 npm run dev -- --ui
 ```
-
----
-
-## 🛰️ MCS Relay — Hosted Cloud Deployment
-
-MCS runs locally via stdio by default (one process per developer, launched by their MCP client). **Relay** is the hosted, multi-tenant alternative: a single long-running daemon serving remote SSE connections over HTTPS, so whole teams can connect their Cursor, Windsurf, or Claude Desktop directly to a shared URL without installing Node.js locally.
-
-Each incoming `/sse` connection gets its own isolated MCP server + transport instance internally — Relay is safe for many teams connecting concurrently, not just one client at a time.
-
-### Configuration
-
-| Env var | Required | Purpose |
-|---|---|---|
-| `RELAY_API_TOKENS` | **Yes** | Comma-separated Bearer tokens, one per team/org (e.g. `team-a-token,team-b-token`). The server refuses to start without at least one — Relay is never unauthenticated. |
-| `PORT` | No (default `8080`) | Port to listen on. Fly.io injects this automatically. |
-
-### Run locally
-
-```bash
-RELAY_API_TOKENS="dev-token" npm run start:relay
-# or: RELAY_API_TOKENS="dev-token" node dist/index.js --relay --port 8080
-```
-
-Endpoints:
-- `GET /sse` — SSE connect endpoint (needs `Authorization: Bearer <token>`)
-- `POST /messages?sessionId=...` — message endpoint used internally by the client library (needs `Authorization: Bearer <token>`)
-- `GET /health` — unauthenticated health probe (for load balancers / orchestrators)
-
-### Deploy with Docker
-
-The existing `Dockerfile` builds a runner image that starts in Relay mode by default:
-
-```bash
-docker build -t mcs-relay .
-docker run -p 8080:8080 -e RELAY_API_TOKENS="team-a-token,team-b-token" mcs-relay
-```
-
-### Deploy to Fly.io
-
-```bash
-fly launch --no-deploy   # generates fly.toml from the Dockerfile, don't deploy yet
-fly secrets set RELAY_API_TOKENS="team-a-token,team-b-token"
-fly deploy
-```
-
-Point DNS for your chosen hostname (e.g. `mcp.ieeecs-sliit.org`) at the Fly.io app, then share `https://mcp.ieeecs-sliit.org/sse` plus each team's token — see [Remote Teams client config](#4-remote-teams--mcs-relay-hosted-sse-no-local-nodejs-needed) above.
-
-### Deploy to AWS ECS
-
-The same Docker image works unchanged on ECS (Fargate or EC2 launch type) behind an Application Load Balancer terminating TLS — set `RELAY_API_TOKENS` via an ECS task definition secret (Secrets Manager / SSM Parameter Store) rather than a plaintext environment variable, and point the ALB health check at `/health`.
-
-### Rotating or adding a team's token
-
-Update `RELAY_API_TOKENS` (append a new comma-separated value, or remove one to revoke) and restart the daemon — there's no database or persisted session state to migrate, so a restart is a clean, instant token rotation. In-flight sessions are dropped, so time it outside a team's active hours if you can.
 
 ---
 

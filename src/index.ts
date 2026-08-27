@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 import http from "http";
-import { timingSafeEqual } from "crypto";
-import { createRequire } from "module";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
@@ -20,26 +18,26 @@ import { generateChangelog, checkPrReadiness, generatePrDescription } from "./to
 import { testApiRequest, generateMockData } from "./tools/api.js";
 import { checkBrokenLinks, autoFixBrokenLinks, extractCodeSnippets } from "./tools/docs.js";
 import { findTodos, inspectHeavyDependencies } from "./tools/code.js";
-import { runSandboxed, stressTest, checkPlagiarism, generateEdgeCases } from "./tools/algo.js";
+import { runSandboxed, stressTest, checkPlagiarism, generateEdgeCases, runInDockerSandbox } from "./tools/algo.js";
 import { runWasmModule, runInVmSandbox } from "./tools/wasm.js";
 import { parseSqliteOrMockSchema, generateMermaidErd } from "./tools/db.js";
 import { auditAssets, checkPerformanceHeaders } from "./tools/perf.js";
 import { fetchCodeforcesProblem } from "./tools/problem.js";
 import { generateCiWorkflow } from "./tools/ci.js";
-import { startUiServer } from "./ui/server.js";
+import { runCli } from "./cli/index.js";
 
-// Read once from package.json instead of hardcoding, so this can't drift
-// from the published version the way the old duplicated "2.0.0" literals did.
-const require = createRequire(import.meta.url);
-const SERVER_VERSION: string = require("../package.json").version;
+const SERVER_VERSION = "2.2.0";
 
-// A fresh Server instance is created per connection (see createServer() below)
-// rather than sharing one module-level instance. The SDK's Protocol.connect()
-// throws "Already connected to a transport" if called twice on the same
-// instance - a single shared Server can only ever serve one live transport at
-// a time. Relay mode (multi-tenant, many concurrent teams) needs one Server
-// per SSE session; stdio mode just calls createServer() once.
-function createServer(): Server {
+// Helper to determine enabled modules (default: all enabled)
+export function getEnabledModules(envModules?: string, argModules?: string): Set<string> {
+  const raw = envModules || argModules || "all";
+  if (raw === "all" || raw === "*") {
+    return new Set(["algo", "doctor", "security", "api", "docs", "code", "git", "db", "perf", "problem", "ci", "wasm"]);
+  }
+  return new Set(raw.split(",").map((m) => m.trim().toLowerCase()));
+}
+
+export function createServer(enabledModules: Set<string> = getEnabledModules()): Server {
   const server = new Server(
     {
       name: "mcs",
@@ -53,10 +51,8 @@ function createServer(): Server {
       },
     }
   );
-  
-  // ==========================================
+
   // 1. MCP PROMPTS
-  // ==========================================
   server.setRequestHandler(ListPromptsRequestSchema, async () => {
     return {
       prompts: [
@@ -78,7 +74,7 @@ function createServer(): Server {
       ],
     };
   });
-  
+
   server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     const { name } = request.params;
     if (name === "diagnose-repo") {
@@ -123,10 +119,8 @@ function createServer(): Server {
     }
     throw new Error(`Prompt not found: ${name}`);
   });
-  
-  // ==========================================
+
   // 2. MCP RESOURCES
-  // ==========================================
   server.setRequestHandler(ListResourcesRequestSchema, async () => {
     return {
       resources: [
@@ -145,7 +139,7 @@ function createServer(): Server {
       ],
     };
   });
-  
+
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     const { uri } = request.params;
     if (uri === "resource://system/ports") {
@@ -162,17 +156,17 @@ function createServer(): Server {
     }
     throw new Error(`Resource not found: ${uri}`);
   });
-  
-  // ==========================================
-  // 3. MCP TOOLS REGISTRY (Flagship Suite)
-  // ==========================================
+
+  // 3. MCP TOOLS REGISTRY (Filtered by enabled modules)
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return {
-      tools: [
-        // ⚡ AlgoJudge & WASM Suite
+    const allTools = [];
+
+    // ⚡ AlgoJudge Module
+    if (enabledModules.has("algo")) {
+      allTools.push(
         {
           name: "algo_run_sandboxed",
-          description: "Executes code in a sandboxed process with strict timeout and memory limits (supports python, javascript, typescript, cpp, c, go)",
+          description: "Executes code in an isolated process with strict timeout and memory limits (supports python, javascript, typescript, cpp, c, go)",
           inputSchema: {
             type: "object",
             properties: {
@@ -180,23 +174,22 @@ function createServer(): Server {
               language: { type: "string", enum: ["python", "javascript", "typescript", "cpp", "c", "go"], description: "Programming language" },
               stdin: { type: "string", description: "Standard input provided to the process" },
               timeoutMs: { type: "number", description: "Execution timeout in ms (default: 3000)" },
-              engine: { type: "string", enum: ["native", "vm"], description: "Execution engine (default: 'native')" },
             },
             required: ["code"],
           },
         },
         {
-          name: "algo_run_wasm",
-          description: "In-process WebAssembly binary evaluator: runs compiled .wasm modules with sub-millisecond execution times and zero dependencies",
+          name: "algo_run_docker",
+          description: "Executes code inside a zero-trust ephemeral Docker container (python:alpine, node:alpine, gcc:alpine) with no network access",
           inputSchema: {
             type: "object",
             properties: {
-              wasmBytesBase64: { type: "string", description: "Base64-encoded WASM binary bytes" },
-              functionName: { type: "string", description: "Exported function to invoke (default: 'main')" },
-              args: { type: "array", items: { type: "number" }, description: "Numeric arguments to pass to the WASM function" },
-              timeoutMs: { type: "number", description: "Execution timeout in ms (default: 3000)" },
+              code: { type: "string", description: "Source code to execute" },
+              language: { type: "string", enum: ["python", "javascript", "cpp"], description: "Programming language" },
+              stdin: { type: "string", description: "Standard input provided to the container" },
+              timeoutMs: { type: "number", description: "Timeout in ms (default: 5000)" },
             },
-            required: ["wasmBytesBase64"],
+            required: ["code"],
           },
         },
         {
@@ -210,14 +203,13 @@ function createServer(): Server {
               generatorCode: { type: "string", description: "Random testcase generator code" },
               language: { type: "string", enum: ["python", "javascript"], description: "Language used (default: python)" },
               maxIterations: { type: "number", description: "Max randomized iterations to run (default: 30)" },
-              engine: { type: "string", enum: ["native", "vm"], description: "Execution engine (default: 'native')" },
             },
             required: ["solutionCode", "bruteForceCode", "generatorCode"],
           },
         },
         {
           name: "algo_check_plagiarism",
-          description: "Compares two code snippets using normalized token analysis and returns similarity percentage and plagiarism verdict",
+          description: "Compares two code submissions using token-level AST analysis and returns similarity percentage and verdict",
           inputSchema: {
             type: "object",
             properties: {
@@ -237,22 +229,59 @@ function createServer(): Server {
               maxN: { type: "number", description: "Maximum constraint bound (e.g. 100000)" },
             },
           },
-        },
-  
-        // 🗄️ Database & Schema Suite
+        }
+      );
+    }
+
+    // ⚡ WASM Module
+    if (enabledModules.has("wasm")) {
+      allTools.push(
         {
-          name: "db_generate_erd",
-          description: "Parses SQL table definitions and generates a clean Mermaid Entity-Relationship (ER) Diagram",
+          name: "wasm_run_module",
+          description: "Executes pre-compiled WebAssembly (.wasm) binary in memory with exported function calls",
           inputSchema: {
             type: "object",
             properties: {
-              schemaSql: { type: "string", description: "DDL SQL string containing CREATE TABLE statements" },
+              wasmBase64: { type: "string", description: "Base64-encoded WASM binary buffer" },
+              functionName: { type: "string", description: "Exported function name to call" },
+              args: { type: "array", description: "Numerical arguments passed to function" },
             },
-            required: ["schemaSql"],
+            required: ["wasmBase64", "functionName"],
           },
         },
-  
-        // ⚡ Web Performance Suite
+        {
+          name: "wasm_run_vm_sandbox",
+          description: "Executes JavaScript in an isolated Node.js VM context with strict execution timeout and zero filesystem access",
+          inputSchema: {
+            type: "object",
+            properties: {
+              code: { type: "string", description: "JavaScript code string to evaluate" },
+              timeoutMs: { type: "number", description: "Execution timeout in ms (default: 2000)" },
+            },
+            required: ["code"],
+          },
+        }
+      );
+    }
+
+    // 🗄️ Database Module
+    if (enabledModules.has("db")) {
+      allTools.push({
+        name: "db_generate_erd",
+        description: "Parses SQL table definitions and generates a clean Mermaid Entity-Relationship (ER) Diagram",
+        inputSchema: {
+          type: "object",
+          properties: {
+            schemaSql: { type: "string", description: "DDL SQL string containing CREATE TABLE statements" },
+          },
+          required: ["schemaSql"],
+        },
+      });
+    }
+
+    // ⚡ Web Performance Module
+    if (enabledModules.has("perf")) {
+      allTools.push(
         {
           name: "perf_audit_assets",
           description: "Scans repository for oversized raster images (>250KB) and calculates bandwidth savings from WebP/AVIF conversion",
@@ -274,36 +303,13 @@ function createServer(): Server {
             },
             required: ["url"],
           },
-        },
-  
-        // 🏆 Contest & Problem Fetcher
-        {
-          name: "problem_fetch_codeforces",
-          description: "Fetches problem statement metadata, tags, and contest details from Codeforces",
-          inputSchema: {
-            type: "object",
-            properties: {
-              contestId: { type: "string", description: "Codeforces contest ID (e.g. '2060')" },
-              index: { type: "string", description: "Problem letter (e.g. 'A', 'B', 'C')" },
-            },
-            required: ["contestId", "index"],
-          },
-        },
-  
-        // 🤖 CI/CD Suite
-        {
-          name: "ci_generate_workflow",
-          description: "Generates production-ready GitHub Actions CI/CD workflows for Next.js, NPM Publishing, Docker, or Python",
-          inputSchema: {
-            type: "object",
-            properties: {
-              type: { type: "string", enum: ["nextjs", "node-publish", "docker", "python"], description: "Workflow type" },
-            },
-            required: ["type"],
-          },
-        },
-  
-        // 🩺 Diagnostics Suite
+        }
+      );
+    }
+
+    // 🩺 Doctor Module
+    if (enabledModules.has("doctor")) {
+      allTools.push(
         {
           name: "doctor_diagnose_project",
           description: "Scans project structure, detects language/framework, missing dependencies, and setup issues",
@@ -338,9 +344,13 @@ function createServer(): Server {
             },
             required: ["ports"],
           },
-        },
-  
-        // 🛡️ Security Suite & AST Sanitizer
+        }
+      );
+    }
+
+    // 🛡️ Security Module
+    if (enabledModules.has("security")) {
+      allTools.push(
         {
           name: "security_scan_secrets",
           description: "Scans repository text files for accidentally hardcoded API keys, JWTs, and private tokens",
@@ -352,18 +362,22 @@ function createServer(): Server {
           },
         },
         {
-          name: "security_auto_sanitize_secrets",
-          description: "Automated AST Fixer: automatically replaces detected raw API keys with process.env.* variables and updates .env.example",
+          name: "security_auto_sanitize",
+          description: "Auto-replaces detected hardcoded secrets with process.env references and populates .env.example",
           inputSchema: {
             type: "object",
             properties: {
-              targetDir: { type: "string", description: "Target directory to sanitize (defaults to cwd)" },
-              dryRun: { type: "boolean", description: "If true, simulates replacements without writing changes (default: false)" },
+              targetDir: { type: "string", description: "Directory to sanitize (defaults to cwd)" },
+              dryRun: { type: "boolean", description: "If true, previews changes without writing files (default: true)" },
             },
           },
-        },
-  
-        // 🌐 API & Web Suite
+        }
+      );
+    }
+
+    // 🌐 API Module
+    if (enabledModules.has("api")) {
+      allTools.push(
         {
           name: "api_test_request",
           description: "Executes an HTTP request (GET, POST, PUT, DELETE, PATCH) and measures latency & formats response data",
@@ -389,9 +403,13 @@ function createServer(): Server {
               count: { type: "number", description: "Number of mock items to generate (1-50)" },
             },
           },
-        },
-  
-        // 📚 Documentation Suite & Fixer
+        }
+      );
+    }
+
+    // 📚 Docs Module
+    if (enabledModules.has("docs")) {
+      allTools.push(
         {
           name: "docs_check_broken_links",
           description: "Scans all markdown files (.md, .mdx) in the project to detect broken internal links and dead file references",
@@ -404,13 +422,12 @@ function createServer(): Server {
         },
         {
           name: "docs_auto_fix_links",
-          description: "Automated Fixer: repairs broken relative markdown links and optionally creates missing doc placeholder stubs",
+          description: "Automatically updates and rewrites broken markdown links when target files have moved",
           inputSchema: {
             type: "object",
             properties: {
               targetDir: { type: "string", description: "Directory to scan and fix (defaults to cwd)" },
-              createStubs: { type: "boolean", description: "If true, creates missing document stubs automatically (default: false)" },
-              dryRun: { type: "boolean", description: "If true, simulates fixes without writing files (default: false)" },
+              dryRun: { type: "boolean", description: "If true, previews updates without writing files (default: true)" },
             },
           },
         },
@@ -423,9 +440,13 @@ function createServer(): Server {
               targetDir: { type: "string", description: "Directory to scan (defaults to cwd)" },
             },
           },
-        },
-  
-        // 🔍 Code Hygiene Suite
+        }
+      );
+    }
+
+    // 🔍 Code Module
+    if (enabledModules.has("code")) {
+      allTools.push(
         {
           name: "code_find_todos",
           description: "Scans the codebase for TODO, FIXME, HACK, and BUG comments with line numbers and file paths",
@@ -438,16 +459,20 @@ function createServer(): Server {
         },
         {
           name: "code_inspect_heavy_dependencies",
-          description: "Inspects package.json to identify notoriously heavy dependencies (moment, lodash, monaco, katex) with optimization tips",
+          description: "Inspects package.json to identify bloated dependencies (moment, lodash, monaco, katex) with optimization tips",
           inputSchema: {
             type: "object",
             properties: {
               projectPath: { type: "string", description: "Path to project root with package.json" },
             },
           },
-        },
-  
-        // 🚀 Git & Release Suite
+        }
+      );
+    }
+
+    // 🚀 Git Module
+    if (enabledModules.has("git")) {
+      allTools.push(
         {
           name: "git_generate_changelog",
           description: "Parses conventional git commit history between tags and outputs a clean markdown changelog",
@@ -476,25 +501,111 @@ function createServer(): Server {
               targetBranch: { type: "string", description: "Target merge branch (default: 'main')" },
             },
           },
+        }
+      );
+    }
+
+    // 🏆 Problem Fetcher Module
+    if (enabledModules.has("problem")) {
+      allTools.push({
+        name: "problem_fetch_codeforces",
+        description: "Fetches problem statement metadata, tags, and contest limits from Codeforces",
+        inputSchema: {
+          type: "object",
+          properties: {
+            contestId: { type: "string", description: "Codeforces contest ID (e.g. '2060')" },
+            index: { type: "string", description: "Problem letter (e.g. 'A', 'B', 'C')" },
+          },
+          required: ["contestId", "index"],
         },
-      ],
-    };
+      });
+    }
+
+    // 🤖 CI Module
+    if (enabledModules.has("ci")) {
+      allTools.push({
+        name: "ci_generate_workflow",
+        description: "Generates production-ready GitHub Actions CI/CD workflows for Next.js, NPM Publishing, Docker, or Python",
+        inputSchema: {
+          type: "object",
+          properties: {
+            type: { type: "string", enum: ["nextjs", "node-publish", "docker", "python"], description: "Workflow type" },
+          },
+          required: ["type"],
+        },
+      });
+    }
+
+    return { tools: allTools };
   });
-  
-  // ==========================================
-  // 4. MCP TOOL CALL HANDLER
-  // ==========================================
+
+  // 4. MCP TOOL CALL HANDLER WITH STRUCTURED SELF-HEALING ERRORS
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
-  
+
     try {
+      // ⚡ AlgoJudge
+      if (name === "algo_run_sandboxed") {
+        const res = runSandboxed(
+          args?.code as string,
+          (args?.language as "python" | "javascript" | "typescript" | "cpp" | "c" | "go") || "python",
+          (args?.stdin as string) || "",
+          (args?.timeoutMs as number) || 3000
+        );
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+      }
+      if (name === "algo_run_docker") {
+        const res = runInDockerSandbox(
+          args?.code as string,
+          (args?.language as "python" | "javascript" | "cpp") || "python",
+          (args?.stdin as string) || "",
+          (args?.timeoutMs as number) || 5000
+        );
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+      }
+      if (name === "algo_stress_test") {
+        const res = stressTest(
+          args?.solutionCode as string,
+          args?.bruteForceCode as string,
+          args?.generatorCode as string,
+          (args?.language as "python" | "javascript") || "python",
+          (args?.maxIterations as number) || 30
+        );
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+      }
+      if (name === "algo_check_plagiarism") {
+        const res = checkPlagiarism(args?.codeA as string, args?.codeB as string);
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+      }
+      if (name === "algo_generate_edge_cases") {
+        const res = generateEdgeCases(
+          (args?.type as "array" | "graph" | "tree" | "string" | "numbers") || "array",
+          (args?.maxN as number) || 100000
+        );
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+      }
+
+      // ⚡ WASM
+      if (name === "wasm_run_module") {
+        const res = await runWasmModule(
+          args?.wasmBase64 as string,
+          args?.functionName as string,
+          (args?.args as number[]) || []
+        );
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+      }
+      if (name === "wasm_run_vm_sandbox") {
+        const res = runInVmSandbox(args?.code as string, (args?.stdin as string) || "", (args?.timeoutMs as number) || 2000);
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+      }
+
       // 🗄️ Database
       if (name === "db_generate_erd") {
         const tables = parseSqliteOrMockSchema(args?.schemaSql as string);
         const erd = generateMermaidErd(tables);
         return { content: [{ type: "text", text: erd }] };
       }
-  
+
       // ⚡ Performance
       if (name === "perf_audit_assets") {
         const report = auditAssets((args?.targetDir as string) || process.cwd(), (args?.thresholdKb as number) || 250);
@@ -504,86 +615,32 @@ function createServer(): Server {
         const report = await checkPerformanceHeaders(args?.url as string);
         return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
       }
-  
-      // 🏆 Problem
-      if (name === "problem_fetch_codeforces") {
-        const problem = await fetchCodeforcesProblem(args?.contestId as string, args?.index as string);
-        return { content: [{ type: "text", text: JSON.stringify(problem, null, 2) }] };
-      }
-  
-      // 🤖 CI
-      if (name === "ci_generate_workflow") {
-        const workflow = generateCiWorkflow(args?.type as "nextjs" | "node-publish" | "docker" | "python");
-        return { content: [{ type: "text", text: workflow }] };
-      }
-  
-      // ⚡ AlgoJudge & WASM
-      if (name === "algo_run_sandboxed") {
-        const result = runSandboxed(
-          args?.code as string,
-          (args?.language as any) || "python",
-          (args?.stdin as string) || "",
-          (args?.timeoutMs as number) || 3000,
-          (args?.engine as any) || "native"
-        );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
-      }
-      if (name === "algo_run_wasm") {
-        const result = await runWasmModule(
-          args?.wasmBytesBase64 as string,
-          (args?.functionName as string) || "main",
-          (args?.args as number[]) || [],
-          (args?.timeoutMs as number) || 3000
-        );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
-      }
-      if (name === "algo_stress_test") {
-        const result = stressTest(
-          args?.solutionCode as string,
-          args?.bruteForceCode as string,
-          args?.generatorCode as string,
-          (args?.language as any) || "python",
-          (args?.maxIterations as number) || 30,
-          (args?.engine as any) || "native"
-        );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
-      }
-      if (name === "algo_check_plagiarism") {
-        const result = checkPlagiarism(args?.codeA as string, args?.codeB as string);
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
-      }
-      if (name === "algo_generate_edge_cases") {
-        const cases = generateEdgeCases((args?.type as any) || "array", (args?.maxN as number) || 100000);
-        return { content: [{ type: "text", text: JSON.stringify(cases, null, 2) }] };
-      }
-  
+
       // 🩺 Doctor
       if (name === "doctor_diagnose_project") {
         const report = diagnoseProject((args?.projectPath as string) || process.cwd());
         return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
       }
       if (name === "doctor_check_env") {
-        const envDiff = checkEnvSync((args?.projectPath as string) || process.cwd());
-        return { content: [{ type: "text", text: JSON.stringify(envDiff, null, 2) }] };
+        const diff = checkEnvSync((args?.projectPath as string) || process.cwd());
+        return { content: [{ type: "text", text: JSON.stringify(diff, null, 2) }] };
       }
       if (name === "doctor_port_inspect") {
-        const ports = inspectPorts((args?.ports as number[]) || [3000, 8080]);
-        return { content: [{ type: "text", text: JSON.stringify(ports, null, 2) }] };
+        const ports = (args?.ports as number[]) || [3000, 6379, 5432];
+        const results = inspectPorts(ports);
+        return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }] };
       }
-  
-      // 🛡️ Security & AST Fixer
+
+      // 🛡️ Security
       if (name === "security_scan_secrets") {
         const findings = scanSecrets((args?.targetDir as string) || process.cwd());
         return { content: [{ type: "text", text: JSON.stringify(findings, null, 2) }] };
       }
-      if (name === "security_auto_sanitize_secrets") {
-        const result = autoSanitizeSecrets(
-          (args?.targetDir as string) || process.cwd(),
-          Boolean(args?.dryRun)
-        );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      if (name === "security_auto_sanitize") {
+        const res = autoSanitizeSecrets((args?.targetDir as string) || process.cwd(), args?.dryRun !== false);
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
       }
-  
+
       // 🌐 API
       if (name === "api_test_request") {
         const response = await testApiRequest(
@@ -602,25 +659,21 @@ function createServer(): Server {
         );
         return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
       }
-  
-      // 📚 Docs & Fixer
+
+      // 📚 Docs
       if (name === "docs_check_broken_links") {
         const findings = checkBrokenLinks((args?.targetDir as string) || process.cwd());
         return { content: [{ type: "text", text: JSON.stringify(findings, null, 2) }] };
       }
       if (name === "docs_auto_fix_links") {
-        const result = autoFixBrokenLinks(
-          (args?.targetDir as string) || process.cwd(),
-          Boolean(args?.createStubs),
-          Boolean(args?.dryRun)
-        );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        const res = autoFixBrokenLinks((args?.targetDir as string) || process.cwd(), args?.dryRun !== false);
+        return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
       }
       if (name === "docs_extract_code_snippets") {
         const snippets = extractCodeSnippets((args?.targetDir as string) || process.cwd());
         return { content: [{ type: "text", text: JSON.stringify(snippets, null, 2) }] };
       }
-  
+
       // 🔍 Code
       if (name === "code_find_todos") {
         const todos = findTodos((args?.targetDir as string) || process.cwd());
@@ -630,7 +683,7 @@ function createServer(): Server {
         const result = inspectHeavyDependencies((args?.projectPath as string) || process.cwd());
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
-  
+
       // 🚀 Git
       if (name === "git_generate_changelog") {
         const changelog = generateChangelog(args?.fromTag as string | undefined, (args?.toTag as string) || "HEAD");
@@ -644,12 +697,32 @@ function createServer(): Server {
         const prDesc = generatePrDescription((args?.targetBranch as string) || "main");
         return { content: [{ type: "text", text: prDesc }] };
       }
-  
+
+      // 🏆 Problem Fetcher
+      if (name === "problem_fetch_codeforces") {
+        const problem = await fetchCodeforcesProblem(String(args?.contestId || ""), args?.index as string);
+        return { content: [{ type: "text", text: JSON.stringify(problem, null, 2) }] };
+      }
+
+      // 🤖 CI
+      if (name === "ci_generate_workflow") {
+        const workflow = generateCiWorkflow(args?.type as "nextjs" | "node-publish" | "docker" | "python");
+        return { content: [{ type: "text", text: `## File: \`${workflow.fileName}\`\n\n\`\`\`yaml\n${workflow.yamlContent}\`\`\`` }] };
+      }
+
       throw new Error(`Tool not found: ${name}`);
     } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const structuredError = {
+        isError: true,
+        tool: name,
+        errorCode: name.toUpperCase() + "_ERROR",
+        message: errorMessage,
+        remediation: "Verify input schema parameters or inspect project environment with `doctor_diagnose_project`.",
+      };
       return {
         isError: true,
-        content: [{ type: "text", text: `Error executing ${name}: ${error instanceof Error ? error.message : String(error)}` }],
+        content: [{ type: "text", text: JSON.stringify(structuredError, null, 2) }],
       };
     }
   });
@@ -657,75 +730,30 @@ function createServer(): Server {
   return server;
 }
 
-// ==========================================
-// 5. SERVER RUNNER & MULTI-TRANSPORT DISPATCH
-// ==========================================
-
-// Relay = the hosted, multi-tenant remote SSE mode. Bearer tokens are
-// comma-separated so each connecting team/org can hold its own revocable
-// token instead of one shared secret for everyone.
-function getRelayTokens(): string[] {
-  return (process.env.RELAY_API_TOKENS || "")
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
-}
-
-function isAuthorized(req: http.IncomingMessage, validTokens: string[]): boolean {
-  const header = req.headers["authorization"];
-  if (!header || Array.isArray(header) || !header.startsWith("Bearer ")) return false;
-  const provided = Buffer.from(header.slice("Bearer ".length));
-  return validTokens.some((token) => {
-    const expected = Buffer.from(token);
-    // timingSafeEqual requires equal-length buffers; a length mismatch is
-    // just "not this token", not something to throw on.
-    return provided.length === expected.length && timingSafeEqual(provided, expected);
-  });
-}
-
 async function main() {
   const args = process.argv.slice(2);
 
-  // Check for UI mode
-  if (args.includes("--ui") || args.includes("ui")) {
-    const portIndex = args.findIndex((a) => a === "--port" || a === "-p");
-    const port = portIndex !== -1 && args[portIndex + 1] ? Number(args[portIndex + 1]) : 4100;
-    await startUiServer(port);
+  // 1. Check if user ran a direct CLI command (e.g. `mcs doctor`, `mcs ports`, `mcs ui`)
+  const handled = await runCli(args);
+  if (handled) {
     return;
   }
 
-  // Relay mode: hosted, multi-tenant remote SSE transport. --sse is kept as
-  // an alias so any existing scripts/docs referencing it keep working.
-  if (args.includes("--relay") || args.includes("relay") || args.includes("--sse") || args.includes("sse")) {
+  // Parse enabled modules if specified
+  const moduleArg = args.find((a) => a.startsWith("--modules="));
+  const enabledModules = getEnabledModules(process.env.MCS_MODULES, moduleArg ? moduleArg.split("=")[1] : undefined);
+
+  // Check for Cloud Hosted SSE Mode
+  if (args.includes("--sse") || args.includes("sse")) {
     const portIndex = args.findIndex((a) => a === "--port" || a === "-p");
     const port = portIndex !== -1 && args[portIndex + 1] ? Number(args[portIndex + 1]) : Number(process.env.PORT) || 8080;
 
-    const relayTokens = getRelayTokens();
-    if (relayTokens.length === 0) {
-      console.error(
-        "Relay mode requires at least one token in RELAY_API_TOKENS (comma-separated, one per team). Refusing to start unauthenticated."
-      );
-      process.exit(1);
-    }
-
-    // SSEServerTransport is deprecated upstream in favor of
-    // StreamableHTTPServerTransport, but it's kept here since it's still the
-    // most widely-supported "literally SSE" contract across current MCP
-    // clients (the ask was specifically SSE). Worth revisiting once client
-    // support for Streamable HTTP is more settled across Cursor/Windsurf/
-    // Claude Desktop.
-    //
-    // One Server + SSEServerTransport pair per connected session, keyed by
-    // the transport's own sessionId. A single shared Server instance (or a
-    // single shared transport variable, as this used to be) can't serve more
-    // than one live connection at once - see createServer()'s comment.
-    const sessions = new Map<string, { server: Server; transport: SSEServerTransport }>();
+    let sseTransport: SSEServerTransport | null = null;
 
     const httpServer = http.createServer(async (req, res) => {
-      // CORS headers
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
       if (req.method === "OPTIONS") {
         res.writeHead(204);
@@ -735,69 +763,39 @@ async function main() {
 
       const parsedUrl = new URL(req.url || "/", `http://localhost:${port}`);
 
-      // Health check stays unauthenticated on purpose - Fly.io/ECS health
-      // probes don't carry a Bearer token.
       if (parsedUrl.pathname === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({
-          status: "healthy",
-          server: "mcp-cs-relay",
-          version: SERVER_VERSION,
-          activeSessions: sessions.size,
-          timestamp: new Date().toISOString(),
-        }));
+        res.end(JSON.stringify({ status: "healthy", server: "mcs", version: SERVER_VERSION, timestamp: new Date().toISOString() }));
         return;
       }
 
-      // Root landing info
       if (parsedUrl.pathname === "/") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({
-          name: "mcp-cs Relay",
-          description: "Hosted, multi-tenant remote SSE transport for mcp-cs - IEEE Computer Society Universal Developer Operations & AlgoJudge Server",
+          name: "mcs",
+          description: "IEEE Computer Society Universal Developer Operations & AlgoJudge Server",
           version: SERVER_VERSION,
           sseEndpoint: "/sse",
           messagesEndpoint: "/messages",
           healthEndpoint: "/health",
-          auth: "Bearer token required in the Authorization header for /sse and /messages",
         }, null, 2));
         return;
       }
 
-      // Everything past this point requires a valid Bearer token.
-      if (parsedUrl.pathname === "/sse" || parsedUrl.pathname === "/messages") {
-        if (!isAuthorized(req, relayTokens)) {
-          res.writeHead(401, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: "Missing or invalid Bearer token" }));
-          return;
-        }
-      }
-
-      // SSE connect endpoint - a fresh Server + transport pair per client.
       if (parsedUrl.pathname === "/sse" && req.method === "GET") {
-        const transport = new SSEServerTransport("/messages", res);
-        const session = createServer();
-        sessions.set(transport.sessionId, { server: session, transport });
-
-        res.on("close", () => {
-          sessions.delete(transport.sessionId);
-        });
-
-        await session.connect(transport);
+        const server = createServer(enabledModules);
+        sseTransport = new SSEServerTransport("/messages", res);
+        await server.connect(sseTransport);
         return;
       }
 
-      // Message endpoint - routed to the right session via the sessionId
-      // query param SSEServerTransport hands the client on connect.
       if (parsedUrl.pathname === "/messages" && req.method === "POST") {
-        const sessionId = parsedUrl.searchParams.get("sessionId");
-        const session = sessionId ? sessions.get(sessionId) : undefined;
-        if (!session) {
+        if (!sseTransport) {
           res.writeHead(400, { "Content-Type": "text/plain" });
-          res.end("Unknown or expired session. Connect to /sse first.");
+          res.end("SSE session not established yet. Connect to /sse first.");
           return;
         }
-        await session.transport.handlePostMessage(req, res);
+        await sseTransport.handlePostMessage(req, res);
         return;
       }
 
@@ -807,19 +805,19 @@ async function main() {
 
     httpServer.listen(port, () => {
       console.log(`\n======================================================`);
-      console.log(`🛰️  mcp-cs Relay - hosted multi-tenant SSE running!`);
-      console.log(`📡 SSE Stream:      http://0.0.0.0:${port}/sse`);
-      console.log(`💬 Messages:        http://0.0.0.0:${port}/messages`);
-      console.log(`🩺 Health check:    http://0.0.0.0:${port}/health`);
-      console.log(`🔑 Tokens loaded:   ${relayTokens.length}`);
+      console.log(`🌐 MCS Cloud-Hosted SSE Engine running!`);
+      console.log(`📡 SSE Stream: http://0.0.0.0:${port}/sse`);
+      console.log(`💬 Message Endpoint: http://0.0.0.0:${port}/messages`);
+      console.log(`🩺 Healthcheck: http://0.0.0.0:${port}/health`);
       console.log(`======================================================\n`);
     });
     return;
   }
 
   // Default: Local Stdio Transport (For Claude Desktop, Cursor, local agent invocation)
+  const server = createServer(enabledModules);
   const transport = new StdioServerTransport();
-  await createServer().connect(transport);
+  await server.connect(transport);
 }
 
 main().catch((error) => {
