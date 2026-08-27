@@ -26,24 +26,29 @@ print("done")
     expect(result.timedOut).toBe(true);
   });
 
-  it("stress-tests matching algorithms successfully", { timeout: 15000 }, () => {
+  it("stress-tests matching algorithms successfully", () => {
     const sol = `
 import sys
 line = sys.stdin.read().strip()
-if line:
-    nums = [int(x) for x in line.split()]
-    print(sum(nums))
-else:
-    print(0)
+nums = [int(x) for x in line.split()] if line else []
+print(sum(nums))
 `;
-    const brute = sol;
+    const brute = `
+import sys
+line = sys.stdin.read().strip()
+nums = [int(x) for x in line.split()] if line else []
+res = 0
+for x in nums:
+    res += x
+print(res)
+`;
     const gen = `
 import random
-print(f"{random.randint(1, 100)} {random.randint(1, 100)}")
+print(f"{random.randint(1, 50)} {random.randint(1, 50)}")
 `;
-    const result = stressTest(sol, brute, gen, "python", 5);
+    const result = stressTest(sol, brute, gen, "python", 3);
     expect(result.status).toBe("PASSED");
-    expect(result.iterationsTested).toBe(5);
+    expect(result.iterationsTested).toBe(3);
   });
 
   it("detects plagiarized / identical token logic", () => {

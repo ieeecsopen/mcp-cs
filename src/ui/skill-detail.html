@@ -568,42 +568,212 @@
       transform: translateY(0);
     }
 
-    @media (max-width: 900px) {
+    
+    /* Prevent any horizontal page blowout */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .navbar {
+      display: flex;
+      flex-direction: column;
+      padding: 14px 24px 8px;
+      background: rgba(13, 17, 23, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(240, 246, 252, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-logo-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-item {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: #ffffff;
+    }
+
+    .nav-btn-github {
+      color: #ffffff;
+      background: transparent;
+      border: 1px solid rgba(240, 246, 252, 0.3);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .nav-btn-github:hover {
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .mobile-nav-bar {
+      display: none;
+      gap: 12px;
+      overflow-x: auto;
+      padding-top: 10px;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .mobile-nav-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mob-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+    }
+    .mob-link.active {
+      color: #ffffff;
+      background: #21262d;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 768px) {
       .navbar {
-        padding: 14px 20px;
+        padding: 12px 16px 8px;
       }
       .nav-menu {
         display: none;
       }
-      .app-layout {
-        grid-template-columns: 1fr;
+      .mobile-nav-bar {
+        display: flex;
       }
-      .sidebar {
-        height: auto;
-        position: relative;
-        top: 0;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        max-height: 240px;
+      .spine-layout-wrapper {
+        padding: 0 12px;
       }
-      .detail-container {
-        padding: 24px 16px 80px;
+      .vertical-spine-line, .spine-node-icon {
+        display: none !important;
       }
-      .spec-title {
-        font-size: clamp(28px, 7vw, 36px);
+      .spine-section-content {
+        padding-left: 0 !important;
       }
-      .install-bar {
+      .hero-section {
+        padding-top: 40px;
+        padding-bottom: 60px;
+      }
+      .hero-top-grid, .editor-main-body, .feature-cards-2col, .simulator-grid, .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+      }
+      .hero-h1, .cli-h1 {
+        font-size: clamp(32px, 8.5vw, 44px) !important;
+        letter-spacing: -1px !important;
+      }
+      .hero-p, .cli-sub {
+        font-size: 16px !important;
+        margin-bottom: 24px !important;
+      }
+      .hero-action-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 36px;
+      }
+      .email-install-box, .install-bar {
         flex-direction: column;
         gap: 8px;
         padding: 8px;
+        width: 100% !important;
+        max-width: 100% !important;
       }
-      .install-input, .install-btn {
+      .email-input-text, .install-input {
+        width: 100% !important;
+        font-size: 12.5px;
+        padding: 8px;
+      }
+      .btn-install-purple, .install-btn {
+        width: 100% !important;
+        padding: 10px;
+      }
+      .btn-trial-border {
         width: 100%;
+        justify-content: center;
       }
-      .bento-grid-4, .usage-grid {
-        grid-template-columns: 1fr;
+      .hero-graphic-cluster {
+        margin: 20px auto 0;
+      }
+      .glossy-3d-emblem {
+        width: 220px !important;
+        height: 220px !important;
+      }
+      .floating-sub-orb {
+        width: 60px !important;
+        height: 60px !important;
+      }
+      .floating-badge-check {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 12px !important;
+      }
+      .block-h2 {
+        font-size: clamp(24px, 6vw, 32px) !important;
+        margin-bottom: 24px !important;
+      }
+      .metric-big-number {
+        font-size: clamp(32px, 7.5vw, 44px) !important;
+      }
+      .table-card, .skills-table-card, .table-card-cli, .ref-table-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        min-width: 520px;
+      }
+      .footer {
+        padding: 30px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
       }
     }
+
   </style>
 </head>
 <body>
@@ -612,21 +782,29 @@
 
   <!-- Unified Sticky Navbar -->
   <nav class="navbar">
-    <div class="nav-left">
-      <a href="/" class="nav-logo-link">
-        <svg height="28" viewBox="0 0 16 16" width="28" fill="#ffffff"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
-        <span style="font-weight: 800; font-size: 16px; margin-left: 8px; color: #ffffff;">MCS</span>
-      </a>
-      <div class="nav-menu">
-        <a href="/" class="nav-item ">Directory</a>
-        <a href="/skill-detail" class="nav-item active">Specifications</a>
-        <a href="/cli" class="nav-item ">CLI Reference</a>
-        <a href="/console" class="nav-item ">Developer Console</a>
+    <div class="nav-container">
+      <div class="nav-left">
+        <a href="/" class="nav-logo-link">
+          <svg height="26" viewBox="0 0 16 16" width="26" fill="#ffffff"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+          <span style="font-weight: 800; font-size: 16px; margin-left: 8px; color: #ffffff;">MCS</span>
+        </a>
+        <div class="nav-menu">
+          <a href="/" class="nav-item ">Directory</a>
+          <a href="/skill-detail" class="nav-item active">Specifications</a>
+          <a href="/cli" class="nav-item ">CLI Reference</a>
+          <a href="/console" class="nav-item ">Console</a>
+        </div>
+      </div>
+      <div class="nav-right">
+        <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-btn-github">GitHub</a>
       </div>
     </div>
-    <div class="nav-right">
-      <a href="/console" class="nav-btn-console">Console</a>
-      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-btn-github">GitHub</a>
+    <!-- Mobile Sub-Navigation Touch Scroll -->
+    <div class="mobile-nav-bar">
+      <a href="/" class="mob-link ">Directory</a>
+      <a href="/skill-detail" class="mob-link active">Specifications</a>
+      <a href="/cli" class="mob-link ">CLI</a>
+      <a href="/console" class="mob-link ">Console</a>
     </div>
   </nav>
 
