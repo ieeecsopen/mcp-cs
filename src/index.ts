@@ -802,7 +802,7 @@ async function main() {
       }
 
 
-      const isHtmlRequest = (req.headers.accept && req.headers.accept.includes("text/html")) || parsedUrl.pathname === "/ui" || parsedUrl.pathname === "/dashboard" || parsedUrl.pathname === "/console";
+      const isHtmlRequest = (req.headers.accept && req.headers.accept.includes("text/html")) || parsedUrl.pathname === "/ui" || parsedUrl.pathname === "/dashboard" || parsedUrl.pathname === "/console" || parsedUrl.pathname === "/cli" || parsedUrl.pathname === "/skill-detail";
 
       const resolveHtmlFile = (filename: string) => {
         let p = path.join(__dirname, "ui", filename);
@@ -811,6 +811,17 @@ async function main() {
         }
         return p;
       };
+
+      // CLI Reference Page Route (/cli)
+      if (parsedUrl.pathname === "/cli" && isHtmlRequest) {
+        try {
+          const cliPath = resolveHtmlFile("cli.html");
+          const content = fs.readFileSync(fs.existsSync(cliPath) ? cliPath : resolveHtmlFile("landing.html"), "utf8");
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(content);
+          return;
+        } catch (e) {}
+      }
 
       // Skill Detail Page Route (/skill-detail or /specification)
       if ((parsedUrl.pathname === "/skill-detail" || parsedUrl.pathname === "/specification") && isHtmlRequest) {
