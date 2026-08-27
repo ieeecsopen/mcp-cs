@@ -706,20 +706,68 @@
     }
 
     @media (max-width: 900px) {
-      .hero-top-grid, .editor-main-body, .feature-cards-2col {
-        grid-template-columns: 1fr;
+      .navbar {
+        padding: 14px 20px;
       }
-      .hero-h1 {
-        font-size: 44px;
-      }
-      .vertical-spine-line {
+      .nav-menu {
         display: none;
       }
-      .spine-section-content {
-        padding-left: 0;
+      .spine-layout-wrapper {
+        padding: 0 16px;
       }
-      .navbar {
-        padding: 16px 20px;
+      .vertical-spine-line {
+        left: 20px;
+        top: 100px;
+      }
+      .spine-node-icon {
+        left: 7px;
+        width: 26px;
+        height: 26px;
+      }
+      .spine-section-content {
+        padding-left: 44px;
+      }
+      .hero-top-grid, .editor-main-body, .feature-cards-2col {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .hero-h1 {
+        font-size: clamp(36px, 9vw, 56px);
+      }
+      .hero-p {
+        font-size: 17px;
+      }
+      .hero-action-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .email-install-box {
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+      }
+      .email-input-text {
+        width: 100%;
+      }
+      .btn-install-purple {
+        width: 100%;
+      }
+      .btn-trial-border {
+        justify-content: center;
+      }
+      .block-h2 {
+        font-size: clamp(28px, 6vw, 40px);
+      }
+      .metric-big-number {
+        font-size: clamp(36px, 8vw, 52px);
+      }
+      .cli-table th:nth-child(3), .cli-table td:nth-child(3) {
+        display: none;
+      }
+      .footer {
+        padding: 40px 20px;
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -1032,6 +1080,122 @@ Opening default browser window... (Press Ctrl+C to stop)`
 
     // Init
     document.getElementById("cliOutput").innerText = cliOutputs.doctor;
+
+    // GSAP Scroll Entrance Animations for CLI Page
+    document.addEventListener("DOMContentLoaded", () => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // 1. Hero Entrance
+      const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      heroTl
+        .from(".hero-h1", { opacity: 0, y: 40, duration: 1 })
+        .from(".hero-p", { opacity: 0, y: 30, duration: 0.8 }, "-=0.6")
+        .from(".hero-action-bar", { opacity: 0, y: 25, duration: 0.8 }, "-=0.6")
+        .from(".hero-graphic-cluster", { opacity: 0, scale: 0.85, duration: 1.2, ease: "back.out(1.4)" }, "-=0.8");
+
+      // 2. Spine Line Reveal
+      gsap.from(".vertical-spine-line", {
+        scaleY: 0,
+        transformOrigin: "top center",
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".spine-layout-wrapper",
+          start: "top 20%",
+          end: "bottom 90%",
+          scrub: 0.5
+        }
+      });
+
+      // 3. Spine Node Icons
+      gsap.utils.toArray(".spine-node-icon").forEach(node => {
+        gsap.from(node, {
+          scale: 0,
+          opacity: 0,
+          duration: 0.6,
+          ease: "back.out(2)",
+          scrollTrigger: {
+            trigger: node,
+            start: "top 80%",
+            toggleActions: "play none none reverse"
+          }
+        });
+      });
+
+      // 4. Simulator Section
+      gsap.from("#simulator .block-tag, #simulator .block-heading-gradient-purple, #simulator .block-h2", {
+        opacity: 0,
+        y: 35,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: "#simulator",
+          start: "top 75%"
+        }
+      });
+
+      gsap.from(".editor-composite-panel", {
+        opacity: 0,
+        y: 40,
+        scale: 0.97,
+        duration: 0.9,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".editor-composite-panel",
+          start: "top 80%"
+        }
+      });
+
+      gsap.from(".metric-callout-wrap", {
+        opacity: 0,
+        x: -30,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".metric-callout-wrap",
+          start: "top 85%"
+        }
+      });
+
+      gsap.from("#simulator .feature-card-dark", {
+        opacity: 0,
+        y: 30,
+        stagger: 0.2,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: "#simulator .feature-cards-2col",
+          start: "top 80%"
+        }
+      });
+
+      // 5. Matrix Table
+      gsap.from("#matrix .block-tag, #matrix .block-heading-gradient-purple, #matrix .block-h2, .table-card-cli", {
+        opacity: 0,
+        y: 35,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: "#matrix",
+          start: "top 80%"
+        }
+      });
+
+      // 6. Globe CTA
+      gsap.from(".globe-cta-section", {
+        opacity: 0,
+        scale: 0.92,
+        y: 40,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".globe-cta-section",
+          start: "top 80%"
+        }
+      });
+    });
+
   </script>
 </body>
 </html>

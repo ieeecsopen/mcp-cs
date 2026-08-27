@@ -996,20 +996,68 @@
     }
 
     @media (max-width: 900px) {
-      .hero-top-grid, .editor-main-body, .feature-cards-2col {
-        grid-template-columns: 1fr;
+      .navbar {
+        padding: 14px 20px;
       }
-      .hero-h1 {
-        font-size: 44px;
-      }
-      .vertical-spine-line {
+      .nav-menu {
         display: none;
       }
-      .spine-section-content {
-        padding-left: 0;
+      .spine-layout-wrapper {
+        padding: 0 16px;
       }
-      .navbar {
-        padding: 16px 20px;
+      .vertical-spine-line {
+        left: 20px;
+        top: 100px;
+      }
+      .spine-node-icon {
+        left: 7px;
+        width: 26px;
+        height: 26px;
+      }
+      .spine-section-content {
+        padding-left: 44px;
+      }
+      .hero-top-grid, .editor-main-body, .feature-cards-2col {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .hero-h1 {
+        font-size: clamp(36px, 9vw, 56px);
+      }
+      .hero-p {
+        font-size: 17px;
+      }
+      .hero-action-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .email-install-box {
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+      }
+      .email-input-text {
+        width: 100%;
+      }
+      .btn-install-purple {
+        width: 100%;
+      }
+      .btn-trial-border {
+        justify-content: center;
+      }
+      .block-h2 {
+        font-size: clamp(28px, 6vw, 40px);
+      }
+      .metric-big-number {
+        font-size: clamp(36px, 8vw, 52px);
+      }
+      .skills-table th:nth-child(3), .skills-table td:nth-child(3) {
+        display: none;
+      }
+      .footer {
+        padding: 40px 20px;
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>

@@ -562,7 +562,13 @@
       transform: translateY(0);
     }
 
-    @media (max-width: 960px) {
+    @media (max-width: 900px) {
+      .navbar {
+        padding: 14px 20px;
+      }
+      .nav-menu {
+        display: none;
+      }
       .app-layout {
         grid-template-columns: 1fr;
       }
@@ -570,9 +576,23 @@
         height: auto;
         position: relative;
         top: 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        max-height: 240px;
       }
       .detail-container {
-        padding: 30px 20px;
+        padding: 24px 16px 80px;
+      }
+      .spec-title {
+        font-size: clamp(28px, 7vw, 36px);
+      }
+      .install-bar {
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+      }
+      .install-input, .install-btn {
+        width: 100%;
       }
       .bento-grid-4, .usage-grid {
         grid-template-columns: 1fr;
