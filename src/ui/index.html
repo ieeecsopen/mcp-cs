@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCS | IEEE CS Model Context & Skills Suite</title>
+  <title>MCS | The Intelligent Model Context & Skills Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #09090b;
-      --bg-surface: #111115;
-      --border: #222228;
-      --border-hover: #33333f;
+      --bg: #040406;
+      --bg-surface: #0c0d12;
+      --bg-card: #12131a;
+      --border: #1e2029;
+      --border-light: #2b2e3b;
+      --border-glow: rgba(255, 208, 0, 0.3);
       --yellow: #ffd000;
-      --yellow-hover: #e6bc00;
+      --yellow-bright: #ffdb33;
       --yellow-dim: rgba(255, 208, 0, 0.12);
-      --yellow-border: rgba(255, 208, 0, 0.25);
-      --text: #ffffff;
-      --text-muted: #9999a3;
-      --text-dim: #555562;
+      --text: #f0f3f6;
+      --text-muted: #8b949e;
+      --text-dim: #505663;
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
@@ -36,20 +37,37 @@
       font-family: var(--font-sans);
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
-      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Navbar */
-    .nav {
+    /* Ambient Glow Background */
+    .ambient-glow-top {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255, 208, 0, 0.08) 0%, rgba(255, 208, 0, 0.02) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Sticky Navbar */
+    .navbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 48px;
-      background: var(--bg);
+      padding: 16px 48px;
+      background: rgba(4, 4, 6, 0.85);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .nav-brand {
+    .nav-left {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -59,28 +77,21 @@
       font-weight: 700;
     }
 
-    .nav-brand-logo {
-      width: 28px;
-      height: 28px;
+    .nav-logo-box {
+      width: 30px;
+      height: 30px;
       background: var(--yellow);
-      border-radius: 4px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #000000;
+      color: #000;
       font-family: var(--font-mono);
       font-weight: 900;
-      font-size: 13px;
+      font-size: 14px;
     }
 
-    .nav-brand-sub {
-      color: var(--text-dim);
-      font-weight: 500;
-      font-size: 13px;
-      margin-left: 4px;
-    }
-
-    .nav-items {
+    .nav-links {
       display: flex;
       align-items: center;
       gap: 28px;
@@ -95,172 +106,353 @@
     }
 
     .nav-link:hover {
-      color: var(--yellow);
+      color: var(--text);
     }
 
-    .nav-btn {
-      background: var(--yellow);
+    .nav-cta {
+      background: #ffffff;
       color: #000000;
       font-weight: 700;
       font-size: 13px;
-      padding: 7px 16px;
+      padding: 8px 16px;
       border-radius: 6px;
       text-decoration: none;
-      transition: background 0.15s;
+      transition: all 0.15s;
     }
 
-    .nav-btn:hover {
-      background: var(--yellow-hover);
-    }
-
-    /* Main Container */
-    .container {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 56px 24px 100px;
+    .nav-cta:hover {
+      background: var(--yellow);
+      box-shadow: 0 0 20px var(--border-glow);
     }
 
     /* Hero Section */
-    .hero {
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 90px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-grid {
       display: grid;
-      grid-template-columns: 1fr 1.1fr;
-      gap: 50px;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 60px;
       align-items: center;
-      margin-bottom: 50px;
     }
 
-    .hero-title-group {
-      display: flex;
-      flex-direction: column;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
-    }
-
-    .hero-title-main {
-      font-family: var(--font-mono);
-      font-size: 64px;
-      font-weight: 900;
-      letter-spacing: -2px;
-      line-height: 1;
-      color: #ffffff;
-    }
-
-    .hero-title-main span.yellow {
-      color: var(--yellow);
-    }
-
-    .hero-tagline {
+      background: rgba(255, 208, 0, 0.08);
+      border: 1px solid rgba(255, 208, 0, 0.2);
+      padding: 5px 14px;
+      border-radius: 20px;
       font-family: var(--font-mono);
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
       color: var(--yellow);
-      text-transform: uppercase;
+      margin-bottom: 24px;
     }
 
-    .hero-desc {
-      font-size: 18px;
+    .hero-headline {
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.08;
+      color: #ffffff;
+      margin-bottom: 24px;
+    }
+
+    .hero-headline span.gradient-text {
+      background: linear-gradient(135deg, #ffffff 40%, var(--yellow) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 19px;
       line-height: 1.6;
       color: var(--text-muted);
-      font-weight: 400;
+      margin-bottom: 36px;
+      max-width: 600px;
     }
 
-    /* Action Row */
-    .action-row {
-      display: grid;
-      grid-template-columns: 1fr 1.1fr;
-      gap: 50px;
-      align-items: flex-start;
-      margin-bottom: 64px;
+    .hero-cta-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
     }
 
-    .section-title {
+    .terminal-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .terminal-pill:hover {
+      border-color: var(--yellow);
+      background: rgba(255, 208, 0, 0.04);
+    }
+
+    .terminal-pill span.prefix {
+      color: var(--yellow);
+      user-select: none;
+    }
+
+    .btn-docs-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border-light);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn-docs-link:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #ffffff;
+    }
+
+    /* Supported IDE Icons Row */
+    .ide-strip-title {
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       color: var(--text-dim);
       text-transform: uppercase;
       margin-bottom: 12px;
     }
 
-    .install-box {
+    .ide-icons-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .ide-icon-box {
+      width: 40px;
+      height: 40px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 13px 18px;
-      font-family: var(--font-mono);
-      font-size: 13.5px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .install-box:hover {
-      border-color: var(--yellow-border);
-      background: rgba(255, 208, 0, 0.03);
-    }
-
-    .install-box code {
-      color: #ffffff;
-    }
-
-    .install-box span.prefix {
-      color: var(--yellow);
-      margin-right: 8px;
-    }
-
-    .copy-icon {
-      color: var(--text-dim);
-      transition: color 0.15s;
-    }
-
-    .install-box:hover .copy-icon {
-      color: var(--yellow);
-    }
-
-    .agent-badges {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding-top: 4px;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      position: relative;
+      cursor: pointer;
     }
 
-    .agent-pill {
+    .ide-icon-box:hover {
+      border-color: var(--yellow);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .ide-icon-box svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .ide-icon-box::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #18181b;
+      border: 1px solid var(--border);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+
+    .ide-icon-box:hover::after {
+      opacity: 1;
+    }
+
+    /* Hero Code Mockup */
+    .code-window {
+      background: #0b0c11;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 208, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .code-window-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      background: #101118;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .code-window-title {
       font-family: var(--font-mono);
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--text-dim);
+      margin-left: 8px;
+    }
+
+    .code-body {
+      padding: 22px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: #d1d5db;
+      overflow-x: auto;
+    }
+
+    .code-body .tok-keyword { color: var(--yellow); font-weight: 600; }
+    .code-body .tok-string { color: #7ee787; }
+    .code-body .tok-fn { color: #79c0ff; }
+    .code-body .tok-comment { color: var(--text-dim); }
+
+    /* Vertical Timeline Spine */
+    .section-spine {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      position: relative;
+    }
+
+    .timeline-node {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .timeline-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--yellow);
+      background: var(--yellow-dim);
+      border: 1px solid var(--border-glow);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* GitHub-style Bento Grid */
+    .bento-showcase {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 90px;
+    }
+
+    .bento-card {
       background: var(--bg-surface);
       border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 6px;
+      border-radius: 12px;
+      padding: 32px;
+      transition: all 0.2s;
     }
 
-    /* Directory Header */
-    .dir-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
+    .bento-card:hover {
+      border-color: var(--border-light);
+      transform: translateY(-2px);
     }
 
-    .dir-title {
+    .bento-header {
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--text-dim);
+      color: var(--yellow);
+      letter-spacing: 1px;
       text-transform: uppercase;
+      margin-bottom: 12px;
     }
 
-    /* Search Box */
-    .search-wrap {
-      position: relative;
+    .bento-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .bento-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Leaderboard / Directory Section */
+    .directory-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 120px;
+    }
+
+    .directory-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
       margin-bottom: 24px;
     }
 
-    .search-wrap svg {
+    .directory-title h2 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+    }
+
+    .directory-title p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .search-filter-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-filter-box svg {
       position: absolute;
       left: 16px;
       top: 50%;
@@ -273,7 +465,7 @@
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 13px 44px 13px 44px;
+      padding: 14px 44px 14px 44px;
       color: #ffffff;
       font-family: var(--font-mono);
       font-size: 13.5px;
@@ -285,33 +477,15 @@
       border-color: var(--yellow);
     }
 
-    .search-input::placeholder {
-      color: var(--text-dim);
-    }
-
-    .search-shortcut {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-
-    /* Category Filter Tabs */
     .filter-tabs {
       display: flex;
-      gap: 20px;
+      gap: 16px;
       margin-bottom: 16px;
       border-bottom: 1px solid var(--border);
       padding-bottom: 12px;
     }
 
-    .filter-btn {
+    .filter-tab {
       background: transparent;
       border: none;
       color: var(--text-dim);
@@ -322,12 +496,12 @@
       position: relative;
     }
 
-    .filter-btn.active {
+    .filter-tab.active {
       color: var(--yellow);
       font-weight: 700;
     }
 
-    .filter-btn.active::after {
+    .filter-tab.active::after {
       content: '';
       position: absolute;
       bottom: -13px;
@@ -337,14 +511,10 @@
       background: var(--yellow);
     }
 
-    .filter-btn:hover {
-      color: var(--text-muted);
-    }
-
-    /* Table */
-    .table-container {
+    /* Skills Table */
+    .table-card {
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       background: var(--bg-surface);
       overflow: hidden;
     }
@@ -356,7 +526,7 @@
     }
 
     .skills-table th {
-      padding: 13px 18px;
+      padding: 14px 20px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
@@ -364,18 +534,18 @@
       letter-spacing: 1px;
       text-transform: uppercase;
       border-bottom: 1px solid var(--border);
-      background: #0d0d10;
+      background: #090a0f;
     }
 
     .skills-table td {
-      padding: 15px 18px;
+      padding: 16px 20px;
       font-size: 13.5px;
-      border-bottom: 1px solid #1a1a20;
+      border-bottom: 1px solid #161720;
       vertical-align: middle;
     }
 
     .skills-table tr:hover td {
-      background: #141418;
+      background: #11121a;
     }
 
     .rank-col {
@@ -385,7 +555,7 @@
       font-size: 12px;
     }
 
-    .skill-link {
+    .skill-title-link {
       font-family: var(--font-mono);
       font-weight: 700;
       color: #ffffff;
@@ -394,18 +564,18 @@
       transition: color 0.15s;
     }
 
-    .skill-link:hover {
+    .skill-title-link:hover {
       color: var(--yellow);
     }
 
-    .skill-meta {
-      color: var(--text-dim);
+    .skill-author-tag {
       font-family: var(--font-mono);
       font-size: 12px;
+      color: var(--text-dim);
       margin-left: 8px;
     }
 
-    .category-badge {
+    .badge-cat {
       display: inline-block;
       font-family: var(--font-mono);
       font-size: 11px;
@@ -416,28 +586,57 @@
       color: var(--text-muted);
     }
 
-    .category-badge.campus {
+    .badge-cat.campus {
       background: var(--yellow-dim);
       color: var(--yellow);
-      border: 1px solid var(--yellow-border);
+      border: 1px solid var(--border-glow);
     }
 
-    .btn-action-view {
+    .btn-view-spec {
       font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-muted);
       background: transparent;
       border: 1px solid var(--border);
-      padding: 5px 12px;
-      border-radius: 5px;
+      padding: 5px 14px;
+      border-radius: 6px;
       text-decoration: none;
       transition: all 0.15s;
     }
 
-    .btn-action-view:hover {
+    .btn-view-spec:hover {
       border-color: var(--yellow);
       color: var(--yellow);
       background: var(--yellow-dim);
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      background: #030304;
+      padding: 48px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-link:hover {
+      color: var(--yellow);
     }
 
     /* Toast */
@@ -450,7 +649,7 @@
       font-family: var(--font-mono);
       font-weight: 700;
       font-size: 13px;
-      padding: 9px 18px;
+      padding: 10px 18px;
       border-radius: 6px;
       box-shadow: 0 8px 24px rgba(255, 208, 0, 0.35);
       opacity: 0;
@@ -465,157 +664,257 @@
       transform: translateY(0);
     }
 
-    @media (max-width: 860px) {
-      .hero, .action-row {
+    @media (max-width: 900px) {
+      .hero-grid {
         grid-template-columns: 1fr;
-        gap: 30px;
+        gap: 40px;
       }
-      .nav {
-        padding: 18px 20px;
+      .bento-showcase {
+        grid-template-columns: 1fr;
+      }
+      .hero-headline {
+        font-size: 42px;
+      }
+      .navbar {
+        padding: 16px 20px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navbar -->
-  <nav class="nav">
-    <a href="/" class="nav-brand">
-      <div class="nav-brand-logo">CS</div>
+  <div class="ambient-glow-top"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="nav-left">
+      <div class="nav-logo-box">CS</div>
       <span>MCS</span>
-      <span class="nav-brand-sub">IEEE Computer Society</span>
     </a>
-    <div class="nav-items">
-      <a href="/" class="nav-link" style="color: var(--yellow); font-weight: 600;">Directory</a>
+    <div class="nav-links">
+      <a href="#skills" class="nav-link">Skills Directory</a>
       <a href="/skill-detail" class="nav-link">Specifications</a>
       <a href="/console" class="nav-link">Developer Console</a>
       <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="nav-link">GitHub</a>
-      <a href="/skill-detail" class="nav-btn">Install Skills</a>
+      <a href="/skill-detail" class="nav-cta">Install Skills</a>
     </div>
   </nav>
 
-  <div class="container">
-
-    <!-- Hero Section -->
-    <div class="hero">
-      <div class="hero-title-group">
-        <div class="hero-title-main">MCS <span class="yellow">SKILLS</span></div>
-        <div class="hero-tagline">IEEE CS Open Agent Skills & MCP Ecosystem</div>
-      </div>
-      <div class="hero-desc">
-        Standardized, reusable procedural runbooks and sandboxed developer operations for AI coding assistants. Install with a single command to empower agents with verified engineering workflows.
-      </div>
-    </div>
-
-    <!-- Action Row -->
-    <div class="action-row">
+  <!-- Hero Section -->
+  <header class="hero-container">
+    <div class="hero-grid">
       <div>
-        <div class="section-title">1-Command Installation</div>
-        <div class="install-box" onclick="copyCommand('npx skills add ieeecsopen/mcp-cs')">
-          <code><span class="prefix">$</span>npx skills add ieeecsopen/mcp-cs</code>
-          <svg class="copy-icon" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        <div class="hero-badge">
+          <span>●</span>
+          <span>IEEE Computer Society Open Source Ecosystem</span>
+        </div>
+        <h1 class="hero-headline">
+          Where developers and AI agents <span class="gradient-text">build together.</span>
+        </h1>
+        <p class="hero-subtitle">
+          The official IEEE CS Model Context Protocol server and standardized 30-skill procedural knowledge suite for software engineers, university capstone teams, and competitive coders.
+        </p>
+        <div class="hero-cta-bar">
+          <div class="terminal-pill" onclick="copyText('npx skills add ieeecsopen/mcp-cs')" title="Copy Command">
+            <code><span class="prefix">$</span>npx skills add ieeecsopen/mcp-cs</code>
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-dim); margin-left: 6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </div>
+          <a href="/skill-detail" class="btn-docs-link">Explore 30 Skills</a>
+        </div>
+
+        <div>
+          <div class="ide-strip-title">Compatible with modern IDEs & AI Agents</div>
+          <div class="ide-icons-row">
+            <!-- Cursor -->
+            <div class="ide-icon-box" data-tooltip="Cursor">
+              <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <!-- Claude -->
+            <div class="ide-icon-box" data-tooltip="Claude Code">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a1 1 0 0 1 .993.883L13 3v2.071a7.002 7.002 0 0 1 5.928 5.93L19 11h2a1 1 0 0 1 .993.883L22 12a1 1 0 0 1-.883.993L21 13h-2a7.002 7.002 0 0 1-5.93 5.928L13 19v2a1 1 0 0 1-.883.993L12 22a1 1 0 0 1-.993-.883L11 21v-2.071a7.002 7.002 0 0 1-5.928-5.93L5 13H3a1 1 0 0 1-.993-.883L2 12a1 1 0 0 1 .883-.993L3 11h2a7.002 7.002 0 0 1 5.93-5.928L11 5V3a1 1 0 0 1 .883-.993L12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>
+            </div>
+            <!-- Antigravity -->
+            <div class="ide-icon-box" data-tooltip="Antigravity">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+            </div>
+            <!-- VS Code -->
+            <div class="ide-icon-box" data-tooltip="VS Code">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.5 2.5L7.2 11.2L3.5 8.4L1.5 9.7L5.5 13L1.5 16.3L3.5 17.6L7.2 14.8L18.5 23.5L22.5 21.5V4.5L18.5 2.5ZM18.5 6.8V19.2L9.5 13L18.5 6.8Z"/></svg>
+            </div>
+            <!-- ChatGPT -->
+            <div class="ide-icon-box" data-tooltip="ChatGPT">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20.5 10.5C20.3 8.3 18.7 6.6 16.5 6.2C16.1 4.7 14.8 3.5 13.2 3.1C11.3 2.6 9.3 3.3 8.1 4.8C6.3 5.2 4.9 6.7 4.7 8.6C3.4 9.8 2.8 11.6 3.1 13.4C3.4 15.2 4.6 16.7 6.3 17.3C6.7 18.9 7.9 20.2 9.6 20.7C11.5 21.2 13.5 20.6 14.7 19.1C16.5 18.7 17.9 17.2 18.1 15.3C19.4 14.1 20.1 12.3 19.8 10.5H20.5ZM13 18.5C12.4 18.5 11.8 18.3 11.3 18L13.8 16.5C14.1 16.3 14.3 16 14.3 15.6V12.1L15.3 12.7C16.1 13.2 16.5 14.1 16.4 15C16.3 16.9 14.8 18.5 13 18.5ZM7.5 15.6C7.2 15 7.1 14.3 7.3 13.7L9.8 15.1V18.1C8.2 17.8 7.1 16.8 7.5 15.6ZM6.2 10.7C6.5 10.2 7 9.8 7.6 9.6L7.6 12.6L8.6 13.2L6.1 14.7C5.3 13.6 5.3 11.9 6.2 10.7ZM14.2 11.4L11.7 10L11.7 7C13.4 7.2 14.6 8.3 14.2 11.4ZM16.4 10.7L13.9 12.2V9.2C15.5 9.5 16.7 10.5 16.4 10.7ZM10.2 12.6L11.2 12L13.7 13.5L11.2 15L8.7 13.5L10.2 12.6Z"/></svg>
+            </div>
+            <!-- Windsurf -->
+            <div class="ide-icon-box" data-tooltip="Windsurf">
+              <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 15c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 3 3M3 9c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 3 3"/></svg>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div>
-        <div class="section-title">Supported AI Assistants</div>
-        <div class="agent-badges">
-          <div class="agent-pill">Antigravity</div>
-          <div class="agent-pill">Cursor</div>
-          <div class="agent-pill">Claude Code</div>
-          <div class="agent-pill">Windsurf</div>
-          <div class="agent-pill">Copilot</div>
-          <div class="agent-pill">Cline</div>
+      <!-- Hero Interactive Code Window -->
+      <div class="code-window">
+        <div class="code-window-header">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+          <span class="code-window-title">mcp-server-session.ts</span>
+        </div>
+        <pre class="code-body"><code><span class="tok-comment">// 1. Invoke sandboxed differential stress test</span>
+<span class="tok-keyword">const</span> result = <span class="tok-keyword">await</span> mcs.<span class="tok-fn">algo_stress_test</span>({
+  solution: <span class="tok-string">"function solve(nums) { ... }"</span>,
+  bruteForce: <span class="tok-string">"function brute(nums) { ... }"</span>,
+  generator: <span class="tok-string">"function gen() { return [...] }"</span>,
+  iterations: <span class="tok-keyword">50</span>
+});
+
+<span class="tok-comment">// 2. Structured Self-Healing Response</span>
+{
+  <span class="tok-string">"status"</span>: <span class="tok-string">"PASS"</span>,
+  <span class="tok-string">"divergenceFound"</span>: <span class="tok-keyword">false</span>,
+  <span class="tok-string">"iterationsTested"</span>: <span class="tok-keyword">50</span>,
+  <span class="tok-string">"maxExecutionTimeMs"</span>: <span class="tok-keyword">4.2</span>
+}</code></pre>
+      </div>
+    </div>
+  </header>
+
+  <!-- Bento Features -->
+  <section class="section-spine">
+    <div class="timeline-node">
+      <span class="timeline-pill">01 / CAPABILITIES</span>
+    </div>
+
+    <div class="bento-showcase">
+      <div class="bento-card">
+        <div class="bento-header">Competitive Engine</div>
+        <div class="bento-title">AlgoJudge Sandboxing</div>
+        <div class="bento-desc">
+          Execute and stress-test Python, C++, Go, and JS algorithms inside isolated V8/WASM and Docker micro-containers with sub-millisecond telemetry.
+        </div>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-header">Academic Suite</div>
+        <div class="bento-title">Campus Engineering</div>
+        <div class="bento-desc">
+          Automate university Final Year Project C4 models, IEEE Std 830 SRS chapters, IEEE 2-column lab templates, and 10-minute viva defense scripts.
+        </div>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-header">DevSecOps</div>
+        <div class="bento-title">Diagnostics & Security</div>
+        <div class="bento-desc">
+          Inspect socket port collisions (EADDRINUSE), synchronize .env secret keys, parse SQL schemas to Mermaid ERDs, and scan for leaked API keys.
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Directory Header -->
-    <div class="dir-header">
-      <div class="dir-title">Skills Catalog (30 Production Runbooks)</div>
-      <div style="font-family: var(--font-mono); font-size: 12px; color: var(--yellow);">
+  <!-- Skills Catalog Table -->
+  <section class="directory-wrap" id="skills">
+    <div class="directory-header">
+      <div class="directory-title">
+        <h2>Skills Catalog</h2>
+        <p>30 standardized operational agent skills compatible with skills.sh</p>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 13px; color: var(--yellow);">
         $ mcs skills install
       </div>
     </div>
 
-    <!-- Search Box -->
-    <div class="search-wrap">
+    <!-- Search Input -->
+    <div class="search-filter-box">
       <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <input type="text" id="dirSearch" class="search-input" placeholder="Search skills by name, topic, or keyword..." onkeyup="filterCatalog()" />
-      <span class="search-shortcut">/</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search skills by name, keyword, or topic (e.g. fyp, algo, docker, api)..." onkeyup="filterSkills()" />
     </div>
 
-    <!-- Category Filter Tabs -->
+    <!-- Filter Tabs -->
     <div class="filter-tabs">
-      <button class="filter-btn active" id="tab-all" onclick="selectTab('all')">All Skills (30)</button>
-      <button class="filter-btn" id="tab-campus" onclick="selectTab('campus')">Campus Engineering (8)</button>
-      <button class="filter-btn" id="tab-algo" onclick="selectTab('algo')">Algorithms & CP (4)</button>
-      <button class="filter-btn" id="tab-backend" onclick="selectTab('backend')">Backend & DB (4)</button>
-      <button class="filter-btn" id="tab-devops" onclick="selectTab('devops')">DevOps & AI (14)</button>
+      <button class="filter-tab active" id="tab-all" onclick="setTab('all')">All Skills (30)</button>
+      <button class="filter-tab" id="tab-campus" onclick="setTab('campus')">Campus Engineering (8)</button>
+      <button class="filter-tab" id="tab-algo" onclick="setTab('algo')">Algorithms & CP (4)</button>
+      <button class="filter-tab" id="tab-backend" onclick="setTab('backend')">Backend & DB (4)</button>
+      <button class="filter-tab" id="tab-devops" onclick="setTab('devops')">DevOps & AI (14)</button>
     </div>
 
     <!-- Table -->
-    <div class="table-container">
+    <div class="table-card">
       <table class="skills-table">
         <thead>
           <tr>
             <th class="rank-col">#</th>
             <th>Skill & Author</th>
             <th>Category</th>
-            <th style="text-align: right; width: 120px;">Specification</th>
+            <th style="text-align: right; width: 120px;">Action</th>
           </tr>
         </thead>
-        <tbody id="catalogBody">
+        <tbody id="skillsTableBody">
           <!-- Populated by JS -->
         </tbody>
       </table>
     </div>
+  </section>
 
-  </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div>
+      © 2026 IEEE Computer Society Student Branch Chapter of SLIIT. Open Source Software.
+    </div>
+    <div class="footer-links">
+      <a href="/skill-detail" class="footer-link">Specifications</a>
+      <a href="/console" class="footer-link">Developer Console</a>
+      <a href="https://github.com/ieeecsopen/mcp-cs" target="_blank" class="footer-link">GitHub Repository</a>
+      <a href="https://www.npmjs.com/package/mcp-cs" target="_blank" class="footer-link">NPM Package</a>
+    </div>
+  </footer>
 
+  <!-- Toast -->
   <div id="toast" class="toast">Copied to clipboard</div>
 
   <script>
-    const catalog = [
-      { idx: 1, id: "campus-fyp-architecture", cat: "campus", name: "campus-fyp-architecture", catName: "Campus" },
-      { idx: 2, id: "campus-ieee-citation", cat: "campus", name: "campus-ieee-citation", catName: "Campus" },
-      { idx: 3, id: "campus-lab-report-generator", cat: "campus", name: "campus-lab-report-generator", catName: "Campus" },
-      { idx: 4, id: "campus-presentation-script", cat: "campus", name: "campus-presentation-script", catName: "Campus" },
-      { idx: 5, id: "campus-assignment-cleaner", cat: "campus", name: "campus-assignment-cleaner", catName: "Campus" },
-      { idx: 6, id: "campus-hackathon-fast-scaffold", cat: "campus", name: "campus-hackathon-fast-scaffold", catName: "Campus" },
-      { idx: 7, id: "campus-dsa-visualizer", cat: "campus", name: "campus-dsa-visualizer", catName: "Campus" },
-      { idx: 8, id: "campus-git-team-workflow", cat: "campus", name: "campus-git-team-workflow", catName: "Campus" },
-      { idx: 9, id: "algo-stress-testing", cat: "algo", name: "algo-stress-testing", catName: "Algorithms" },
-      { idx: 10, id: "algo-edge-case-generator", cat: "algo", name: "algo-edge-case-generator", catName: "Algorithms" },
-      { idx: 11, id: "algo-plagiarism-detector", cat: "algo", name: "algo-plagiarism-detector", catName: "Algorithms" },
-      { idx: 12, id: "algo-complexity-analyzer", cat: "algo", name: "algo-complexity-analyzer", catName: "Algorithms" },
-      { idx: 13, id: "frontend-clean-ui", cat: "devops", name: "frontend-clean-ui", catName: "Frontend" },
-      { idx: 14, id: "react-state-architecture", cat: "devops", name: "react-state-architecture", catName: "Frontend" },
-      { idx: 15, id: "backend-rest-api-design", cat: "backend", name: "backend-rest-api-design", catName: "Backend" },
-      { idx: 16, id: "database-migration-guardian", cat: "backend", name: "database-migration-guardian", catName: "Database" },
-      { idx: 17, id: "db-architect", cat: "backend", name: "db-architect", catName: "Database" },
-      { idx: 18, id: "api-mock-generator", cat: "backend", name: "api-mock-generator", catName: "Backend" },
-      { idx: 19, id: "ai-rag-pipeline-architect", cat: "devops", name: "ai-rag-pipeline-architect", catName: "AI" },
-      { idx: 20, id: "ai-prompt-evaluator", cat: "devops", name: "ai-prompt-evaluator", catName: "AI" },
-      { idx: 21, id: "test-unit-generator", cat: "devops", name: "test-unit-generator", catName: "Testing" },
-      { idx: 22, id: "test-e2e-playwright", cat: "devops", name: "test-e2e-playwright", catName: "Testing" },
-      { idx: 23, id: "devops-dockerfile-optimizer", cat: "devops", name: "devops-dockerfile-optimizer", catName: "DevOps" },
-      { idx: 24, id: "devops-vercel-render-deploy", cat: "devops", name: "devops-vercel-render-deploy", catName: "DevOps" },
-      { idx: 25, id: "repo-doctor", cat: "devops", name: "repo-doctor", catName: "Diagnostics" },
-      { idx: 26, id: "env-sync", cat: "devops", name: "env-sync", catName: "DevOps" },
-      { idx: 27, id: "port-inspector", cat: "devops", name: "port-inspector", catName: "Diagnostics" },
-      { idx: 28, id: "ci-workflow-architect", cat: "devops", name: "ci-workflow-architect", catName: "DevOps" },
-      { idx: 29, id: "security-auditor", cat: "devops", name: "security-auditor", catName: "Security" },
-      { idx: 30, id: "docs-broken-link-checker", cat: "devops", name: "docs-broken-link-checker", catName: "Docs" }
+    const skillsList = [
+      { rank: 1, id: "campus-fyp-architecture", cat: "campus", name: "campus-fyp-architecture", catName: "Campus" },
+      { rank: 2, id: "campus-ieee-citation", cat: "campus", name: "campus-ieee-citation", catName: "Campus" },
+      { rank: 3, id: "campus-lab-report-generator", cat: "campus", name: "campus-lab-report-generator", catName: "Campus" },
+      { rank: 4, id: "campus-presentation-script", cat: "campus", name: "campus-presentation-script", catName: "Campus" },
+      { rank: 5, id: "campus-assignment-cleaner", cat: "campus", name: "campus-assignment-cleaner", catName: "Campus" },
+      { rank: 6, id: "campus-hackathon-fast-scaffold", cat: "campus", name: "campus-hackathon-fast-scaffold", catName: "Campus" },
+      { rank: 7, id: "campus-dsa-visualizer", cat: "campus", name: "campus-dsa-visualizer", catName: "Campus" },
+      { rank: 8, id: "campus-git-team-workflow", cat: "campus", name: "campus-git-team-workflow", catName: "Campus" },
+      { rank: 9, id: "algo-stress-testing", cat: "algo", name: "algo-stress-testing", catName: "Algorithms" },
+      { rank: 10, id: "algo-edge-case-generator", cat: "algo", name: "algo-edge-case-generator", catName: "Algorithms" },
+      { rank: 11, id: "algo-plagiarism-detector", cat: "algo", name: "algo-plagiarism-detector", catName: "Algorithms" },
+      { rank: 12, id: "algo-complexity-analyzer", cat: "algo", name: "algo-complexity-analyzer", catName: "Algorithms" },
+      { rank: 13, id: "frontend-clean-ui", cat: "devops", name: "frontend-clean-ui", catName: "Frontend" },
+      { rank: 14, id: "react-state-architecture", cat: "devops", name: "react-state-architecture", catName: "Frontend" },
+      { rank: 15, id: "backend-rest-api-design", cat: "backend", name: "backend-rest-api-design", catName: "Backend" },
+      { rank: 16, id: "database-migration-guardian", cat: "backend", name: "database-migration-guardian", catName: "Database" },
+      { rank: 17, id: "db-architect", cat: "backend", name: "db-architect", catName: "Database" },
+      { rank: 18, id: "api-mock-generator", cat: "backend", name: "api-mock-generator", catName: "Backend" },
+      { rank: 19, id: "ai-rag-pipeline-architect", cat: "devops", name: "ai-rag-pipeline-architect", catName: "AI" },
+      { rank: 20, id: "ai-prompt-evaluator", cat: "devops", name: "ai-prompt-evaluator", catName: "AI" },
+      { rank: 21, id: "test-unit-generator", cat: "devops", name: "test-unit-generator", catName: "Testing" },
+      { rank: 22, id: "test-e2e-playwright", cat: "devops", name: "test-e2e-playwright", catName: "Testing" },
+      { rank: 23, id: "devops-dockerfile-optimizer", cat: "devops", name: "devops-dockerfile-optimizer", catName: "DevOps" },
+      { rank: 24, id: "devops-vercel-render-deploy", cat: "devops", name: "devops-vercel-render-deploy", catName: "DevOps" },
+      { rank: 25, id: "repo-doctor", cat: "devops", name: "repo-doctor", catName: "Diagnostics" },
+      { rank: 26, id: "env-sync", cat: "devops", name: "env-sync", catName: "DevOps" },
+      { rank: 27, id: "port-inspector", cat: "devops", name: "port-inspector", catName: "Diagnostics" },
+      { rank: 28, id: "ci-workflow-architect", cat: "devops", name: "ci-workflow-architect", catName: "DevOps" },
+      { rank: 29, id: "security-auditor", cat: "devops", name: "security-auditor", catName: "Security" },
+      { rank: 30, id: "docs-broken-link-checker", cat: "devops", name: "docs-broken-link-checker", catName: "Docs" }
     ];
 
     let currentTab = "all";
 
-    function renderCatalog() {
-      const tbody = document.getElementById("catalogBody");
-      const q = document.getElementById("dirSearch").value.toLowerCase();
+    function renderTable() {
+      const tbody = document.getElementById("skillsTableBody");
+      const q = document.getElementById("searchInput").value.toLowerCase();
 
-      const filtered = catalog.filter(s => {
+      const filtered = skillsList.filter(s => {
         const matchesTab = currentTab === "all" || s.cat === currentTab;
         const matchesQuery = s.name.toLowerCase().includes(q) || s.catName.toLowerCase().includes(q);
         return matchesTab && matchesQuery;
@@ -630,50 +929,50 @@
         const isCampus = s.cat === "campus" ? "campus" : "";
         return `
           <tr>
-            <td class="rank-col">${s.idx}</td>
+            <td class="rank-col">${s.rank}</td>
             <td>
-              <a href="/skill-detail?skill=${s.id}" class="skill-link">${s.name}</a>
-              <span class="skill-meta">ieeecsopen/mcp-cs</span>
+              <a href="/skill-detail?skill=${s.id}" class="skill-title-link">${s.name}</a>
+              <span class="skill-author-tag">ieeecsopen/mcp-cs</span>
             </td>
             <td>
-              <span class="category-badge ${isCampus}">${s.catName}</span>
+              <span class="badge-cat ${isCampus}">${s.catName}</span>
             </td>
             <td style="text-align: right;">
-              <a href="/skill-detail?skill=${s.id}" class="btn-action-view">View</a>
+              <a href="/skill-detail?skill=${s.id}" class="btn-view-spec">View Spec</a>
             </td>
           </tr>
         `;
       }).join("");
     }
 
-    function selectTab(tab) {
+    function setTab(tab) {
       currentTab = tab;
-      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".filter-tab").forEach(b => b.classList.remove("active"));
       const target = document.getElementById(`tab-${tab}`);
       if (target) target.classList.add("active");
-      renderCatalog();
+      renderTable();
     }
 
-    function filterCatalog() {
-      renderCatalog();
+    function filterSkills() {
+      renderTable();
     }
 
-    function copyCommand(txt) {
+    function copyText(txt) {
       navigator.clipboard.writeText(txt);
       const toast = document.getElementById("toast");
       toast.innerText = `Copied: ${txt}`;
       toast.classList.add("active");
-      setTimeout(() => toast.classList.remove("active"), 2000);
+      setTimeout(() => toast.classList.remove("active"), 2200);
     }
 
     window.addEventListener("keydown", (e) => {
-      if (e.key === "/" && document.activeElement !== document.getElementById("dirSearch")) {
+      if (e.key === "/" && document.activeElement !== document.getElementById("searchInput")) {
         e.preventDefault();
-        document.getElementById("dirSearch").focus();
+        document.getElementById("searchInput").focus();
       }
     });
 
-    renderCatalog();
+    renderTable();
   </script>
 </body>
 </html>
