@@ -862,6 +862,78 @@ async function main() {
       }
 
 
+      // Read JSON Body helper for API endpoints
+      const readJsonBody = async (): Promise<any> => {
+        return new Promise((resolveBody) => {
+          let body = "";
+          req.on("data", (chunk) => (body += chunk));
+          req.on("end", () => {
+            try {
+              resolveBody(JSON.parse(body || "{}"));
+            } catch {
+              resolveBody({});
+            }
+          });
+        });
+      };
+
+      // API: Scan Ports
+      if (parsedUrl.pathname === "/api/ports" && req.method === "GET") {
+        const ports = [3000, 3001, 3306, 4000, 5000, 5173, 5432, 6379, 8000, 8080, 8888, 9000];
+        const status = inspectPorts(ports);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(status));
+        return;
+      }
+
+      // API: Kill Process by PID
+      if (parsedUrl.pathname === "/api/kill-process" && req.method === "POST") {
+        const body = await readJsonBody();
+        const pid = Number(body.pid);
+        if (!pid || isNaN(pid) || pid <= 1) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: "Invalid PID provided" }));
+          return;
+        }
+
+        try {
+          process.kill(pid, "SIGTERM");
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, message: `Killed process ${pid}` }));
+        } catch (err: unknown) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: err instanceof Error ? err.message : String(err) }));
+        }
+        return;
+      }
+
+      // API: Parse SQL Schema to Mermaid ERD
+      if (parsedUrl.pathname === "/api/erd" && req.method === "POST") {
+        const body = await readJsonBody();
+        const schemaSql = body.schema || "";
+        const tables = parseSqliteOrMockSchema(schemaSql);
+        const mermaid = generateMermaidErd(tables);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ mermaid, tables }));
+        return;
+      }
+
+      // API: Stress Test Solution
+      if (parsedUrl.pathname === "/api/stress-test" && req.method === "POST") {
+        const body = await readJsonBody();
+        const { solution, bruteForce, generator, language, iterations } = body;
+        const result = stressTest(
+          solution || "",
+          bruteForce || "",
+          generator || "",
+          language || "javascript",
+          iterations || 20
+        );
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+        return;
+      }
+
       if (parsedUrl.pathname === "/sse" && req.method === "GET") {
         const server = createServer(enabledModules);
         sseTransport = new SSEServerTransport("/messages", res);
