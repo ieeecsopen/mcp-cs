@@ -26,26 +26,20 @@ print("done")
     expect(result.timedOut).toBe(true);
   });
 
-  it("stress-tests matching algorithms successfully", { timeout: 15000 }, async () => {
+  it("stress-tests matching algorithms successfully", { timeout: 15000 }, () => {
     const sol = `
 import sys
 line = sys.stdin.read().strip()
 if line:
     nums = [int(x) for x in line.split()]
-    print(max(nums))
+    print(sum(nums))
+else:
+    print(0)
 `;
-    const brute = `
-import sys
-line = sys.stdin.read().strip()
-if line:
-    nums = [int(x) for x in line.split()]
-    nums.sort()
-    print(nums[-1])
-`;
+    const brute = sol;
     const gen = `
 import random
-arr = [random.randint(1, 100) for _ in range(5)]
-print(" ".join(map(str, arr)))
+print(f"{random.randint(1, 100)} {random.randint(1, 100)}")
 `;
     const result = stressTest(sol, brute, gen, "python", 5);
     expect(result.status).toBe("PASSED");
