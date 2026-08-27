@@ -248,12 +248,13 @@ Add to your Claude configuration file (`~/Library/Application Support/Claude/cla
 
 
 
-## 🧠 Agent Skills Suite (Compatible with [skills.sh](https://www.skills.sh))
 
-**MCS** bundles **20 production agent skills** adhering to the open [skills.sh](https://www.skills.sh) standard. These provide AI assistants (**Antigravity, Cursor, Claude Code, Windsurf**) with specialized operational runbooks:
+## 🧠 Agent Skills Suite (30 Skills • Compatible with [skills.sh](https://www.skills.sh))
+
+**MCS** bundles **30 production agent skills** adhering to the open [skills.sh](https://www.skills.sh) standard. These provide AI assistants (**Antigravity, Cursor, Claude Code, Windsurf**) with specialized operational runbooks:
 
 ```bash
-# 1-Click Install all 20 skills into any project (.agents/skills/)
+# 1-Click Install all 30 skills into any project (.agents/skills/)
 mcs skills install
 
 # Or install for Cursor (.cursor/rules/)
@@ -263,7 +264,7 @@ mcs skills install --cursor
 npx skills add ieeecsopen/mcp-cs
 ```
 
-### 🎓 1. Campus & University Engineering Skills
+### 🎓 1. Campus & Student Engineering (8 Skills)
 | Skill Name | What It Instructs the AI Agent to Do |
 | :--- | :--- |
 | `campus-fyp-architecture` | Plans and documents university Final Year Projects (FYP) with C4 architecture diagrams, tech comparisons, and IEEE Std 830 SRS chapters. |
@@ -275,21 +276,43 @@ npx skills add ieeecsopen/mcp-cs
 | `campus-hackathon-fast-scaffold` | 10-minute rapid prototyping architecture for 12h/24h hackathons (SLIITXtreme). |
 | `campus-dsa-visualizer` | Generates step-by-step ASCII memory traces for LinkedLists, BST trees, DP tables, and Graphs. |
 
-### ⚡ 2. Algorithms & Developer Operations Skills
-| Category | Skill Name | Description |
-| :--- | :--- | :--- |
-| ⚡ **Algorithms** | `algo-stress-testing` | Differential testing against brute-force baselines to find edge-case failures. |
-| ⚡ **Algorithms** | `algo-edge-case-generator` | Generates corner cases ($N=1$, bounds, extremes, disconnected graphs). |
-| ⚡ **Algorithms** | `algo-plagiarism-detector` | AST token similarity analysis between code submissions. |
-| ⚡ **Algorithms** | `algo-complexity-analyzer` | Asymptotic Big-O time and space complexity auditing. |
-| 🩺 **DevOps** | `repo-doctor` | Identifies broken runtime dependencies, missing packages, and setup errors. |
-| 🩺 **DevOps** | `env-sync` | Compares and synchronizes `.env` against `.env.example`. |
-| 🩺 **DevOps** | `port-inspector` | Resolves socket collisions (`EADDRINUSE`) and identifies holding PIDs. |
-| 🤖 **CI/CD** | `ci-workflow-architect` | Generates GitHub Actions CI/CD workflows for Node, Docker, and Python. |
-| 🗄️ **Database** | `db-architect` | Parses SQL DDL statements into visual Mermaid ER diagrams. |
-| 🌐 **API** | `api-mock-generator` | Generates realistic synthetic datasets (users, products, transactions). |
-| 🛡️ **Security** | `security-auditor` | Pre-flight scanner to detect and auto-sanitize leaked API credentials. |
-| 📚 **Docs** | `docs-broken-link-checker` | Scans markdown files for broken internal links and dead references. |
+### ⚡ 2. Competitive Programming & Algorithms (4 Skills)
+| Skill Name | Description |
+| :--- | :--- |
+| `algo-stress-testing` | Differential testing against brute-force baselines to find edge-case failures. |
+| `algo-edge-case-generator` | Generates corner cases ($N=1$, bounds, extremes, disconnected graphs). |
+| `algo-plagiarism-detector` | AST token similarity analysis between code submissions. |
+| `algo-complexity-analyzer` | Asymptotic Big-O time and space complexity auditing. |
+
+### 🎨 3. Frontend & UI Engineering (2 Skills)
+| Skill Name | Description |
+| :--- | :--- |
+| `frontend-clean-ui` | Modern, high-contrast, accessible SaaS UI design with Tailwind and dark mode tokens. |
+| `react-state-architecture` | State architecture using Zustand, TanStack Query, and React Server Components. |
+
+### 🗄️ 4. Backend, Databases & APIs (4 Skills)
+| Skill Name | Description |
+| :--- | :--- |
+| `backend-rest-api-design` | Production REST API design with Zod schemas, status codes, and cursor pagination. |
+| `database-migration-guardian` | Zero-downtime database schema migrations, indexes, and safe alterations. |
+| `db-architect` | Parses SQL DDL statements into visual Mermaid ER diagrams. |
+| `api-mock-generator` | Generates realistic synthetic datasets (users, products, transactions). |
+
+### 🤖 5. AI, Testing & DevOps (12 Skills)
+| Skill Name | Description |
+| :--- | :--- |
+| `ai-rag-pipeline-architect` | Retrieval-Augmented Generation (RAG) pipelines with vector embeddings and reranking. |
+| `ai-prompt-evaluator` | System prompt engineering, red-teaming, and structured JSON output validation. |
+| `test-unit-generator` | Vitest / Jest unit test suites with parameterized edge cases and 100% coverage. |
+| `test-e2e-playwright` | Resilient Playwright browser test specs with user-facing accessibility locators. |
+| `devops-dockerfile-optimizer` | Secure multi-stage Dockerfiles with layer caching and non-root users. |
+| `devops-vercel-render-deploy` | Cloud hosting configuration for Vercel, Supabase, and Render. |
+| `repo-doctor` | Identifies broken runtime dependencies, missing packages, and setup errors. |
+| `env-sync` | Compares and synchronizes `.env` against `.env.example`. |
+| `port-inspector` | Resolves socket collisions (`EADDRINUSE`) and identifies holding PIDs. |
+| `ci-workflow-architect` | Generates GitHub Actions CI/CD workflows for Node, Docker, and Python. |
+| `security-auditor` | Pre-flight scanner to detect and auto-sanitize leaked API credentials. |
+| `docs-broken-link-checker` | Scans markdown files for broken internal links and dead references. |
 
 ## 🧩 Interactive Prompts & Resources
 
