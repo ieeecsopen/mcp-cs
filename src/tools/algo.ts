@@ -11,12 +11,20 @@ export interface ExecutionResult {
   timedOut: boolean;
 }
 
+import { runInVmSandbox } from "./wasm.js";
+
 export function runSandboxed(
   code: string,
   language: "python" | "javascript" | "typescript" | "cpp" | "c" | "go" | "rust" = "python",
   stdin: string = "",
-  timeoutMs: number = 3000
+  timeoutMs: number = 3000,
+  engine: "native" | "vm" = "native"
 ): ExecutionResult {
+  // If engine is 'vm' and language is JS/TS, execute in-memory VM isolate
+  if (engine === "vm" && (language === "javascript" || language === "typescript")) {
+    return runInVmSandbox(code, stdin, timeoutMs);
+  }
+
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "mcp-algo-"));
   const startTime = Date.now();
 
@@ -83,6 +91,12 @@ export function runSandboxed(
       durationMs,
       timedOut,
     };
+  } catch (err: unknown) {
+    // If native execution fails due to missing binary, fallback to in-memory VM for JS/TS
+    if (language === "javascript" || language === "typescript") {
+      return runInVmSandbox(code, stdin, timeoutMs);
+    }
+    throw err;
   } finally {
     try {
       fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -90,60 +104,96 @@ export function runSandboxed(
   }
 }
 
+export interface StressTestIteration {
+  iteration: number;
+  input: string;
+  solutionOutput: string;
+  expectedOutput: string;
+  solutionDurationMs: number;
+  bruteDurationMs: number;
+  passed: boolean;
+}
+
 export function stressTest(
   solutionCode: string,
   bruteForceCode: string,
   generatorCode: string,
   language: "python" | "javascript" = "python",
-  maxIterations: number = 30
+  maxIterations: number = 30,
+  engine: "native" | "vm" = "native"
 ): {
   status: "PASSED" | "FAILED" | "ERROR";
   iterationsTested: number;
   failingInput?: string;
   solutionOutput?: string;
   expectedOutput?: string;
+  iterations?: StressTestIteration[];
   message: string;
 } {
   const safeIterations = Math.min(Math.max(1, maxIterations), 100);
+  const iterations: StressTestIteration[] = [];
 
   for (let i = 1; i <= safeIterations; i++) {
     // 1. Generate random test input
-    const genRun = runSandboxed(generatorCode, language, "", 2000);
+    const genRun = runSandboxed(generatorCode, language, "", 2000, engine);
     if (genRun.exitCode !== 0 || !genRun.stdout) {
       return {
         status: "ERROR",
         iterationsTested: i,
+        iterations,
         message: `Generator failed at iteration ${i}: ${genRun.stderr || "No stdout produced"}`,
       };
     }
     const testInput = genRun.stdout.trim();
 
     // 2. Run optimal solution
-    const solRun = runSandboxed(solutionCode, language, testInput, 2500);
+    const solRun = runSandboxed(solutionCode, language, testInput, 2500, engine);
     if (solRun.timedOut) {
+      iterations.push({
+        iteration: i,
+        input: testInput,
+        solutionOutput: "<Time Limit Exceeded>",
+        expectedOutput: "Valid execution",
+        solutionDurationMs: solRun.durationMs,
+        bruteDurationMs: 0,
+        passed: false,
+      });
       return {
         status: "FAILED",
         iterationsTested: i,
         failingInput: testInput,
         solutionOutput: "<Time Limit Exceeded>",
         expectedOutput: "Valid execution under time limit",
+        iterations,
         message: `Solution Time Limit Exceeded on testcase #${i}`,
       };
     }
 
     // 3. Run brute force solution
-    const bruteRun = runSandboxed(bruteForceCode, language, testInput, 3000);
+    const bruteRun = runSandboxed(bruteForceCode, language, testInput, 3000, engine);
 
     const solOut = solRun.stdout.trim();
     const expOut = bruteRun.stdout.trim();
+    const passed = solOut === expOut;
 
-    if (solOut !== expOut) {
+    iterations.push({
+      iteration: i,
+      input: testInput,
+      solutionOutput: solOut,
+      expectedOutput: expOut,
+      solutionDurationMs: solRun.durationMs,
+      bruteDurationMs: bruteRun.durationMs,
+      passed,
+    });
+
+    if (!passed) {
       return {
         status: "FAILED",
         iterationsTested: i,
         failingInput: testInput,
         solutionOutput: solOut,
         expectedOutput: expOut,
+        iterations,
         message: `Discrepancy found on testcase #${i}! Solution output does not match brute-force baseline.`,
       };
     }
@@ -152,6 +202,7 @@ export function stressTest(
   return {
     status: "PASSED",
     iterationsTested: safeIterations,
+    iterations,
     message: `All ${safeIterations} generated testcases matched the baseline output perfectly!`,
   };
 }

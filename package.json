@@ -1,6 +1,6 @@
 {
   "name": "mcp-cs",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "IEEE Computer Society Universal Developer Operations, Diagnostics & AlgoJudge Competitive Execution MCP Server",
   "type": "module",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js",
+    "build": "tsc && mkdir -p dist/ui && cp src/ui/index.html dist/ui/ && chmod +x dist/index.js",
     "prepublishOnly": "npm run test && npm run build",
     "test": "vitest run",
     "start": "node dist/index.js",

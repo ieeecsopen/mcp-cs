@@ -1,7 +1,7 @@
 <div align="center">
 
 # ⚡ MCP-CS (`mcp-cs`)
-### The Universal Developer Operations, Diagnostics & AlgoJudge Competitive Execution Suite
+### The Universal Developer Operations, Diagnostics & AlgoJudge Competitive Platform
 
 [![npm version](https://img.shields.io/npm/v/mcp-cs.svg?color=ffd000&label=npm%20package)](https://www.npmjs.com/package/mcp-cs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -9,33 +9,58 @@
 [![MCP](https://img.shields.io/badge/protocol-Model%20Context%20Protocol-black)](https://modelcontextprotocol.io)
 [![Organization](https://img.shields.io/badge/IEEE%20CS-SLIIT-blue)](https://github.com/ieeecsopen)
 
-**A full-featured [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server created for developers, competitive programmers, and engineering teams.**
+**An industry-grade [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server & developer console created by the IEEE Computer Society Student Branch.**
 
-[Installation](#-installation-guide) • [Client Configuration](#-client-configuration) • [Tool Catalog](#-complete-tool-catalog-24-tools) • [Prompts & Resources](#-interactive-prompts--resources) • [Contributing](#-local-development)
+[Visual Dashboard](#-1-interactive-local-visual-dashboard) • [Installation & Homebrew](#-installation-guide) • [Dual-Mode Transport](#-dual-mode-transport-stdio--cloud-sse) • [WASM Sandboxes](#-in-process-wasm-sandbox-engine) • [Tool Catalog](#-flagship-tool-catalog) • [Contributing](#-local-development)
 
 </div>
 
 ---
 
-## 🌟 Why `mcp-cs`?
+## 🌟 Flagship Highlights
 
-`mcp-cs` connects your AI assistant (**Antigravity, Cursor, Claude Desktop, Windsurf, Cline**) directly to powerful local execution, repository diagnostics, database modeling, and competitive algorithm tools with **zero manual configuration**.
+```
+                       ┌────────────────────────────────────────────────────────┐
+                       │               mcp-cs Advanced Platform                 │
+                       └───────────────────────────┬────────────────────────────┘
+          ┌──────────────────────┬─────────────────┴──────────────┬──────────────────────┐
+          ▼                      ▼                                ▼                      ▼
+   1. Visual Dashboard    2. WASM Sandboxes               3. Cloud SSE Engine    4. AST Code Fixers
+  (`npx mcp-cs --ui`)   (Zero Local Compiler)           (Remote Multi-Tenant)  (Auto-Sanitize Secrets)
+```
 
-- ⚡ **AlgoJudge Engine**: Run sandboxed code (Python, JS/TS, C++, Go), perform automated differential stress-testing, and check AST code similarity.
-- 🩺 **Environment Doctor**: Diagnose project setups, detect `.env` disparities, and inspect port conflicts with process PIDs.
-- 🗄️ **Database & ERD**: Parse SQL schemas and auto-generate Mermaid Entity-Relationship diagrams.
-- ⚡ **Web Performance**: Scan for oversized raster assets and audit HTTP compression & security headers.
-- 🛡️ **Security Guard**: Detect leaked API keys, tokens, and hardcoded credentials before committing.
-- 🌐 **API Playground**: Live HTTP test client and realistic synthetic mock data generator.
+- 🖥️ **Interactive Visual Dashboard (`npx mcp-cs --ui`)**: Live ERD viewer with zoom/pan and SVG/PNG export, side-by-side differential stress-test visualizer, and live localhost port/process heatmap with 1-click process termination.
+- ⚡ **In-Process WASM & VM Sandboxes**: Sub-millisecond JS/TS and raw `.wasm` WebAssembly module execution without requiring local `g++`, `python3`, or `go` compiler toolchains.
+- 🌐 **Dual-Mode Transport (Stdio + Cloud Hosted SSE)**: Use standard local stdio in Cursor/Claude or connect directly over remote HTTP/SSE (`https://mcp.ieeecs-sliit.org/sse`).
+- 🧩 **Automated AST Code Fixers**: Automatically sanitize exposed secrets into `process.env.*` variables with `.env.example` generation, and repair broken documentation markdown links.
+- 📦 **Homebrew Distribution**: Easy 1-line installation with `brew install ieeecsopen/tap/mcp-cs`.
+
+---
+
+## 🖥️ 1. Interactive Local Visual Dashboard
+
+Launch the embedded web console instantly in your browser:
+
+```bash
+npx mcp-cs --ui
+```
+
+### Dashboard Capabilities
+1. **Visual Database ERD Viewer**: Live interactive rendering of SQL DDL schema into Mermaid ERD with zoom/pan controls and instant 1-click export to PNG and SVG.
+2. **Stress-Test Visualizer**: Side-by-side output diff viewer comparing optimal vs brute-force logic, execution time comparison charts, and adversarial input inspector.
+3. **Port & Process Heatmap**: Live localhost inspection (ports `3000`, `5173`, `8000`, `8080`, etc.), showing active process names, PIDs, and a 1-click **Kill Process** button.
 
 ---
 
 ## 📦 Installation Guide
 
-You can install and use `mcp-cs` through any of the following 3 methods:
+### Method 1: Homebrew (macOS & Linux)
+```bash
+brew tap ieeecsopen/tap
+brew install mcp-cs
+```
 
-### Method 1: Instant Run via `npx` *(Recommended — No install needed)*
-Simply configure your AI client with the command:
+### Method 2: Instant Run via `npx` *(Zero Installation)*
 ```json
 {
   "mcpServers": {
@@ -47,207 +72,100 @@ Simply configure your AI client with the command:
 }
 ```
 
----
-
-### Method 2: Global NPM Installation
-Install the binary globally to run directly without `npx`:
+### Method 3: Global NPM Installation
 ```bash
 npm install -g mcp-cs
 ```
 
-Then configure your client with:
-```json
-{
-  "mcpServers": {
-    "mcp-cs": {
-      "command": "mcp-cs"
-    }
-  }
-}
-```
-
 ---
 
-### Method 3: 1-Click Installation via Smithery
+## 🌐 Dual-Mode Transport (Stdio + Cloud SSE)
+
+### Local Stdio Mode (Default)
+Standard Stdio transport for local AI assistants (Claude Desktop, Cursor, Antigravity, Windsurf):
 ```bash
-npx -y @smithery/cli install mcp-cs --client claude
+mcp-cs
 ```
 
----
-
-## 🔌 Client Configuration
-
-### 1. Antigravity IDE
-Add `mcp-cs` to your global configuration file at `~/.gemini/config/mcp_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "mcp-cs": {
-      "command": "npx",
-      "args": ["-y", "mcp-cs"]
-    }
-  }
-}
+### Cloud-Hosted SSE Mode
+Run as a multi-tenant remote server accessible over HTTP / Server-Sent Events (SSE):
+```bash
+mcp-cs --sse --port 8080
 ```
+- **SSE Stream**: `http://localhost:8080/sse`
+- **Messages Endpoint**: `http://localhost:8080/messages`
+- **Healthcheck**: `http://localhost:8080/health`
 
 ---
 
-### 2. Claude Desktop
-Add to your Claude configuration file:
-- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+## 🛠️ Flagship Tool Catalog
 
-```json
-{
-  "mcpServers": {
-    "mcp-cs": {
-      "command": "npx",
-      "args": ["-y", "mcp-cs"]
-    }
-  }
-}
-```
+### ⚡ AlgoJudge & WASM Execution
+| Tool | Description |
+|------|-------------|
+| `algo_run_sandboxed` | Runs code in a sandboxed process with strict timeout and memory limits (Python, JS, TS, C++, C, Go) |
+| `algo_run_wasm` | In-process WebAssembly binary evaluator supporting raw `.wasm` modules with sub-millisecond execution |
+| `algo_stress_test` | Differential tester: executes optimal vs brute-force baseline on randomized testcases to catch corner-case bugs |
+| `algo_check_plagiarism` | Token-normalized code similarity detector with plagiarism risk scoring |
+| `algo_generate_edge_cases` | Generates adversarial edge-cases (N=1, max bounds, identical items, extreme negatives, disconnected graphs) |
 
----
+### 🗄️ Database & Schemas
+| Tool | Description |
+|------|-------------|
+| `db_generate_erd` | Parses SQL table DDL and generates an interactive Mermaid Entity-Relationship Diagram |
 
-### 3. Cursor IDE
-1. Open **Settings** (`Cmd + ,` on Mac or `Ctrl + ,` on Windows).
-2. Go to **Features** $\to$ **MCP**.
-3. Click **+ Add New MCP Server**:
-   - **Name:** `mcp-cs`
-   - **Type:** `command`
-   - **Command:** `npx -y mcp-cs`
+### 🛡️ Security & AST Fixers
+| Tool | Description |
+|------|-------------|
+| `security_scan_secrets` | Scans repository for leaked API keys, tokens, and hardcoded private credentials |
+| `security_auto_sanitize_secrets` | **Automated Fixer**: Replaces detected secrets with `process.env` references and updates `.env.example` |
 
----
+### 📚 Documentation & Fixers
+| Tool | Description |
+|------|-------------|
+| `docs_check_broken_links` | Scans markdown files for broken relative links and dead document references |
+| `docs_auto_fix_links` | **Automated Fixer**: Automatically corrects broken relative links and generates missing doc stubs |
+| `docs_extract_code_snippets` | Extracts all fenced code blocks from markdown documentation for quick inspection |
 
-### 4. Windsurf & Cline / Roo-Code
-Add under `mcpServers` in your configuration:
+### 🩺 Diagnostics & Health
+| Tool | Description |
+|------|-------------|
+| `doctor_diagnose_project` | Scans project structure, identifies language/framework, and flags missing dependencies |
+| `doctor_check_env` | Compares `.env` against `.env.example` and flags missing or extraneous variables |
+| `doctor_port_inspect` | Inspects occupied network ports and reports active process PIDs |
 
-```json
-{
-  "mcpServers": {
-    "mcp-cs": {
-      "command": "npx",
-      "args": ["-y", "mcp-cs"]
-    }
-  }
-}
-```
-
----
-
-## 🛠️ Complete Tool Catalog (24 Tools)
-
-### ⚡ 1. AlgoJudge Competitive & Algorithm Engine
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `algo_run_sandboxed` | Runs code in Python, JS, TS, C++, C, or Go in an isolated process with strict time and memory limits. | *"Run this C++ solution with the test input `5\n1 2 3 4 5`."* |
-| `algo_stress_test` | **Automated Differential Tester:** Compares an optimal algorithm against a brute-force baseline on randomized inputs to find failing edge cases. | *"Stress-test my Dijkstra implementation against a brute-force solution to find where it fails."* |
-| `algo_check_plagiarism` | Token-based AST code similarity checker that compares two code submissions and detects suspicious duplicated logic. | *"Check if `solution_a.py` and `solution_b.py` have plagiarized logic."* |
-| `algo_generate_edge_cases` | Generates adversarial corner cases (min $N=1$, max constraints, identical items, extreme negatives, disconnected graphs). | *"Generate edge testcases for a binary tree problem."* |
-
----
-
-### 🗄️ 2. Database & Schema Suite
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `db_generate_erd` | Parses SQL `CREATE TABLE` and foreign key statements to automatically generate Mermaid Entity-Relationship Diagrams. | *"Generate a Mermaid ERD diagram from this `schema.sql` file."* |
-
----
-
-### ⚡ 3. Web Performance Suite
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `perf_audit_assets` | Scans directory for uncompressed raster images (>250KB) and calculates bandwidth savings from WebP/AVIF conversion. | *"Audit the images in `/public` and show me how much size we can save with WebP."* |
-| `perf_check_headers` | Audits HTTP response headers of a web application for Gzip/Brotli compression, Cache-Control, and security headers. | *"Check the performance and security headers on `http://localhost:3000`."* |
-
----
-
-### 🩺 4. Environment & System Doctor
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `doctor_diagnose_project` | Auto-detects runtime (Node, Next.js, Python, Docker), missing `node_modules`, missing `.env`, and unconfigured virtual environments. | *"Diagnose why this repo won't start."* |
-| `doctor_check_env` | Diffs `.env` against `.env.example` to detect missing or surplus keys. | *"Check if my `.env` is missing any keys from `.env.example`."* |
-| `doctor_port_inspect` | Identifies which background processes and PIDs are locking ports (`3000`, `6379`, `5432`). | *"Check why port 6379 is occupied."* |
-
----
-
-### 🛡️ 5. Security & Secrets Guard
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `security_scan_secrets` | Scans codebase for leaked OpenAI keys, AWS access tokens, GitHub PATs, and private keys. | *"Scan my repository for accidentally committed secrets."* |
-
----
-
-### 🌐 6. API Client & Mock Generator
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `api_test_request` | Executes live HTTP calls (`GET`, `POST`, `PUT`, `DELETE`) with headers, auth, and query params — measures latency (TTFB) and formats JSON. | *"Send a GET request to `https://api.github.com/zen` and show the latency."* |
-| `api_generate_mock_data` | Generates realistic synthetic mock datasets (`users`, `products`, `posts`, `transactions`) for frontend and backend testing. | *"Generate 10 mock user records with IDs and emails."* |
-
----
-
-### 📚 7. Documentation & Code Hygiene
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `docs_check_broken_links` | Scans all markdown files (`.md`, `.mdx`) to detect broken internal links and dead file references. | *"Check all markdown files in the repo for broken links."* |
-| `docs_extract_code_snippets`| Extracts all fenced code blocks from markdown documentation for quick inspection. | *"Extract all code snippets in `docs/` so we can verify their syntax."* |
-| `code_find_todos` | Scans the codebase for `TODO`, `FIXME`, `HACK`, and `BUG` comments with line numbers and file paths. | *"Find all `TODO` and `FIXME` comments in the codebase."* |
-| `code_inspect_heavy_dependencies` | Inspects `package.json` to identify bloated dependencies (moment, lodash, monaco, katex) with optimization tips. | *"Check if we have heavy dependencies slowing down our bundle."* |
-
----
-
-### 🚀 8. Git, Release & CI/CD Suite
-| Tool | Description | Example Prompt |
-| :--- | :--- | :--- |
-| `git_generate_changelog` | Parses conventional git commit history between tags and outputs a clean markdown changelog. | *"Generate a changelog for all commits since `v1.0.0`."* |
-| `git_pr_readiness_check` | Verifies uncommitted files, unpushed commits, and branch health before opening a Pull Request. | *"Check if my branch is ready for a Pull Request."* |
-| `git_generate_pr_description` | Generates a structured markdown Pull Request description summarizing branch commits and diffs. | *"Generate a structured PR description for my current branch."* |
-| `problem_fetch_codeforces` | Fetches problem statements, sample inputs/outputs, tags, and contest limits from Codeforces. | *"Fetch the details for Codeforces problem 2060A."* |
-| `ci_generate_workflow` | Generates production-ready GitHub Actions CI/CD workflows for Next.js, NPM Publishing, Docker, or Python. | *"Generate a GitHub Action workflow to automatically publish this package to NPM."* |
-
----
-
-## 🧩 Interactive Prompts & Resources
-
-### Slash Commands / Prompts:
-- **`/diagnose-repo`**: Runs full system doctor diagnostics, checks environment variables, scans ports, and generates an onboarding report.
-- **`/stress-test-solution`**: Interactive algorithm stress-testing assistant to find counter-example edge cases.
-- **`/prepare-pr`**: Pre-flight PR creation checklist and summary.
-
-### Dynamic Context Resources:
-- `resource://system/ports`: Live socket feed of active network ports.
-- `resource://git/status`: Real-time repository branch and sync state.
+### 🚀 Git, Release & CI
+| Tool | Description |
+|------|-------------|
+| `git_generate_changelog` | Generates structured markdown changelog from conventional git commits |
+| `git_pr_readiness_check` | Validates uncommitted files, unpushed commits, and branch health before opening a PR |
+| `git_generate_pr_description` | Auto-generates a Pull Request title and structured description |
+| `ci_generate_workflow` | Generates production GitHub Actions CI/CD workflows for Next.js, Node, Docker, and Python |
 
 ---
 
 ## 💻 Local Development
 
-To contribute or run `mcp-cs` from source:
-
 ```bash
-# 1. Clone repository
+# Clone the repository
 git clone https://github.com/ieeecsopen/mcp-cs.git
 cd mcp-cs
 
-# 2. Install dependencies
+# Install dependencies
 npm install
 
-# 3. Run automated tests
+# Run Vitest test suite
 npm test
 
-# 4. Build TypeScript
+# Build production distribution
 npm run build
 
-# 5. Start in development mode
-npm run dev
+# Launch interactive UI
+npm run dev -- --ui
 ```
 
 ---
 
-## 📄 License & Community
-
-Distributed under the **MIT License**.
-
-Maintained with ❤️ by the **[IEEE Computer Society of SLIIT](https://github.com/ieeecsopen)**.
+<div align="center">
+  <b>Maintained with ❤️ by IEEE Computer Society Student Branch of SLIIT</b>
+</div>

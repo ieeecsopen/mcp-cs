@@ -9,6 +9,13 @@ export interface BrokenLinkFinding {
   reason: string;
 }
 
+export interface DocsFixResult {
+  fixedCount: number;
+  stubsCreated: string[];
+  repairedLinks: Array<{ file: string; line: number; oldTarget: string; newTarget: string }>;
+  dryRun: boolean;
+}
+
 export function checkBrokenLinks(targetDir: string = process.cwd()): BrokenLinkFinding[] {
   const findings: BrokenLinkFinding[] = [];
   const IGNORED_DIRS = new Set(["node_modules", ".git", ".next", "dist", "build", ".venv"]);
@@ -75,6 +82,79 @@ export function checkBrokenLinks(targetDir: string = process.cwd()): BrokenLinkF
 
   traverse(targetDir);
   return findings;
+}
+
+/**
+ * Automatically repairs broken markdown links by finding closest matching files
+ * or creating placeholder markdown stubs if missing.
+ */
+export function autoFixBrokenLinks(
+  targetDir: string = process.cwd(),
+  createStubs: boolean = false,
+  dryRun: boolean = false
+): DocsFixResult {
+  const findings = checkBrokenLinks(targetDir);
+  const repairedLinks: DocsFixResult["repairedLinks"] = [];
+  const stubsCreated: string[] = [];
+
+  // Index all repo files for fast similarity matching
+  const allRepoFiles: string[] = [];
+  const IGNORED_DIRS = new Set(["node_modules", ".git", ".next", "dist", "build", ".venv"]);
+
+  function indexDir(dir: string) {
+    try {
+      const entries = fs.readdirSync(dir);
+      for (const entry of entries) {
+        if (IGNORED_DIRS.has(entry)) continue;
+        const fullPath = path.join(dir, entry);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) indexDir(fullPath);
+        else allRepoFiles.push(fullPath);
+      }
+    } catch {}
+  }
+  indexDir(targetDir);
+
+  for (const finding of findings) {
+    const docFullPath = path.resolve(targetDir, finding.file);
+    const targetBasename = path.basename(finding.target.split("#")[0].split("?")[0]).toLowerCase();
+
+    // Look for file with exact or similar base name
+    const candidate = allRepoFiles.find((f) => path.basename(f).toLowerCase() === targetBasename);
+
+    if (candidate) {
+      const relativeTarget = path.relative(path.dirname(docFullPath), candidate);
+      const newTarget = relativeTarget.startsWith(".") ? relativeTarget : `./${relativeTarget}`;
+
+      if (!dryRun) {
+        let content = fs.readFileSync(docFullPath, "utf8");
+        content = content.replace(`](${finding.target})`, `](${newTarget})`);
+        fs.writeFileSync(docFullPath, content, "utf8");
+      }
+
+      repairedLinks.push({
+        file: finding.file,
+        line: finding.line,
+        oldTarget: finding.target,
+        newTarget,
+      });
+    } else if (createStubs) {
+      const targetPath = path.resolve(path.dirname(docFullPath), finding.target.split("#")[0]);
+      if (!dryRun) {
+        fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+        const title = path.basename(targetPath, path.extname(targetPath));
+        fs.writeFileSync(targetPath, `# ${title}\n\nDocumentation placeholder created automatically by mcp-cs.\n`, "utf8");
+      }
+      stubsCreated.push(path.relative(targetDir, targetPath));
+    }
+  }
+
+  return {
+    fixedCount: repairedLinks.length + stubsCreated.length,
+    stubsCreated,
+    repairedLinks,
+    dryRun,
+  };
 }
 
 export function extractCodeSnippets(targetDir: string = process.cwd()): Array<{ file: string; language: string; lineCount: number; snippet: string }> {
