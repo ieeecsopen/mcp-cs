@@ -12,14 +12,20 @@ const __dirname = path.dirname(__filename);
 
 export function startUiServer(port: number = 4100): Promise<http.Server> {
   return new Promise((resolve, reject) => {
-    // Look for index.html in either dist/ui or src/ui
-    let htmlPath = path.join(__dirname, "index.html");
-    if (!fs.existsSync(htmlPath)) {
-      htmlPath = path.join(__dirname, "../../src/ui/index.html");
-    }
+    // Resolve HTML paths
+    const resolveHtml = (filename: string) => {
+      let p = path.join(__dirname, filename);
+      if (!fs.existsSync(p)) {
+        p = path.join(__dirname, "../../src/ui", filename);
+      }
+      return p;
+    };
+
+    const dashboardPath = resolveHtml("dashboard.html");
+    const landingPath = resolveHtml("landing.html");
 
     const server = http.createServer(async (req, res) => {
-      // Disable browser caching completely
+      // Disable browser caching
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       res.setHeader("Pragma", "no-cache");
       res.setHeader("Expires", "0");
@@ -37,10 +43,24 @@ export function startUiServer(port: number = 4100): Promise<http.Server> {
 
       const parsedUrl = new URL(req.url || "/", `http://localhost:${port}`);
 
-      // Serve UI HTML
-      if (parsedUrl.pathname === "/" || parsedUrl.pathname === "/index.html") {
+      // Route: Landing page
+      if (parsedUrl.pathname === "/landing" || parsedUrl.pathname === "/skills") {
         try {
-          const htmlContent = fs.readFileSync(htmlPath, "utf8");
+          const htmlContent = fs.readFileSync(landingPath, "utf8");
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(htmlContent);
+        } catch (err: unknown) {
+          res.writeHead(500, { "Content-Type": "text/plain" });
+          res.end("Error loading landing HTML: " + (err instanceof Error ? err.message : String(err)));
+        }
+        return;
+      }
+
+      // Default Route for local CLI: Serve Developer Dashboard
+      if (parsedUrl.pathname === "/" || parsedUrl.pathname === "/index.html" || parsedUrl.pathname === "/dashboard" || parsedUrl.pathname === "/console") {
+        try {
+          let file = fs.existsSync(dashboardPath) ? dashboardPath : landingPath;
+          const htmlContent = fs.readFileSync(file, "utf8");
           res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
           res.end(htmlContent);
         } catch (err: unknown) {
@@ -128,7 +148,7 @@ export function startUiServer(port: number = 4100): Promise<http.Server> {
 
     server.listen(port, () => {
       console.log(`\n======================================================`);
-      console.log(`🚀 mcp-cs Interactive Visual Dashboard running!`);
+      console.log(`🚀 MCS Interactive Visual Dashboard running!`);
       console.log(`🔗 URL: http://localhost:${port}`);
       console.log(`======================================================\n`);
       

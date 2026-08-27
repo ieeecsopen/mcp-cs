@@ -802,22 +802,36 @@ async function main() {
       }
 
 
-      const isHtmlRequest = (req.headers.accept && req.headers.accept.includes("text/html")) || parsedUrl.pathname === "/ui" || parsedUrl.pathname === "/dashboard";
+      const isHtmlRequest = (req.headers.accept && req.headers.accept.includes("text/html")) || parsedUrl.pathname === "/ui" || parsedUrl.pathname === "/dashboard" || parsedUrl.pathname === "/console";
 
-      // 1. Root Landing Page: Serve HTML UI if accessed by a browser
-      if ((parsedUrl.pathname === "/" || parsedUrl.pathname === "/ui" || parsedUrl.pathname === "/dashboard") && isHtmlRequest) {
-        let htmlPath = path.join(__dirname, "ui", "index.html");
-        if (!fs.existsSync(htmlPath)) {
-          htmlPath = path.join(__dirname, "../src/ui/index.html");
+      const resolveHtmlFile = (filename: string) => {
+        let p = path.join(__dirname, "ui", filename);
+        if (!fs.existsSync(p)) {
+          p = path.join(__dirname, "../src/ui", filename);
         }
+        return p;
+      };
+
+      // 1. Developer Console Route (/console or /dashboard)
+      if ((parsedUrl.pathname === "/console" || parsedUrl.pathname === "/dashboard" || parsedUrl.pathname === "/ui") && isHtmlRequest) {
         try {
-          const htmlContent = fs.readFileSync(htmlPath, "utf8");
+          const dashPath = resolveHtmlFile("dashboard.html");
+          const content = fs.readFileSync(fs.existsSync(dashPath) ? dashPath : resolveHtmlFile("index.html"), "utf8");
           res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-          res.end(htmlContent);
+          res.end(content);
           return;
-        } catch (e) {
-          // Fallback to JSON if file missing
-        }
+        } catch (e) {}
+      }
+
+      // 2. Root Landing Page: Serve yellow & black skills.sh style Landing Page
+      if (parsedUrl.pathname === "/" && isHtmlRequest) {
+        try {
+          const landPath = resolveHtmlFile("landing.html");
+          const content = fs.readFileSync(fs.existsSync(landPath) ? landPath : resolveHtmlFile("index.html"), "utf8");
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(content);
+          return;
+        } catch (e) {}
       }
 
       // Root JSON metadata (for programmatic tools / curl)
