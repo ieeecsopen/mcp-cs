@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import http from "http";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -796,18 +801,41 @@ async function main() {
         return;
       }
 
-      if (parsedUrl.pathname === "/") {
+
+      const isHtmlRequest = (req.headers.accept && req.headers.accept.includes("text/html")) || parsedUrl.pathname === "/ui" || parsedUrl.pathname === "/dashboard";
+
+      // 1. Root Landing Page: Serve HTML UI if accessed by a browser
+      if ((parsedUrl.pathname === "/" || parsedUrl.pathname === "/ui" || parsedUrl.pathname === "/dashboard") && isHtmlRequest) {
+        let htmlPath = path.join(__dirname, "ui", "index.html");
+        if (!fs.existsSync(htmlPath)) {
+          htmlPath = path.join(__dirname, "../src/ui/index.html");
+        }
+        try {
+          const htmlContent = fs.readFileSync(htmlPath, "utf8");
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          res.end(htmlContent);
+          return;
+        } catch (e) {
+          // Fallback to JSON if file missing
+        }
+      }
+
+      // Root JSON metadata (for programmatic tools / curl)
+      if (parsedUrl.pathname === "/" || parsedUrl.pathname === "/info") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({
-          name: "mcs",
-          description: "IEEE Computer Society Universal Developer Operations & AlgoJudge Server",
+          name: "MCS (mcp-cs)",
+          description: "IEEE Computer Society Universal Campus Developer Operations & AlgoJudge Server",
           version: SERVER_VERSION,
+          ui: "https://mcs.ieeesliit.com/",
           sseEndpoint: "/sse",
           messagesEndpoint: "/messages",
           healthEndpoint: "/health",
+          github: "https://github.com/ieeecsopen/mcp-cs",
         }, null, 2));
         return;
       }
+
 
       if (parsedUrl.pathname === "/sse" && req.method === "GET") {
         const server = createServer(enabledModules);
