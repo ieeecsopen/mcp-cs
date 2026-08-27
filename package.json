@@ -1,14 +1,18 @@
 {
   "name": "mcp-cs",
-  "version": "2.1.0",
-  "description": "IEEE Computer Society Universal Developer Operations, Diagnostics & AlgoJudge Competitive Execution MCP Server",
+  "version": "2.2.0",
+  "description": "MCS (mcp-cs) — IEEE Computer Society Universal Campus Developer, Diagnostics & AlgoJudge Competitive Execution MCP Server",
   "type": "module",
   "main": "dist/index.js",
-  "bin": "./dist/index.js",
+  "bin": {
+    "mcs": "./dist/index.js",
+    "mcp-cs": "./dist/index.js"
+  },
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "Formula"
   ],
   "scripts": {
     "build": "tsc && mkdir -p dist/ui && cp src/ui/index.html dist/ui/ && chmod +x dist/index.js",
@@ -18,11 +22,13 @@
     "dev": "tsx src/index.ts"
   },
   "keywords": [
+    "mcs",
+    "mcp-cs",
     "mcp",
     "model-context-protocol",
-    "mcp-cs",
     "ieee-cs",
     "algojudge",
+    "campus-developer",
     "database-erd",
     "performance-audit",
     "codeforces",
@@ -32,9 +38,7 @@
     "developer-tools",
     "claude",
     "cursor",
-    "antigravity",
-    "diagnostics",
-    "security"
+    "antigravity"
   ],
   "author": "IEEE Computer Society of SLIIT",
   "license": "MIT",
@@ -47,6 +51,6 @@
     "@types/node": "^22.13.5",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",
-    "vitest": "^3.0.7"
+    "vitest": "^3.2.7"
   }
 }

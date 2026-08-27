@@ -1,4 +1,4 @@
-class McpCs < Formula
+class Mcs < Formula
   desc "MCS (mcp-cs) — IEEE CS Universal Developer Operations, Diagnostics & AlgoJudge MCP Server"
   homepage "https://github.com/ieeecsopen/mcp-cs"
   url "https://registry.npmjs.org/mcp-cs/-/mcp-cs-2.2.0.tgz"
@@ -13,6 +13,6 @@ class McpCs < Formula
   end
 
   test do
-    system "#{bin}/mcp-cs", "--help"
+    system "#{bin}/mcs", "--help"
   end
 end

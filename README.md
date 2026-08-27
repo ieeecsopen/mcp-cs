@@ -1,7 +1,7 @@
 <div align="center">
 
-# ⚡ MCP-CS (`mcp-cs`)
-### The Universal Developer Operations, Diagnostics & AlgoJudge Competitive Execution Suite
+# ⚡ MCS (`mcp-cs`)
+### The Universal Campus Developer, Diagnostics & AlgoJudge Competitive Execution Suite
 
 [![npm version](https://img.shields.io/npm/v/mcp-cs.svg?color=ffd000&label=npm%20package)](https://www.npmjs.com/package/mcp-cs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -9,21 +9,21 @@
 [![MCP](https://img.shields.io/badge/protocol-Model%20Context%20Protocol-black)](https://modelcontextprotocol.io)
 [![Organization](https://img.shields.io/badge/IEEE%20CS-SLIIT-blue)](https://github.com/ieeecsopen)
 
-**A full-featured [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server and visual console created for developers, competitive programmers, and engineering teams.**
+**MCS** (*Model Context Server for Computer Society*) is a full-featured [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server and visual console created for developers, university students, competitive programmers, and engineering teams.
 
 [Installation](#-installation-guide) • [Visual Console](#-interactive-visual-dashboard) • [Client Configuration](#-client-configuration) • [Tool Catalog](#-complete-tool-catalog-24-tools) • [Homebrew](#-homebrew-installation)
 
 <br/>
 
-<img src="./assets/dashboard-overview.png" alt="MCP-CS Developer Console Dashboard" width="100%" style="border-radius: 10px; border: 1px solid #eaecf0; box-shadow: 0 4px 20px rgba(0,0,0,0.06);" />
+<img src="./assets/dashboard-overview.png" alt="MCS Developer Console Dashboard" width="100%" style="border-radius: 10px; border: 1px solid #eaecf0; box-shadow: 0 4px 20px rgba(0,0,0,0.06);" />
 
 </div>
 
 ---
 
-## 🌟 Why `mcp-cs`?
+## 🌟 Why MCS?
 
-`mcp-cs` connects your AI assistant (**Antigravity, Cursor, Claude Desktop, Windsurf, Cline**) directly to powerful local execution, repository diagnostics, database modeling, and competitive algorithm tools with **zero manual configuration**.
+**MCS** connects your AI assistant (**Antigravity, Cursor, Claude Desktop, Windsurf, Cline**) directly to powerful local execution, repository diagnostics, database modeling, and competitive algorithm tools with **zero manual configuration**.
 
 - ⚡ **AlgoJudge Engine**: Run sandboxed code (Python, JS/TS, C++, Go), perform automated differential stress-testing, and check AST code similarity.
 - 🩺 **Environment Doctor**: Diagnose project setups, detect `.env` disparities, and inspect port conflicts with process PIDs.
@@ -36,12 +36,13 @@
 
 ## 🖥️ Interactive Visual Dashboard
 
-Launch the embedded graphical visualizer locally with:
+Launch the embedded graphical visualizer locally with either command:
 
 ```bash
+mcs --ui
+# or
 npx mcp-cs --ui
 ```
-*(Or after Homebrew/global installation: `mcp-cs --ui`)*
 
 <div align="center">
   <img src="./assets/dashboard-stress-tester.png" alt="Differential Stress Tester View" width="100%" style="border-radius: 10px; border: 1px solid #eaecf0; margin-top: 10px;" />
@@ -51,13 +52,13 @@ npx mcp-cs --ui
 
 ## 📦 Installation Guide
 
-You can install and use `mcp-cs` through any of the following methods:
+You can install and use **MCS** through any of the following methods:
 
 ### Method 1: Instant Run via `npx` *(Recommended — No install needed)*
 ```json
 {
   "mcpServers": {
-    "mcp-cs": {
+    "mcs": {
       "command": "npx",
       "args": ["-y", "mcp-cs"]
     }
@@ -70,9 +71,9 @@ You can install and use `mcp-cs` through any of the following methods:
 ### Method 2: Homebrew Installation (macOS & Linux)
 ```bash
 brew tap ieeecsopen/tap
-brew install mcp-cs
+brew install mcs
 ```
-*(Or in 1 command: `brew install ieeecsopen/tap/mcp-cs`)*
+*(Or install `mcp-cs`: `brew install ieeecsopen/tap/mcp-cs`)*
 
 ---
 
@@ -80,6 +81,7 @@ brew install mcp-cs
 ```bash
 npm install -g mcp-cs
 ```
+*(Installs both `mcs` and `mcp-cs` executable commands)*
 
 ---
 
@@ -93,12 +95,12 @@ npx -y @smithery/cli install mcp-cs --client claude
 ## 🔌 Client Configuration
 
 ### 1. Antigravity IDE
-Add `mcp-cs` to your global configuration file at `~/.gemini/config/mcp_config.json`:
+Add `mcs` to your global configuration file at `~/.gemini/config/mcp_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "mcp-cs": {
+    "mcs": {
       "command": "npx",
       "args": ["-y", "mcp-cs"]
     }
@@ -116,7 +118,7 @@ Add to your Claude configuration file:
 ```json
 {
   "mcpServers": {
-    "mcp-cs": {
+    "mcs": {
       "command": "npx",
       "args": ["-y", "mcp-cs"]
     }
@@ -130,7 +132,7 @@ Add to your Claude configuration file:
 1. Open **Settings** (`Cmd + ,` on Mac or `Ctrl + ,` on Windows).
 2. Go to **Features** $\to$ **MCP**.
 3. Click **+ Add New MCP Server**:
-   - **Name:** `mcp-cs`
+   - **Name:** `mcs`
    - **Type:** `command`
    - **Command:** `npx -y mcp-cs`
 
