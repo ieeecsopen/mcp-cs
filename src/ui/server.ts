@@ -2,7 +2,7 @@ import http from "http";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { exec, execSync } from "child_process";
+import { exec } from "child_process";
 import { inspectPorts } from "../tools/doctor.js";
 import { parseSqliteOrMockSchema, generateMermaidErd } from "../tools/db.js";
 import { stressTest } from "../tools/algo.js";
@@ -12,9 +12,18 @@ const __dirname = path.dirname(__filename);
 
 export function startUiServer(port: number = 4100): Promise<http.Server> {
   return new Promise((resolve, reject) => {
-    const htmlPath = path.join(__dirname, "index.html");
+    // Look for index.html in either dist/ui or src/ui
+    let htmlPath = path.join(__dirname, "index.html");
+    if (!fs.existsSync(htmlPath)) {
+      htmlPath = path.join(__dirname, "../../src/ui/index.html");
+    }
 
     const server = http.createServer(async (req, res) => {
+      // Disable browser caching completely
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+
       // Enable CORS for development
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -32,11 +41,11 @@ export function startUiServer(port: number = 4100): Promise<http.Server> {
       if (parsedUrl.pathname === "/" || parsedUrl.pathname === "/index.html") {
         try {
           const htmlContent = fs.readFileSync(htmlPath, "utf8");
-          res.writeHead(200, { "Content-Type": "text/html" });
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
           res.end(htmlContent);
-        } catch {
+        } catch (err: unknown) {
           res.writeHead(500, { "Content-Type": "text/plain" });
-          res.end("Error loading dashboard HTML");
+          res.end("Error loading dashboard HTML: " + (err instanceof Error ? err.message : String(err)));
         }
         return;
       }
@@ -123,7 +132,6 @@ export function startUiServer(port: number = 4100): Promise<http.Server> {
       console.log(`🔗 URL: http://localhost:${port}`);
       console.log(`======================================================\n`);
       
-      // Auto-open browser
       const openCmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
       exec(`${openCmd} http://localhost:${port}`);
       
