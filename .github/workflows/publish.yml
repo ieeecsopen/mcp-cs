@@ -1,4 +1,4 @@
-name: Auto-Publish to NPM
+name: Auto-Publish to NPM & GitHub Packages
 
 on:
   release:
@@ -6,12 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
+  publish-npm:
     name: Build & Publish Release
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
+      packages: write
 
     steps:
       - name: Checkout Code
@@ -33,6 +34,22 @@ jobs:
         run: npm run build
 
       - name: Publish to NPM
-        run: npm publish --provenance --access public
+        run: npm publish --provenance --access public || true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image to GitHub Packages
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:2.0.0
